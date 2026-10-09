@@ -10,13 +10,13 @@ The demo data is fabricated (see `datagen/`); all companies are fictional. Desig
 
 | Screen | What it does |
 |---|---|
-| Decision board | The recommendation in one sentence, supply risk, vendor status, the decisions waiting on you |
+| Decision board | The recommended award, supply risk, what stands between you and approval, each vendor's status and items priced |
 | Draft RFQ | Chat with the co-pilot; it pulls approved specs and volumes, proposes questionnaire and terms. Sending is simulated. |
 | Vendor replies | Each vendor's original files next to what was read from them, with sources |
-| Comparison | 30 lines × 5 vendors in ₹ per unit, delivered, ex-GST, with L1 marked; questionnaire answers, terms and documents alongside; Excel export; every conversion step and the vendor's own words |
+| Comparison | 30 lines × 5 vendors in ₹ per unit, delivered, ex-GST, with the award (L1) marked; a vendor scorecard with adjustable weights; questionnaire answers, terms and documents alongside; Excel export; every conversion step and the vendor's own words |
 | Open issues | Every uncertainty ranked by money at stake; confirm values, include vendors (reason logged), draft clarification emails |
 | Ask a question | Plain-language questions answered by real SQL and award-engine runs, shown under each answer; charts and Excel exports |
-| Award memo | One-page recommendation written only from computed numbers, plus an Excel pack with the audit trail |
+| Award and approvals | One-page recommendation written only from computed numbers; send to Quality, Logistics, Finance and the VP with a checklist each; their sign-off is logged; Excel pack with the audit trail |
 | Reading accuracy | Scores the live reading against a hidden answer key; the headline number is "confidently wrong" |
 
 ## How it works
@@ -27,11 +27,13 @@ The demo data is fabricated (see `datagen/`); all companies are fictional. Desig
 | Units, GST, FX, freight, discounts, last-year lookups | Code, every step written out | `core/normalize.py` |
 | Questionnaire | AI judgement + code checks for numeric limits and certificate dates | `core/questionnaire.py` |
 | Award and money-weighted review queue | Code | `core/award.py` |
+| Vendor scorecard | Code, formulas shown on screen | `core/scorecard.py` |
+| Stakeholder checklists and sign-off | Code | `core/review.py` |
 | Ask a question | AI agent with tools (SQL, award scenarios, charts, exports, evidence) | `core/analyst.py` |
 | RFQ drafting, memo, clarification emails | AI | `core/copilot.py`, `core/memo.py` |
 | Accuracy scoring | Code | `core/evaluate.py` |
 
-**Design rule:** the AI reads and reasons; code does the arithmetic. Unreadable values are never guessed; they're kept as alternatives and evaluated at the vendor's least favourable reading until the buyer confirms.
+**Design rule:** the AI reads and reasons; code does the arithmetic; people sign off. Unreadable values are never guessed; they're kept as alternatives and evaluated at the vendor's least favourable reading until the buyer confirms.
 
 ## Run it on Streamlit Community Cloud (free, about 10 minutes)
 

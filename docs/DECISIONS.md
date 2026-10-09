@@ -11,13 +11,15 @@
 - **Code overrides the AI on facts.** Numeric questionnaire limits and certificate expiry are checked in code; a peer check catches unit errors.
 - **Cheapest is not automatically defensible.** The board warns when one vendor would hold most of the spend and prices a split. L1 matching (the next vendor matches L1 for its share) usually removes the premium.
 - **Measured accuracy.** A hidden answer key scores the live reading. The headline metric is *confidently wrong*: a wrong value shown without a warning. It is zero; the only misses were a blur the AI said it couldn't read.
-- **The buyer stays in charge.** Including a vendor needs a written reason; every decision lands in a log that ships with the award pack. The memo states the approval needed and any L1 justification.
-- **Channel: email and WhatsApp** (simulated). Small Indian vendors answer on WhatsApp, and vendor participation decides whether a sourcing event works.
+- **A scorecard as a second lens, not the rule.** Price, quality, delivery, commercial terms and coverage are scored 0-100 by visible formulas with adjustable weights. The award still follows the RFQ rule; the scorecard shows approvers the trade-offs (in the demo, the only qualified vendor is 3% above the cheapest like-for-like price).
+- **AI prepares, people validate.** Quality, Logistics, Finance and the VP each get a specific checklist built from the award; their sign-off is logged, and goes stale if the award changes afterwards. Including a vendor needs a written reason. Everything ships in the award pack.
+- **Channel: email, WhatsApp and vendor portal** (simulated). Small Indian vendors answer on WhatsApp, and vendor participation decides whether a sourcing event works.
+- **Guardrails.** Vendor documents are treated as data (instructions inside them are ignored and flagged); the analyst's SQL cannot read files or the network; vendor text is escaped before display.
 
 ## Deliberately left out
 
 - **Negotiation and reverse auctions.** Aerchain has a Negotiation Agent; the award memo is where it would pick up.
-- **Real email/WhatsApp, vendor portal, login, approvals workflow.** Plumbing, stubbed as allowed.
+- **Real email/WhatsApp/portal delivery, login, notifications to reviewers.** Plumbing, stubbed as allowed.
 - **Silent auto-resolution.** The system drafts the vendor email instead of deciding for the buyer.
 - **Payment terms inside landed cost.** Kept as an on-request cost-of-capital view, so the headline stays a price.
 - **Re-mapping a line by hand, multi-RFQ history, other categories.** Next on the list; one RFQ done properly first.

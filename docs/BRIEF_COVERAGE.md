@@ -19,7 +19,7 @@ Source: "Kill the Quote Spreadsheet" (Aerchain product take-home, 2 pages) and t
 | The buyer retypes all of it. Three days gone | Nothing is retyped; all five replies are read in 1-3 minutes | Decision board → Read replies |
 | VP: "split it, cheapest per line, but only among vendors who cleared the quality questionnaire" | Award engine with questionnaire eligibility (`core/award.py`); first suggested question | Ask a question → The VP's question |
 | A buyer *talks* an RFx into existence: scope, line items, questionnaire, terms | Co-pilot fills header/scope, line items from the approved spec master, a pass/fail questionnaire and terms | Draft RFQ |
-| It goes out to vendors over a channel you choose | Email and WhatsApp Business (simulated). WhatsApp because small Indian vendors answer there; Godavari's reply is a WhatsApp photo | Draft RFQ → Send |
+| It goes out to vendors over a channel you choose | Email, WhatsApp Business and vendor portal (simulated), pick any combination. WhatsApp because small Indian vendors answer there; Godavari's reply is a WhatsApp photo | Draft RFQ → Send |
 | Vendors reply however they like; nobody is forced into your template | A quote template exists (`data/rfx/RFQ_quote_template.xlsx`); no vendor used it, and nothing depends on it | Vendor replies |
 | Your system reads every response, whatever shape it arrives in | Five formats in the demo; any new file or pasted email can be added live | Vendor replies → Add a vendor reply |
 | A single side-by-side comparison: same lines, same units, same currency | ₹ per RFQ unit, ex-GST, landed at Waluj; unit, GST, FX, freight conversions written out per cell | Comparison |
@@ -27,7 +27,7 @@ Source: "Kill the Quote Spreadsheet" (Aerchain product take-home, 2 pages) and t
 | The buyer stops clicking and starts asking. Natural language, over the whole comparison | Analyst agent over five tables (lines, vendors, quotes, questionnaire, last year's contract) | Ask a question |
 | Text answers, tables, charts, exports | Answers + tables + Plotly charts + Excel/CSV exports from the analyst; Excel export on Comparison; Excel award pack | Ask a question, Comparison, Award memo |
 | Real analysis on real extracted data | Every answer is a SQL query or award-engine run on the extracted data; the query is shown | "How this was worked out" under each answer |
-| …all the way to a defensible award decision | Award memo written only from computed facts, with exclusions, open risks, supply security, approval and L1 justification; Excel pack with audit trail and decision log | Award memo |
+| …all the way to a defensible award decision | Vendor scorecard (price, quality, delivery, terms, coverage) as a cross-check; stakeholder validation by Quality, Logistics, Finance and the VP, logged; award memo written only from computed facts, with exclusions, open risks, supply security, approval and L1 justification; Excel pack with audit trail and decision log | Award memo |
 | Five vendors, thirty line items, a questionnaire, attached documents | 5 vendors, 30 lines, 8-question questionnaire (6 mandatory), attachments: 2 ISO certificates, a BCT test report | Vendor replies |
 | Fabricate a dataset a procurement person would nod at | Board grades (GSM/BF), flutes, partitions per set, IPL promo shipper, MIDC Waluj vendor, kraft-index price clauses, last year's contract, a freight rate card | `datagen/`, `data/` |
 

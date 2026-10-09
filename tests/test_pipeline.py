@@ -160,3 +160,70 @@ def test_share_cap_moves_lines_and_reports_premium(norms, ex):
 def test_share_cap_reports_when_no_second_vendor(norms, ex):
     sp = award(norms, Scenario(eligible={A}, max_share=0.7), conditional_discounts(ex))["split"]
     assert not sp["feasible"] and "qualifying" in sp["note"] or "No other qualified vendor" in sp["note"]
+
+
+# ---------------- scorecard, stakeholder validation, analyst sandbox
+class FakeState:
+    """Enough of core.pipeline.State for the scorecard, review and analyst modules, without the cache or the AI."""
+    def __init__(self, ex, norms):
+        from core.questionnaire import _rule_checks  # noqa: F401  (import check only)
+        self.extractions, self.norms = ex, norms
+        self.vendor_names = {k: v["vendor_name"] for k, v in ex.items()}
+        self.status = dict(VERDICTS)
+        self.verdicts = dict(VERDICTS)
+        mand = ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6"]
+        self.q_evals = {v: {"results": {qq: {"status": ("pass" if s == "pass" or qq != "Q1" else "fail"), "reason": "test"}
+                                        for qq in mand}} for v, s in VERDICTS.items()}
+        self.discounts = conditional_discounts(ex)
+        self.decisions = {"choices": {}, "eligibility": {}, "log": []}
+
+    @property
+    def eligible(self):
+        return {v for v, s in self.status.items() if s in ("pass", "include")}
+
+    def award(self, **kw):
+        sc = Scenario(eligible=kw.pop("eligible", None) or set(self.eligible), **kw)
+        return award(self.norms, sc, self.discounts)
+
+    def issues(self):
+        others = {v: s for v, s in self.status.items() if v not in self.eligible}
+        return impact(self.norms, Scenario(eligible=set(self.eligible)), self.discounts, others, self.vendor_names)
+
+
+def test_scorecard_scores_are_bounded_and_price_is_relative(norms, ex):
+    from core.scorecard import build
+    rows = build(FakeState(ex, norms))
+    assert len(rows) == 5 and sorted(r["rank"] for r in rows) == [1, 2, 3, 4, 5]
+    for r in rows:
+        for k in ("price", "quality", "delivery", "commercial", "coverage", "total"):
+            assert 0 <= r[k] <= 100, (r["vendor"], k, r[k])
+    kaveri = next(r for r in rows if r["vendor"] == C)
+    assert kaveri["items_priced"] == 27 and kaveri["coverage"] == 90.0
+    # weights change the ranking input, not the per-dimension scores
+    only_cov = build(FakeState(ex, norms), {"price": 0, "quality": 0, "delivery": 0, "commercial": 0, "coverage": 100})
+    assert all(r["total"] == r["coverage"] for r in only_cov)
+
+
+def test_review_asks_are_specific_and_responses_logged(norms, ex, tmp_path, monkeypatch):
+    from core import review, pipeline
+    monkeypatch.setattr(pipeline, "STATE_FILE", tmp_path / "decisions.json")
+    s = FakeState(ex, norms)
+    asks = review.asks(s)
+    assert any("Seabreeze" in a for a in asks["quality"])          # a failed vendor is put to Quality
+    assert any("crore" in a or "lakh" in a for a in asks["finance"])
+    dec = {"log": []}
+    review.request(dec, ["quality", "approver"], "by Friday", total=1.0)
+    assert review.status(dec)["quality"]["status"] == "requested" and review.status(dec)["finance"]["status"] == "not_sent"
+    review.respond(dec, "quality", "approved", "ok", total=1.0)
+    assert dec["log"][-1]["actor"] == "Anil Deshmukh" and review.status(dec)["quality"]["status"] == "approved"
+
+
+def test_analyst_sql_cannot_touch_files(norms, ex):
+    from core.analyst import build_db
+    con = build_db(FakeState(ex, norms))
+    assert con.execute("select count(*) from quotes").fetchone()[0] > 0
+    assert con.execute("select count(*) from vendor_scorecard").fetchone()[0] == 5
+    with pytest.raises(Exception):
+        con.execute("select * from read_csv('/etc/passwd')").fetchall()
+    with pytest.raises(Exception):
+        con.execute("SET enable_external_access = true")

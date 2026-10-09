@@ -4,6 +4,7 @@ Interface only. All logic lives in core/ (the AI reads, code does the arithmetic
 from __future__ import annotations
 import json
 import os
+from html import escape as E  # vendor- and AI-supplied text goes into HTML: always escape it
 
 import pandas as pd
 import plotly.express as px
@@ -71,6 +72,8 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] {{ color: #9
 .stButton > button[kind="primary"] {{ background: {INK}; color: #FFFFFF !important; border-color: {INK}; }}
 .stButton > button[kind="primary"] p {{ color: #FFFFFF !important; }}
 .stButton > button p, .stDownloadButton > button p {{ color: inherit !important; }}
+[data-baseweb="tag"] {{ background: {MUTED_BG} !important; border: 1px solid {LINE}; }}
+[data-baseweb="tag"] span, [data-baseweb="tag"] svg {{ color: {INK} !important; fill: {INK} !important; }}
 [data-testid="stExpander"] details {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 8px; }}
 
 /* components */
@@ -80,24 +83,11 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] {{ color: #9
 .good {{ background: {GOOD_BG}; color: {GOOD}; }} .check {{ background: {CHECK_BG}; color: {CHECK}; }}
 .stop {{ background: {STOP_BG}; color: {STOP}; }} .muted {{ background: {MUTED_BG}; color: {MUTED}; }}
 .l1 {{ display: inline-block; background: {KRAFT}; color: #fff; font-weight: 700; font-size: .75rem; padding: 1px 7px; border-radius: 4px; }}
-.reco {{ background: {CARD}; border: 1px solid {LINE}; border-left: 6px solid {KRAFT}; border-radius: 8px; padding: 18px 22px; margin: 4px 0 18px 0; }}
-.reco .lead {{ font-size: 1.22rem; font-weight: 600; line-height: 1.45; color: {INK}; }}
-.reco .sub {{ color: {INK_2}; margin-top: 6px; }}
 .kpis {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 6px 0 8px 0; }}
 .kpi {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 8px; padding: 14px 16px; }}
 .kpi-label {{ color: {INK_2}; font-size: .86rem; }}
 .kpi-value {{ font-size: 1.65rem; font-weight: 700; color: {INK}; line-height: 1.25; margin-top: 2px; }}
 .kpi-note {{ color: {INK_2}; font-size: .82rem; margin-top: 2px; }}
-.steps {{ display: flex; gap: 0; margin: 4px 0 6px 0; flex-wrap: wrap; }}
-.stp {{ flex: 1 1 0; min-width: 150px; padding: 10px 14px; background: {CARD}; border: 1px solid {LINE}; margin-right: -1px; }}
-.stp:first-child {{ border-radius: 8px 0 0 8px; }} .stp:last-child {{ border-radius: 0 8px 8px 0; }}
-.stp .t {{ font-size: .8rem; color: {INK_2}; }} .stp .v {{ font-weight: 600; color: {INK}; }}
-.stp.done {{ box-shadow: inset 0 3px 0 {GOOD}; }} .stp.wait {{ box-shadow: inset 0 3px 0 {CHECK}; }} .stp.block {{ box-shadow: inset 0 3px 0 {STOP}; }}
-.vcard {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 8px; padding: 14px 16px; height: 100%; }}
-.vcard .name {{ font-weight: 600; font-size: 1.02rem; color: {INK}; }}
-.vcard .meta {{ color: {INK_2}; font-size: .84rem; margin: 2px 0 10px 0; }}
-.vcard .row {{ font-size: .9rem; color: {INK}; margin-top: 6px; }}
-.vcard .why {{ font-size: .84rem; color: {INK_2}; margin-top: 8px; line-height: 1.4; }}
 .issue {{ background: {CARD}; border: 1px solid {LINE}; border-left: 6px solid {CHECK}; border-radius: 8px; padding: 14px 18px; margin: 12px 0 6px 0; }}
 .issue.stopper {{ border-left-color: {STOP}; }} .issue.quiet {{ border-left-color: #C4CDD7; }}
 .issue .head {{ font-weight: 600; font-size: 1.04rem; color: {INK}; }}
@@ -108,7 +98,7 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] {{ color: #9
 .sw {{ display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; border: 1px solid {LINE}; }}
 .step {{ border-left: 2px solid {KRAFT}; padding: 3px 0 3px 12px; margin: 5px 0; font-size: .93rem; color: {INK}; }}
 .terms td {{ padding: 4px 14px 4px 0; font-size: .93rem; }} .terms td:first-child {{ color: {INK_2}; }}
-.small {{ color: {INK_2}; font-size: .86rem; }}
+.small, p.small {{ color: {INK_2} !important; font-size: .88rem !important; line-height: 1.45; }}
 .hero {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 10px; padding: 20px 24px; height: 100%; }}
 .hero .eyebrow {{ color: {INK_2}; font-size: .9rem; font-weight: 500; }}
 .hero .big {{ font-size: 2.5rem; font-weight: 700; color: {INK}; line-height: 1.15; margin: 4px 0 14px 0; font-variant-numeric: tabular-nums; }}
@@ -135,6 +125,16 @@ table.vt .sub {{ color: {INK_2}; font-size: .8rem; margin-top: 2px; }}
 table.vt td.why {{ color: {INK_2}; font-size: .86rem; max-width: 340px; }}
 .mini {{ width: 120px; height: 8px; background: {MUTED_BG}; border-radius: 4px; overflow: hidden; margin-top: 6px; }}
 .mini div {{ height: 100%; }}
+table.vt th abbr {{ text-decoration: underline dotted {INK_2}; cursor: help; }}
+.sc {{ display: flex; align-items: center; gap: 8px; }}
+.sc .track {{ flex: 1; height: 7px; background: {MUTED_BG}; border-radius: 4px; overflow: hidden; min-width: 40px; }}
+table.vt td.watch {{ color: {INK_2}; font-size: .86rem; min-width: 150px; }}
+.sc .track div {{ height: 100%; background: {INK}; }}
+.sc .v {{ width: 2.2em; text-align: right; font-variant-numeric: tabular-nums; font-size: .9rem; }}
+.total {{ font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }}
+.rev {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 10px; padding: 14px 18px; height: 100%; }}
+.rev .who {{ font-weight: 600; color: {INK}; }} .rev .role {{ color: {INK_2}; font-size: .86rem; }}
+.rev ul {{ margin: 8px 0 4px 1rem; padding: 0; }} .rev li {{ font-size: .9rem; margin-bottom: 4px; }}
 @media (max-width: 900px) {{ .kpis {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
 </style>""", unsafe_allow_html=True)
 
@@ -156,8 +156,20 @@ def money(x):
     return f"₹{x/1e7:,.2f} cr" if abs(x) >= 1e7 else f"₹{x/1e5:,.1f} lakh" if abs(x) >= 1e5 else f"₹{x:,.0f}"
 
 
+_SHORT: dict[str, str] = {}
+
+
+def _set_short_names(names):
+    """First word of each vendor name; if two vendors share it, use the first two words."""
+    _SHORT.clear()
+    first = [n.split()[0] for n in names if n]
+    for n in names:
+        if n:
+            _SHORT[n] = n.split()[0] if first.count(n.split()[0]) == 1 else " ".join(n.split()[:2])
+
+
 def short(name):
-    return (name or "").split()[0]
+    return _SHORT.get(name) or (name or "").split()[0] if name else ""
 
 
 def pill(text, cls):
@@ -173,6 +185,7 @@ def get_state(refresh=False) -> State:
     if refresh or "state" not in st.session_state:
         st.session_state.state = State()
         st.session_state.pop("analyst", None)
+    _set_short_names(list(st.session_state.state.vendor_names.values()))
     return st.session_state.state
 
 
@@ -236,11 +249,12 @@ VENDOR_COLORS = ["#16243A", "#4F7CAC", "#9A6A2F", "#6E9E80", "#B5655A", "#7A6FA8
 
 def page_board():
     s = get_state()
-    st.markdown(f"""<div class="intro"><div class="what"><b>Quote desk</b> reads every vendor reply however it arrives (an Excel sheet,
-        a letterhead PDF, a Word letter, a phone photo, a WhatsApp message), puts every price on one like-for-like basis, and tells you
-        what to award, what is still uncertain, and what each uncertainty is worth in rupees.</div>
-        <div class="how"><span><b>1</b>Read any format, never retype</span><span><b>2</b>Compare landed cost, same units and currency</span>
-        <span><b>3</b>Resolve what changes the award</span><span><b>4</b>Ask questions, then approve with an audit trail</span></div>
+    st.markdown("""<div class="intro"><div class="what"><b>Quote desk</b> turns vendor replies, in whatever shape they arrive, into an award you can defend.
+        It reads every format, puts every price on the same landed basis, checks each vendor against your quality questionnaire, and shows
+        which uncertainties could change the award and what each is worth in rupees. The AI does the reading; you and your approvers make
+        the call, and every number traces back to the vendor's own words.</div>
+        <div class="how"><span><b>1</b>Collect in any format, never retype</span><span><b>2</b>Compare like for like: price, quality, terms</span>
+        <span><b>3</b>Resolve what moves money</span><span><b>4</b>Validate with stakeholders, then approve</span></div>
         </div>""", unsafe_allow_html=True)
     header("Corrugated packaging, FY27 annual contract",
            f"Deccan Peak Breweries, Waluj plant · {config.RFX_ID} · 30 lines · bids closed 7 Oct 2026")
@@ -279,10 +293,10 @@ def page_board():
             sav = res["savings_vs_fy26"]
             delta = (f'<span class="pill good">↓ {money(sav)} vs last year</span>' if sav >= 0 else
                      f'<span class="pill stop">↑ {money(-sav)} vs last year</span>') if res["fy26_comparable_base"] else ""
-            bar = "".join(f'<div title="{n}: {money(d["value"])}" style="width:{d["value"] / res["total"] * 100:.2f}%;'
+            bar = "".join(f'<div title="{E(n)}: {money(d["value"])}" style="width:{d["value"] / res["total"] * 100:.2f}%;'
                           f'background:{color[name_to_key[n]]}"></div>' for n, d in split)
             legend = "".join(f'<div class="lg"><span class="dot" style="background:{color[name_to_key[n]]}"></span>'
-                             f'<b>{short(n)}</b> {d["lines"]} lines · {money(d["value"])} · {d["value"] / res["total"]:.0%}</div>' for n, d in split)
+                             f'<b>{E(short(n))}</b> {d["lines"]} lines · {money(d["value"])} · {d["value"] / res["total"]:.0%}</div>' for n, d in split)
             flags = []
             if res["uncovered_lines"]:
                 flags.append(f'{len(res["uncovered_lines"])} lines have no qualified quote yet')
@@ -294,7 +308,7 @@ def page_board():
                 else:
                     flags.append(f'{short(res["top_vendor"])} holds {res["top_share"]:.0%} of spend and no other vendor is qualified yet: '
                                  f'single-source risk through peak season')
-            flag_html = "".join(f'<div class="warn-line">⚠ {f}</div>' for f in flags)
+            flag_html = "".join(f'<div class="warn-line">⚠ {E(f)}</div>' for f in flags)
             qual = sum(1 for v in s.status.values() if v == "pass")
             inc = sum(1 for v in s.status.values() if v == "include")
             st.markdown(f"""<div class="hero"><div class="eyebrow">Recommended award</div><div class="flute" style="width:120px;margin:6px 0 2px 0"></div>
@@ -309,17 +323,19 @@ def page_board():
     # ---------------- what stands between her and approval
     with right:
         if hot:
-            items = "".join(f'<li><div class="it">{issue_headline(i)}</div><div class="iv">{money(_stake(i)[0])} · '
+            items = "".join(f'<li><div class="it">{E(issue_headline(i))}</div><div class="iv">{money(_stake(i)[0])} · '
                             f'{"changes L1 on " + str(len(i["lines_flipping"])) + " lines" if i["lines_flipping"] else "assumption to confirm"}</div></li>'
                             for i in hot[:4])
             more = f'<div class="meta">+{len(hot) - 4} more</div>' if len(hot) > 4 else ""
             st.markdown(f'<div class="hero side"><div class="eyebrow">Before you approve</div><ol class="todo">{items}</ol>{more}</div>',
                         unsafe_allow_html=True)
             _link("issues", "Resolve these in Open issues")
+            _review_line()
         else:
             st.markdown('<div class="hero side"><div class="eyebrow">Before you approve</div><div class="big" style="font-size:1.4rem">'
                         'Nothing open</div><div class="meta">No open issue can change this award.</div></div>', unsafe_allow_html=True)
-            _link("memo", "Write the award memo")
+            _link("memo", "Write the memo and send it for validation")
+            _review_line()
 
     # ---------------- vendors, one row each
     st.subheader("Vendors")
@@ -329,22 +345,37 @@ def page_board():
         ns = [n for n in s.norms if n.vendor == v]
         quoted = sum(1 for n in ns if n.status != "missing")
         conf = sum(1 for n in ns if n.status == "review")
+        sub = " · ".join(x for x in [f"{30 - quoted} not quoted" if quoted < 30 else "", f"{conf} to confirm" if conf else ""] if x)
         won = res["by_vendor"].get(s.vendor_names[v], {"lines": 0, "value": 0})
         share = won["value"] / res["total"] if res["total"] else 0
         fmt = ", ".join(sorted({f.split(".")[-1].upper().replace("TXT", "Email") for f in ex.get("_meta", {}).get("files", [])}))
         why = vendor_reason(s, v) if s.status[v] != "pass" else ""
-        rows.append(f"""<tr><td><span class="dot" style="background:{color[v]}"></span><b>{s.vendor_names[v]}</b>
-            <div class="sub">{place(ex.get('vendor_location'))}{' · ' + fmt if fmt else ''}</div></td>
-            <td>{pill(lbl, cls)}</td><td class="n">{quoted}/30{f'<div class="sub">{conf} to confirm</div>' if conf else ''}</td>
+        rows.append(f"""<tr><td><span class="dot" style="background:{color[v]}"></span><b>{E(s.vendor_names[v])}</b>
+            <div class="sub">{E(place(ex.get('vendor_location')))}{' · ' + fmt if fmt else ''}</div></td>
+            <td>{pill(lbl, cls)}</td><td class="n"><b>{quoted}</b> of 30{f'<div class="sub">{sub}</div>' if sub else ''}</td>
             <td class="n">{won['lines'] or '–'}</td>
             <td><div class="mini"><div style="width:{share * 100:.1f}%;background:{color[v]}"></div></div>
                 <div class="sub">{money(won['value']) + ' · ' + f'{share:.0%}' if won['lines'] else 'none'}</div></td>
-            <td class="why">{why or '–'}</td></tr>""")
-    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th>Status</th><th>Lines quoted</th><th>L1 on</th>'
+            <td class="why">{E(why) or '–'}</td></tr>""")
+    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th>Qualification</th>'
+                '<th><abbr title="How many of the 30 RFQ items this vendor gave a price for">Items priced</abbr></th>'
+                '<th><abbr title="Items where this vendor is the lowest qualified landed price (L1) in the recommended award">Wins (L1)</abbr></th>'
                 '<th>Share of award</th><th>What is holding them back</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>",
                 unsafe_allow_html=True)
+    st.markdown('<p class="small" style="margin-top:6px"><b>Items priced</b>: how many of the 30 RFQ items the vendor quoted. '
+                '<b>Wins (L1)</b>: items where the vendor is the lowest qualified landed price and so gets the award. '
+                '<b>Qualification</b>: the result of the quality questionnaire; only qualified vendors can win.</p>', unsafe_allow_html=True)
     st.write("")
     _saved_results()
+
+
+def _review_line():
+    from core.review import status as review_status
+    rs = review_status(load_decisions())
+    done = sum(1 for r in rs.values() if r["status"] == "approved")
+    sent = sum(1 for r in rs.values() if r["status"] != "not_sent")
+    st.markdown(f'<p class="small">Stakeholder validation: {done} of {len(rs)} signed off'
+                f'{"" if sent else " · not sent yet"}</p>', unsafe_allow_html=True)
 
 
 def _saved_results():
@@ -404,7 +435,7 @@ def page_draft():
         if not (d["header"] or d["line_items"]):
             st.markdown('<p class="small">The draft builds here as you talk: scope, line items, questionnaire and terms.</p>', unsafe_allow_html=True)
         if d["header"]:
-            st.markdown('<table class="terms">' + "".join(f"<tr><td>{k.replace('_', ' ').capitalize()}</td><td>{v}</td></tr>"
+            st.markdown('<table class="terms">' + "".join(f"<tr><td>{E(k.replace('_', ' ').capitalize())}</td><td>{E(str(v))}</td></tr>"
                                                          for k, v in d["header"].items()) + "</table>", unsafe_allow_html=True)
         if d["line_items"]:
             st.markdown(f"**Line items ({len(d['line_items'])})**")
@@ -416,9 +447,12 @@ def page_draft():
             st.markdown("**Terms**\n" + "\n".join(f"- {t}" for t in d["terms"]))
         if d["line_items"]:
             st.markdown("**Send to:** " + ", ".join(d["vendors"]))
-            channel = st.radio("Channel", ["Email", "WhatsApp Business", "Email and WhatsApp"], index=2, horizontal=True,
-                               help="Small vendors often answer on WhatsApp; replies from both land in Vendor replies.")
-            if st.button("Send RFQ to vendors", type="primary"):
+            chosen = st.pills("Send by", ["Email", "WhatsApp Business", "Vendor portal"], selection_mode="multi",
+                              default=["Email", "WhatsApp Business"],
+                              help="Vendors answer wherever suits them. Small vendors often reply on WhatsApp; larger ones may prefer a portal. "
+                                   "Replies from every channel land in Vendor replies, and nobody is forced into a template.") or []
+            channel = " + ".join(chosen)
+            if st.button("Send RFQ to vendors", type="primary", disabled=not chosen):
                 st.session_state.sent = channel
                 log(load_decisions(), "rfq sent", f"Sent to {len(d['vendors'])} vendors by {channel} (simulated)")
             if st.session_state.get("sent"):
@@ -427,6 +461,13 @@ def page_draft():
 
 
 # ================================================================== Vendor replies
+@st.cache_data(show_spinner=False, max_entries=64)
+def _pdf_pages(path: str, resolution: int, mtime: float) -> list[bytes]:
+    from pathlib import Path
+    from core import readers
+    return readers.pdf_page_images(Path(path), resolution)
+
+
 def page_replies():
     from core import readers
     s = get_state()
@@ -453,7 +494,7 @@ def page_replies():
                 elif suf in (".txt", ".eml"):
                     st.text(f.read_text(errors="ignore"))
                 elif suf == ".pdf":
-                    for img in readers.pdf_page_images(f, 70):
+                    for img in _pdf_pages(str(f), 70, f.stat().st_mtime):
                         st.image(img, width="stretch")
                 elif suf in (".xlsx", ".xlsm"):
                     import openpyxl
@@ -485,12 +526,12 @@ def page_replies():
                 ("Payment", f"{t.get('payment_days')} days" if t.get("payment_days") else "Not stated"),
                 ("Lead time", f"{t.get('lead_time_days')} days" if t.get("lead_time_days") else "Not stated"),
                 ("Discounts", disc)]
-        st.markdown('<table class="terms">' + "".join(f"<tr><td>{a}</td><td><b>{b}</b></td></tr>" for a, b in rows) + "</table>", unsafe_allow_html=True)
+        st.markdown('<table class="terms">' + "".join(f"<tr><td>{a}</td><td><b>{E(str(b))}</b></td></tr>" for a, b in rows) + "</table>", unsafe_allow_html=True)
         unsure = ex.get("unreadable_or_uncertain", [])
         if unsure:
             st.markdown("**The reader flagged**")
             for u in unsure[:8]:
-                st.markdown(f"{pill('Check', 'check')} {u}", unsafe_allow_html=True)
+                st.markdown(f"{pill('Check', 'check')} {E(str(u))}", unsafe_allow_html=True)
         prices = []
         for n in [n for n in s.norms if n.vendor == pick]:
             worst = max((f.severity for f in n.flags), key=lambda x: ["info", "warn", "critical"].index(x), default="")
@@ -539,38 +580,61 @@ def page_replies():
 # ================================================================== Comparison
 def page_compare():
     s = get_state()
-    header("Comparison", "Every vendor on the same basis: rupees per RFQ unit, excluding GST, delivered to Waluj. "
-           "Click any line and vendor below to see exactly how a number was worked out.")
+    header("Comparison", "Every vendor on the same basis: rupees per RFQ unit, excluding GST, delivered to Waluj, with the questionnaire, "
+           "terms and documents alongside. Pick any line and vendor at the bottom to see exactly how a number was worked out.")
     if not s.ready():
         need_replies(); return
     lines = extract.load_rfx_lines()
     vendors = list(s.extractions)
     by = {(n.vendor, n.line_id): n for n in s.norms}
+    tab_p, tab_s, tab_q = st.tabs(["Prices by item", "Vendor scorecard", "Questionnaire, terms and documents"])
+    with tab_p:
+        data = _price_table(s, lines, vendors, by)
+    with tab_s:
+        _scorecard(s)
+    with tab_q:
+        _vendor_summary(s, vendors)
+    if data:
+        st.download_button("Download the comparison (Excel: prices, scorecard, questionnaire and terms)",
+                           _comparison_xlsx(s, pd.DataFrame(data)), file_name="comparison.xlsx")
+    st.subheader("How was this number worked out?")
+    c1, c2 = st.columns(2)
+    lid = c1.selectbox("Line", [l["line_id"] for l in lines], format_func=lambda x: f"{x} · {next(l['description'] for l in lines if l['line_id'] == x)}")
+    v = c2.selectbox("Vendor", vendors, format_func=lambda k: s.vendor_names[k])
+    _evidence(s, by.get((v, lid)))
+
+
+def _price_table(s, lines, vendors, by):
+    res = s.award()
+    won = {r["line_id"]: r for r in res["rows"]}
+    disc = {d["vendor"]: d["percent"] for d in res["discounts_applied"]}
     c1, c2 = st.columns([3, 2])
     view = c1.segmented_control("Show", ["All lines", "Lines to confirm", "Lines without a qualified quote"], default="All lines",
                                 label_visibility="collapsed") or "All lines"
     only_q = c2.toggle("Only qualified vendors", value=False)
-    st.markdown(f"""<div class="legend"><span><span class="l1">L1</span> lowest qualified, on-spec price</span>
-        <span><span class="sw" style="background:#DCEFE4"></span>L1 cell</span>
+    disc_note = (f'<span>† after {", ".join(f"{short(s.vendor_names.get(v, v))} {p:g}%" for v, p in disc.items())} volume discount</span>'
+                 if disc else "")
+    st.markdown(f"""<div class="legend"><span><span class="l1">L1</span> recommended award: lowest qualified, on-spec landed price</span>
+        <span><span class="sw" style="background:#DCEFE4"></span>awarded</span>
         <span><span class="sw" style="background:{CHECK_BG}"></span>more than one possible reading (shown at the higher one)</span>
         <span><span class="sw" style="background:{STOP_BG}"></span>lower spec than asked</span>
-        <span>– = not quoted</span><span>* = not qualified yet</span></div>""", unsafe_allow_html=True)
+        <span>– not quoted</span><span>* not qualified yet</span>{disc_note}</div>""", unsafe_allow_html=True)
     shown = [v for v in vendors if (not only_q or v in s.eligible)]
     colname = {v: short(s.vendor_names[v]) + ("" if v in s.eligible else " *") for v in shown}
     data, style = [], []
     for l in lines:
         lid = l["line_id"]
-        elig = [by[(v, lid)] for v in vendors if v in s.eligible and by.get((v, lid)) and by[(v, lid)].landed is not None
-                and by[(v, lid)].status != "missing" and by[(v, lid)].spec_compliant]
-        best = min(elig, key=lambda n: n.landed) if elig else None
+        w = won.get(lid) or {}
+        best_v = w.get("vendor")
         any_review = any(by.get((v, lid)) and by[(v, lid)].status == "review" for v in vendors)
         if view == "Lines to confirm" and not any_review:
             continue
-        if view == "Lines without a qualified quote" and best is not None:
+        if view == "Lines without a qualified quote" and best_v is not None:
             continue
         row = {"Line": lid, "Item": l["description"], "Annual qty": f"{int(l['annual_qty']):,}",
-               "L1": f"{short(best.vendor_name)} ₹{best.landed:,.2f}" if best else "No qualified quote"}
-        srow = {"L1": f"color:{KRAFT}; font-weight:600" if best else f"color:{STOP}"}
+               "Awarded (L1)": (f"{short(w['vendor_name'])} ₹{w['unit_price']:,.2f}{' †' if best_v in disc else ''}" if best_v
+                      else "No qualified quote")}
+        srow = {"Awarded (L1)": f"color:{KRAFT}; font-weight:600" if best_v else f"color:{STOP}"}
         for v in shown:
             n = by.get((v, lid))
             row[colname[v]] = f"{n.landed:,.2f}" if (n and n.landed is not None and n.status != "missing") else "–"
@@ -581,28 +645,61 @@ def page_compare():
                 css = f"background-color:{STOP_BG}; color:{STOP}"
             elif n.status == "review":
                 css = f"background-color:{CHECK_BG}"
-            if best is n and n is not None:
+            if v == best_v:
                 css = "background-color:#DCEFE4; font-weight:700"
             srow[colname[v]] = css
         data.append(row); style.append(srow)
     if not data:
         st.success("No lines match this filter.")
-    else:
-        df = pd.DataFrame(data)
-        sty = df.style.apply(lambda _: pd.DataFrame([{**{c: "" for c in df.columns}, **r} for r in style], columns=df.columns), axis=None) \
-            .set_properties(subset=[colname[v] for v in shown] + ["Annual qty"], **{"text-align": "right"})
-        st.dataframe(sty, hide_index=True, width="stretch", height=min(35 * (len(df) + 1) + 3, 1150),
-                     column_config={colname[v]: st.column_config.Column(width="small") for v in shown} |
-                     {"Line": st.column_config.Column(width=48), "Item": st.column_config.Column(width="medium"),
-                      "Annual qty": st.column_config.Column(width="small"), "L1": st.column_config.Column(width="medium")})
-    if data:
-        st.download_button("Download this comparison (Excel)", _comparison_xlsx(s, pd.DataFrame(data)), file_name="comparison.xlsx")
-    _vendor_summary(s, shown)
-    st.subheader("How was this number worked out?")
-    c1, c2 = st.columns(2)
-    lid = c1.selectbox("Line", [l["line_id"] for l in lines], format_func=lambda x: f"{x} · {next(l['description'] for l in lines if l['line_id'] == x)}")
-    v = c2.selectbox("Vendor", vendors, format_func=lambda k: s.vendor_names[k])
-    _evidence(s, by.get((v, lid)))
+        return data
+    df = pd.DataFrame(data)
+    sty = df.style.apply(lambda _: pd.DataFrame([{**{c: "" for c in df.columns}, **r} for r in style], columns=df.columns), axis=None) \
+        .set_properties(subset=[colname[v] for v in shown] + ["Annual qty"], **{"text-align": "right"})
+    st.dataframe(sty, hide_index=True, width="stretch", height=min(35 * (len(df) + 1) + 3, 1150),
+                 column_config={colname[v]: st.column_config.Column(width="small") for v in shown} |
+                 {"Line": st.column_config.Column(width=48), "Item": st.column_config.Column(width="medium"),
+                  "Annual qty": st.column_config.Column(width="small"), "Awarded (L1)": st.column_config.Column(width="medium")})
+    return data
+
+
+def _scorecard(s):
+    from core.scorecard import DIMENSIONS, DEFAULT_WEIGHTS, build
+    st.markdown('<p class="small">A second lens for approvers: every vendor scored 0-100 by formula on five dimensions. '
+                '<b>The award still follows the RFQ rule</b> (lowest landed price per item among qualified vendors); the scorecard shows '
+                'who is strong overall and what the trade-offs are. Change the weights to test how sensitive the ranking is.</p>',
+                unsafe_allow_html=True)
+    with st.expander("Weights and how each score is calculated"):
+        cols = st.columns(5)
+        w = {k: cols[i].number_input(k.title(), 0, 100, DEFAULT_WEIGHTS[k], 5, key=f"w_{k}") for i, k in enumerate(DEFAULT_WEIGHTS)}
+        for k, txt in DIMENSIONS.items():
+            st.markdown(f"- {txt}")
+    rows = build(s, w)
+    tot_w = sum(w.values()) or 1
+
+    def bar(x):
+        return f'<div class="sc"><div class="track"><div style="width:{x:.0f}%"></div></div><span class="v">{x:.0f}</span></div>'
+    body = []
+    for r in rows:
+        lbl, cls = STATUS.get(r["status"], ("Unknown", "muted"))
+        notes = []
+        if r["price_premium"] is not None:
+            notes.append("cheapest on its items" if r["price_premium"] < 0.005 else f"{r['price_premium']:+.0%} vs cheapest")
+        if r["failed_mandatory"]:
+            notes.append("fails " + ", ".join(r["failed_mandatory"]))
+        if r["lower_spec_items"]:
+            notes.append(f"{r['lower_spec_items']} items at lower spec")
+        body.append(f"""<tr><td class="n"><b>{r['rank']}</b></td><td><b>{E(r['vendor_name'])}</b><div class="sub">{pill(lbl, cls)}</div></td>
+            <td><span class="total">{r['total']:.0f}</span></td>
+            {''.join(f'<td>{bar(r[k])}</td>' for k in DEFAULT_WEIGHTS)}
+            <td class="watch">{E('; '.join(notes)) or '–'}</td></tr>""")
+    heads = "".join(f'<th><abbr title="{DIMENSIONS[k]}">{k.title()}</abbr> <span class="sub">{w[k] / tot_w:.0%}</span></th>' for k in DEFAULT_WEIGHTS)
+    st.markdown(f'<table class="vt"><thead><tr><th>#</th><th>Vendor</th><th>Overall</th>{heads}<th>Watch</th></tr></thead>'
+                f'<tbody>{"".join(body)}</tbody></table>', unsafe_allow_html=True)
+    top = rows[0] if rows else None
+    if top and not top["eligible"]:
+        st.markdown(f'<div class="warn-line">⚠ {E(top["vendor_name"])} ranks first overall but is not qualified, so it cannot win under the RFQ '
+                    f'rule. Its open questionnaire items are in Open issues.</div>', unsafe_allow_html=True)
+    st.session_state["_scorecard_weights"] = w
 
 
 def _vendor_rows(s, vendors):
@@ -642,7 +739,6 @@ def _vendor_rows(s, vendors):
 
 
 def _vendor_summary(s, vendors):
-    st.subheader("Questionnaire, terms and documents")
     st.markdown('<p class="small">The same vendors, side by side on everything that isn\'t a unit price. ✓ pass, ✗ fail, ? unclear.</p>',
                 unsafe_allow_html=True)
     rows, kinds = _vendor_rows(s, vendors)
@@ -668,6 +764,11 @@ def _comparison_xlsx(s, prices: pd.DataFrame) -> bytes:
     buf = io.BytesIO()
     with pd.ExcelWriter(buf, engine="openpyxl") as xw:
         prices.to_excel(xw, sheet_name="Landed prices", index=False)
+        from core.scorecard import build
+        sc = pd.DataFrame(build(s, st.session_state.get("_scorecard_weights")))
+        if not sc.empty:
+            sc["failed_mandatory"] = sc["failed_mandatory"].apply(", ".join)
+            sc.to_excel(xw, sheet_name="Vendor scorecard", index=False)
         pd.DataFrame(rows).to_excel(xw, sheet_name="Questionnaire & terms", index=False)
     return buf.getvalue()
 
@@ -681,13 +782,13 @@ def _evidence(s, n):
     with left:
         st.markdown("**Steps**")
         for stp in n.steps:
-            st.markdown(f'<div class="step">{stp}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="step">{E(stp)}</div>', unsafe_allow_html=True)
         if n.flags:
             st.markdown("**Things to know**")
         for f in n.flags:
             cls = {"critical": "stop", "warn": "check", "info": "muted"}[f.severity]
             lbl = {"critical": "Blocks", "warn": "Check", "info": "Note"}[f.severity]
-            st.markdown(f"{pill(lbl, cls)} {f.text}", unsafe_allow_html=True)
+            st.markdown(f"{pill(lbl, cls)} {E(f.text)}", unsafe_allow_html=True)
         if len(n.candidates) > 1:
             st.table(pd.DataFrame([{"If the value is": c["label"], "Landed ₹": f"{c['landed']:,.2f}"} for c in n.candidates]))
     with right:
@@ -714,7 +815,8 @@ def _show_source(n):
         st.code("\n".join(lines[max(0, hit - 2): hit + 3]), language=None)
     m = re.search(r"([\w\-. ]+\.pdf):p(\d+)", loc)
     if m and (vdir / m.group(1).strip()).exists():
-        pages = readers.pdf_page_images(vdir / m.group(1).strip(), 90)
+        pf = vdir / m.group(1).strip()
+        pages = _pdf_pages(str(pf), 90, pf.stat().st_mtime)
         k = int(m.group(2)) - 1
         if 0 <= k < len(pages):
             st.image(pages[k], caption=f"{m.group(1).strip()}, page {k + 1}", width="stretch")
@@ -749,10 +851,10 @@ def _issue_card(s, i, compact=False):
     flips = i["lines_flipping"]
     flip_txt = (f"Changes L1 on {len(flips)} line{'s' if len(flips) != 1 else ''}" if flips else "Doesn't change L1 on any line")
     detail = i["title"] if i["kind"] != "eligibility" else i["title"].split(". ", 1)[-1]
-    st.markdown(f"""<div class="issue {cls}"><div class="head">{issue_headline(i)}</div>
+    st.markdown(f"""<div class="issue {cls}"><div class="head">{E(issue_headline(i))}</div>
         <div><span class="stake">{money(stake)}</span> <span class="stake-l">{stake_lbl}</span></div>
-        <div class="detail">{detail}</div>
-        <div class="detail">{flip_txt}{'. ' + i['detail'] if i.get('detail') else ''}.</div></div>""", unsafe_allow_html=True)
+        <div class="detail">{E(detail)}</div>
+        <div class="detail">{flip_txt}{'. ' + E(i['detail']) if i.get('detail') else ''}.</div></div>""", unsafe_allow_html=True)
     if compact:
         return
     if i.get("cascade_lines") and i.get("discount_effect"):
@@ -824,7 +926,8 @@ SUGGESTED = [
     ("Test an unreadable value", "If Godavari's blurred 5-ply rate is 62.50 instead of 68.50, what changes in the award?"),
     ("Cheap but risky", "Nordvik is cheapest on the Classic 650 shipper. What would it take to award them, and what's the risk?"),
     ("Payment terms", "Nordvik offers 90 days credit and Godavari 30. At a 10% cost of capital, does that change who is really cheapest?"),
-    ("Chart and export", "Chart landed cost by vendor for the 650 ml shippers and export the full comparison to Excel."),
+    ("Overall ranking", "Rank the vendors on price, quality, delivery and terms. Does the strongest vendor overall match the "
+                        "cheapest-per-line award? Chart it and export the ranking to Excel."),
 ]
 
 
@@ -915,8 +1018,8 @@ def _render_outputs(outs):
 def page_memo():
     from core.memo import write_memo, memo_workbook
     s = get_state()
-    header("Award memo", "A one-page recommendation for approval, written only from the computed numbers, "
-           "plus an Excel pack with the full comparison, open issues and your decision log.")
+    header("Award and approvals", "The system prepares the case; people sign it off. Write a one-page recommendation from the computed "
+           "numbers only, send it to the stakeholders who need to validate it, and download the award pack with the full audit trail.")
     key_notice()
     if not s.ready():
         need_replies(); return
@@ -924,6 +1027,7 @@ def page_memo():
     hot = [i for i in s.issues() if i["decision_relevant"]]
     if hot:
         st.warning(f"{len(hot)} open issue{'s' if len(hot) != 1 else ''} could still change this award. The memo will list them as risks.")
+    st.subheader("1. Award memo")
     if st.button("Write the memo", type="primary", disabled=not api_key_present()):
         with st.spinner("Writing the memo"):
             md, facts, res = write_memo(s)
@@ -931,11 +1035,58 @@ def page_memo():
         log(load_decisions(), "memo written", f"Award {money(res['total'])}")
     if st.session_state.get("memo"):
         md, res_m = st.session_state.memo
+        if abs(res_m["total"] - res["total"]) > 1:
+            st.info(f"The award has changed since this memo was written ({money(res_m['total'])} then, {money(res['total'])} now). "
+                    "Write it again before sending.")
         with st.container(border=True):
             st.markdown(md)
         c1, c2 = st.columns(2)
         c1.download_button("Download memo", md, file_name="award_memo.md")
         c2.download_button("Download award pack (Excel)", memo_workbook(s, res_m, s.issues()), file_name="award_pack.xlsx")
+    _validation(s, res)
+
+
+def _validation(s, res):
+    from core import review
+    st.subheader("2. Stakeholder validation")
+    st.markdown('<p class="small">Each reviewer gets a short list of exactly what to check, built from the award and the open issues. '
+                'Sending is simulated in this demo; record their answer here and it goes into the decision log and the memo.</p>',
+                unsafe_allow_html=True)
+    dec = load_decisions()
+    rs = review.status(dec)
+    asks = review.asks(s)
+    cols = st.columns(2, gap="medium")
+    for k, (role, meta) in enumerate(review.REVIEWERS.items()):
+        r = rs[role]
+        cls = {"not_sent": "muted", "requested": "check", "approved": "good", "changes": "stop"}[r["status"]]
+        stale = r["status"] == "approved" and r.get("total") is not None and abs(r["total"] - res["total"]) > 1
+        with cols[k % 2]:
+            items = "".join(f"<li>{E(x)}</li>" for x in asks.get(role, [])) or "<li>Nothing specific to check.</li>"
+            said = f'<div class="small">“{E(r["note"])}”</div>' if r.get("note") and r["status"] in ("approved", "changes") else ""
+            st.markdown(f'<div class="rev"><div class="who">{meta["person"]} {pill(review.STATUS[r["status"]], cls)}'
+                        f'{" " + pill("award changed since", "check") if stale else ""}</div>'
+                        f'<div class="role">{meta["role"]}: {meta["why"]}</div><ul>{items}</ul>'
+                        f'{said}'
+                        f'</div>', unsafe_allow_html=True)
+            if r["status"] in ("requested", "changes") or stale:
+                c1, c2 = st.columns([3, 2])
+                note = c1.text_input("Their comment", key=f"rv_n_{role}", label_visibility="collapsed", placeholder="Their comment (optional)")
+                outcome = c2.selectbox("Outcome", ["Approved", "Changes requested"], key=f"rv_o_{role}", label_visibility="collapsed")
+                if st.button("Record response", key=f"rv_b_{role}"):
+                    review.respond(dec, role, "approved" if outcome == "Approved" else "changes", note, total=res["total"])
+                    refresh(); st.rerun()
+            st.write("")
+    unsent = [k for k, r in rs.items() if r["status"] == "not_sent"]
+    if unsent:
+        pick = st.multiselect("Send for validation to", unsent, default=unsent,
+                              format_func=lambda k: f"{review.REVIEWERS[k]['person']} ({review.REVIEWERS[k]['role']})")
+        note = st.text_input("Note to reviewers (optional)", placeholder="e.g. need sign-off by Friday; PO release planned 20 Oct")
+        if st.button("Send for validation", type="primary", disabled=not pick):
+            review.request(dec, pick, note, total=res["total"])
+            refresh(); st.rerun()
+    done = sum(1 for r in rs.values() if r["status"] == "approved")
+    if done == len(rs):
+        st.success("All stakeholders have signed off. The decision log and award pack record who approved what, and when.")
 
 
 # ================================================================== Reading accuracy
@@ -985,7 +1136,7 @@ pages = {
     "Evaluate": [st.Page(page_compare, title="Comparison", url_path="compare"),
                  st.Page(page_issues, title="Open issues", url_path="issues"),
                  st.Page(page_ask, title="Ask a question", url_path="ask")],
-    "Decide": [st.Page(page_memo, title="Award memo", url_path="memo")],
+    "Decide": [st.Page(page_memo, title="Award and approvals", url_path="memo")],
     "Trust": [st.Page(page_accuracy, title="Reading accuracy", url_path="accuracy")],
 }
 st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Decide"][0]}

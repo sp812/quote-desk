@@ -8,6 +8,8 @@ import pandas as pd
 
 from .llm import simple_text
 from .config import RFX_ID
+from .review import REVIEWERS, STATUS as REVIEW_STATUS, status as review_status
+from .scorecard import build as _scorecard
 
 
 def lakh(x):
@@ -37,6 +39,12 @@ def facts(st) -> dict:
                                                        premium=lakh(split["premium"]), note=split["note"]) if split else None)),
         approval=("Award value above ₹1 crore: per a typical approval matrix this needs CFO/CPO sign-off "
                   "(adjust to Deccan Peak's actual delegation of authority)."),
+        vendor_scorecard=[dict(vendor=r["vendor_name"], overall=r["total"], price=r["price"], quality=r["quality"],
+                               delivery=r["delivery"], commercial=r["commercial"], coverage=r["coverage"], eligible=r["eligible"])
+                          for r in _scorecard(st)],
+        stakeholder_reviews={REVIEWERS[k]["role"]: dict(person=REVIEWERS[k]["person"], status=REVIEW_STATUS[v["status"]],
+                                                        comment=v.get("note") or "")
+                             for k, v in review_status(st.decisions).items()},
         buyer_decisions=st.decisions.get("log", [])[-15:],
     ), res, issues
 
@@ -50,7 +58,8 @@ Structure (markdown):
 **Who was excluded and why**
 **Open risks before PO** (only decision-relevant items, each with the money at stake and the action - e.g. clarification sent to vendor)
 **Assumptions** (freight estimates, FX, last-year prices)
-**Approval requested**
+**Vendor scorecard** (one short table: vendor, overall score and the weakest dimension; note that the award follows the RFQ price rule and the scorecard is a cross-check)
+**Validation and approval** (each stakeholder review and its status as given; then the approval requested. Never claim a review is approved unless the facts say so)
 Tone: crisp, factual, no hype."""
 
 
