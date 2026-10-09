@@ -62,9 +62,36 @@ h3 {{ font-size: 1.08rem !important; font-weight: 600 !important; }}
 .num, td, .kpi-value {{ font-variant-numeric: tabular-nums; }}
 
 /* sidebar */
-section[data-testid="stSidebar"] {{ background: {INK}; }}
+section[data-testid="stSidebar"] {{ background: {INK}; border-right: 1px solid #0E1828; }}
 section[data-testid="stSidebar"] * {{ color: #E6EBF1 !important; }}
-section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] {{ color: #9FB0C3 !important; font-size: .78rem; letter-spacing: .02em; }}
+/* brand block above the navigation */
+section[data-testid="stSidebar"] [data-testid="stSidebarContent"] {{ display: flex; flex-direction: column; }}
+section[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] {{ order: -1; padding: 0 1rem 14px 1rem; border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 4px; }}
+section[data-testid="stSidebar"] [data-testid="stSidebarHeader"] {{ order: -2; height: 2.4rem; min-height: 0; padding-bottom: 0; }}
+section[data-testid="stSidebar"] [data-testid="stSidebarNav"] {{ padding-top: 0; }}
+/* section labels */
+section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] {{ color: #8EA2B8 !important; font-size: .72rem !important;
+  font-weight: 650; letter-spacing: .09em; text-transform: uppercase; margin: 14px 0 4px 0; }}
+section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] * {{ color: #8EA2B8 !important; }}
+/* navigation items */
+section[data-testid="stSidebar"] a[data-testid="stSidebarNavLink"] {{ border-radius: 7px; padding: 7px 12px; margin: 1px 0;
+  border-left: 3px solid transparent; transition: background .12s; }}
+section[data-testid="stSidebar"] a[data-testid="stSidebarNavLink"] span {{ font-size: .98rem !important; color: #D3DCE6 !important; }}
+section[data-testid="stSidebar"] a[data-testid="stSidebarNavLink"] [data-testid="stIconMaterial"] {{ color: #8EA2B8 !important; font-size: 1.15rem; }}
+section[data-testid="stSidebar"] a[data-testid="stSidebarNavLink"]:hover {{ background: rgba(255,255,255,.06); }}
+section[data-testid="stSidebar"] a[data-testid="stSidebarNavLink"][aria-current="page"] {{ background: rgba(255,255,255,.10);
+  border-left-color: {KRAFT}; }}
+section[data-testid="stSidebar"] a[data-testid="stSidebarNavLink"][aria-current="page"] span {{ color: #FFFFFF !important; font-weight: 650; }}
+section[data-testid="stSidebar"] a[data-testid="stSidebarNavLink"][aria-current="page"] [data-testid="stIconMaterial"] {{ color: #D9A866 !important; }}
+.sb-brand {{ display: flex; align-items: center; gap: 10px; margin: 0 0 2px 0; }}
+.sb-mark {{ width: 34px; height: 34px; border-radius: 8px; background: {KRAFT}; display: flex; align-items: center; justify-content: center; flex: none; }}
+.sb-sub {{ font-size: .82rem; color: #9FB0C3 !important; line-height: 1.35; margin: 2px 0 0 0; }}
+.sb-rfq {{ margin: 12px 0 4px 0; padding: 10px 12px; border-radius: 8px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); }}
+.sb-rfq .k {{ font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: #8EA2B8 !important; }}
+.sb-rfq .v {{ font-size: .9rem; color: #FFFFFF !important; font-weight: 600; margin-top: 2px; }}
+.sb-rfq .m {{ font-size: .8rem; color: #B7C4D2 !important; margin-top: 2px; }}
+.sb-note {{ font-size: .76rem; color: #8EA2B8 !important; margin-top: 8px; line-height: 1.4; }}
+.sb-note.off {{ color: #E8B96B !important; }}
 
 /* buttons: explicit so a dark-mode browser cannot invert them */
 .stButton > button, .stDownloadButton > button {{ background: {CARD}; color: {INK} !important; border: 1px solid #C4CDD7; border-radius: 6px; font-weight: 500; }}
@@ -340,7 +367,7 @@ def page_board():
     with right:
         if hot:
             items = "".join(f'<li><div class="it">{E(issue_headline(i))}</div><div class="iv">{money(_stake(i)[0])} · '
-                            f'{"changes L1 on " + str(len(i["lines_flipping"])) + " lines" if i["lines_flipping"] else "assumption to confirm"}</div></li>'
+                            f'{"changes L1 on " + str(len(i["lines_flipping"])) + (" line" if len(i["lines_flipping"]) == 1 else " lines") if i["lines_flipping"] else "assumption to confirm"}</div></li>'
                             for i in hot[:4])
             more = f'<div class="meta">+{len(hot) - 4} more</div>' if len(hot) > 4 else ""
             st.markdown(f'<div class="hero side"><div class="eyebrow">Before you approve</div><ol class="todo">{items}</ol>{more}</div>',
@@ -1249,20 +1276,26 @@ def page_accuracy():
 
 # ================================================================== navigation
 pages = {
-    "": [st.Page(page_board, title="Decision board", default=True)],
-    "Collect": [st.Page(page_draft, title="Draft RFQ", url_path="draft"),
-                st.Page(page_replies, title="Vendor replies", url_path="replies")],
-    "Evaluate": [st.Page(page_compare, title="Comparison", url_path="compare"),
-                 st.Page(page_issues, title="Open issues", url_path="issues"),
-                 st.Page(page_ask, title="Ask a question", url_path="ask")],
-    "Decide": [st.Page(page_memo, title="Award and approvals", url_path="memo")],
-    "Trust": [st.Page(page_accuracy, title="Reading accuracy", url_path="accuracy")],
+    "Overview": [st.Page(page_board, title="Decision board", icon=":material/space_dashboard:", default=True)],
+    "Collect": [st.Page(page_draft, title="Draft RFQ", icon=":material/edit_note:", url_path="draft"),
+                st.Page(page_replies, title="Vendor replies", icon=":material/inbox:", url_path="replies")],
+    "Evaluate": [st.Page(page_compare, title="Comparison", icon=":material/table_chart:", url_path="compare"),
+                 st.Page(page_issues, title="Open issues", icon=":material/priority_high:", url_path="issues"),
+                 st.Page(page_ask, title="Ask a question", icon=":material/forum:", url_path="ask")],
+    "Decide": [st.Page(page_memo, title="Award and approvals", icon=":material/verified:", url_path="memo")],
+    "Trust": [st.Page(page_accuracy, title="Reading accuracy", icon=":material/fact_check:", url_path="accuracy")],
 }
 st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Decide"][0], "compare": pages["Evaluate"][0]}
 nav = st.navigation(pages)
 with st.sidebar:
-    st.markdown('<div class="brand">Quote desk</div><div class="flute" style="margin:8px 0 10px 0"></div>', unsafe_allow_html=True)
-    st.caption("From vendor replies to a defensible award. Demo data; all companies are fictional.")
-    if not api_key_present():
-        st.caption("AI actions are off (no API key). Everything already read still works.")
+    BOX = ("<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#FFFFFF' stroke-width='1.8' stroke-linejoin='round'>"
+           "<path d='M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z'/><path d='M3 7.5 12 12l9-4.5M12 12v9'/></svg>")
+    _n = len(vendor_dirs())
+    st.markdown(f"""<div class="sb-brand"><div class="sb-mark">{BOX}</div><div class="brand">Quote desk</div></div>
+        <div class="sb-sub">From vendor replies to an award you can defend</div>
+        <div class="flute" style="margin:10px 0 0 0"></div>
+        <div class="sb-rfq"><div class="k">Sourcing event</div><div class="v">{config.RFX_ID}</div>
+        <div class="m">Corrugated packaging · 30 items · {_n} vendors</div><div class="m">Deccan Peak Breweries, Waluj</div></div>
+        <div class="sb-note{'' if api_key_present() else ' off'}">{'Demo data; all companies are fictional.' if api_key_present()
+            else 'AI actions are off (no API key). Everything already read still works.'}</div>""", unsafe_allow_html=True)
 nav.run()

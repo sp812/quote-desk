@@ -137,7 +137,7 @@ class State:
                 why = "; ".join(f"{q} {r['status']}: {r['reason']}" for q, r in sorted(ev.items()) if r["status"] != "pass") or "no questionnaire evaluation"
                 st_txt = {"fail": "Failed questionnaire", "pending": "Questionnaire evidence pending", "exclude": "Excluded by buyer"}.get(i.get("status"), i.get("status"))
                 i["title"] = f"{st_txt}. {why}"
-                i["detail"] = f"If cleared, wins {len(i['lines'])} lines"
+                i["detail"] = f"If cleared, wins {len(i['lines'])} line{'s' if len(i['lines']) != 1 else ''}"
         return issues
 
     def ready(self) -> bool:
