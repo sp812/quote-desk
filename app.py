@@ -72,8 +72,8 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] {{ color: #9
 .stButton > button[kind="primary"] {{ background: {INK}; color: #FFFFFF !important; border-color: {INK}; }}
 .stButton > button[kind="primary"] p {{ color: #FFFFFF !important; }}
 .stButton > button p, .stDownloadButton > button p {{ color: inherit !important; }}
-[data-baseweb="tag"] {{ background: {MUTED_BG} !important; border: 1px solid {LINE}; }}
-[data-baseweb="tag"] span, [data-baseweb="tag"] svg {{ color: {INK} !important; fill: {INK} !important; }}
+[data-testid="stMultiSelectTagsContainer"] > span > span, [data-baseweb="tag"] {{ background: {MUTED_BG} !important; border: 1px solid {LINE}; }}
+[data-testid="stMultiSelectTagsContainer"] span, [data-testid="stMultiSelectTagsContainer"] svg {{ color: {INK} !important; fill: {INK} !important; }}
 [data-testid="stExpander"] details {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 8px; }}
 
 /* components */
@@ -194,8 +194,8 @@ def refresh():
 
 
 def key_notice():
-    if not api_key_present():
-        st.info("AI actions are off because no Anthropic API key is configured. Everything already read still works.")
+    """No banner on every page: the sidebar says once if AI actions are off, and AI buttons are disabled."""
+    return
 
 
 def need_replies():
@@ -249,21 +249,16 @@ VENDOR_COLORS = ["#16243A", "#4F7CAC", "#9A6A2F", "#6E9E80", "#B5655A", "#7A6FA8
 
 def page_board():
     s = get_state()
-    st.markdown("""<div class="intro"><div class="what"><b>Quote desk</b> turns vendor replies, in whatever shape they arrive, into an award you can defend.
-        It reads every format, puts every price on the same landed basis, checks each vendor against your quality questionnaire, and shows
-        which uncertainties could change the award and what each is worth in rupees. The AI does the reading; you and your approvers make
-        the call, and every number traces back to the vendor's own words.</div>
-        <div class="how"><span><b>1</b>Collect in any format, never retype</span><span><b>2</b>Compare like for like: price, quality, terms</span>
-        <span><b>3</b>Resolve what moves money</span><span><b>4</b>Validate with stakeholders, then approve</span></div>
+    st.markdown("""<div class="intro"><div class="what"><b>Quote desk</b> turns messy vendor quotes into an award you can defend: the AI reads, code does the maths, you decide.</div>
+        <div class="how"><span><b>1</b>Collect in any format</span><span><b>2</b>Compare like for like</span>
+        <span><b>3</b>Resolve what moves money</span><span><b>4</b>Get sign-off and approve</span></div>
         </div>""", unsafe_allow_html=True)
-    header("Corrugated packaging, FY27 annual contract",
-           f"Deccan Peak Breweries, Waluj plant · {config.RFX_ID} · 30 lines · bids closed 7 Oct 2026")
+    header("Corrugated packaging, FY27 annual contract", f"Deccan Peak Breweries, Waluj · {config.RFX_ID} · 30 items · bids closed 7 Oct 2026")
     key_notice()
     missing = s.missing_extractions()
     if missing:
         st.subheader(f"{len(missing)} vendor replies are waiting to be read")
-        st.write("Each reply is read whatever its format (Excel, PDF, Word, a phone photo or a plain email), mapped to the 30 RFQ lines, "
-                 "converted to landed cost and checked against the quality questionnaire. Usually 1-3 minutes.")
+        st.write("Any format: Excel, PDF, Word, photo, email. Usually 1-3 minutes.")
         if st.button(f"Read {len(missing)} replies", type="primary", disabled=not api_key_present()):
             from core.pipeline import run_many
             box = st.status(f"Reading {len(missing)} replies", expanded=True)
@@ -314,8 +309,7 @@ def page_board():
             st.markdown(f"""<div class="hero"><div class="eyebrow">Recommended award</div><div class="flute" style="width:120px;margin:6px 0 2px 0"></div>
                 <div class="big">{money(res['total'])} <span class="per">a year</span> {delta}</div>
                 <div class="bar">{bar}</div><div class="legend2">{legend}</div>
-                <div class="meta">{covered} of 30 lines covered · {qual} of {len(s.extractions)} vendors qualified{f" + {inc} included by you" if inc else ""} ·
-                lowest landed cost per line among qualified, on-spec quotes</div>{flag_html}</div>""", unsafe_allow_html=True)
+                <div class="meta">{covered} of 30 items covered · {qual} of {len(s.extractions)} vendors qualified{f" + {inc} included by you" if inc else ""}</div>{flag_html}</div>""", unsafe_allow_html=True)
         else:
             st.markdown('<div class="hero"><div class="eyebrow">Recommended award</div><div class="big">No award possible yet</div>'
                         '<div class="meta">No vendor is qualified under the RFQ rule. See what each one is missing on the right.</div></div>',
@@ -334,7 +328,7 @@ def page_board():
         else:
             st.markdown('<div class="hero side"><div class="eyebrow">Before you approve</div><div class="big" style="font-size:1.4rem">'
                         'Nothing open</div><div class="meta">No open issue can change this award.</div></div>', unsafe_allow_html=True)
-            _link("memo", "Write the memo and send it for validation")
+            _link("memo", "Write the memo and get sign-off")
             _review_line()
 
     # ---------------- vendors, one row each
@@ -357,14 +351,11 @@ def page_board():
             <td><div class="mini"><div style="width:{share * 100:.1f}%;background:{color[v]}"></div></div>
                 <div class="sub">{money(won['value']) + ' · ' + f'{share:.0%}' if won['lines'] else 'none'}</div></td>
             <td class="why">{E(why) or '–'}</td></tr>""")
-    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th>Qualification</th>'
+    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th><abbr title="Quality questionnaire result. Only qualified vendors can win.">Qualification</abbr></th>'
                 '<th><abbr title="How many of the 30 RFQ items this vendor gave a price for">Items priced</abbr></th>'
                 '<th><abbr title="Items where this vendor is the lowest qualified landed price (L1) in the recommended award">Wins (L1)</abbr></th>'
-                '<th>Share of award</th><th>What is holding them back</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>",
+                '<th>Share of award</th><th>Holding them back</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>",
                 unsafe_allow_html=True)
-    st.markdown('<p class="small" style="margin-top:6px"><b>Items priced</b>: how many of the 30 RFQ items the vendor quoted. '
-                '<b>Wins (L1)</b>: items where the vendor is the lowest qualified landed price and so gets the award. '
-                '<b>Qualification</b>: the result of the quality questionnaire; only qualified vendors can win.</p>', unsafe_allow_html=True)
     st.write("")
     _saved_results()
 
@@ -384,8 +375,7 @@ def _saved_results():
     from core.config import EXTRACT_CACHE
     with st.expander("Saved results: backup and restore"):
         files = sorted(EXTRACT_CACHE.glob("*.json"))
-        st.write("What the AI read from each reply is saved, so pages open instantly. Download a backup, or commit these files to "
-                 "`cache/extractions/` in the repository so the live app always starts with them. Re-read any reply to watch it run live.")
+        st.caption("Download a backup, or commit these files to `cache/extractions/` so the live app always starts with them.")
         if files:
             buf = io.BytesIO()
             with zipfile.ZipFile(buf, "w") as z:
@@ -407,8 +397,7 @@ def _saved_results():
 # ================================================================== Draft RFQ
 def page_draft():
     from core import copilot
-    header("Draft the RFQ", "Describe what you need in your own words. The co-pilot pulls approved specs and last year's volumes, "
-           "proposes a supplier questionnaire with pass/fail rules, and asks about anything it can't know.")
+    header("Draft the RFQ", "Say what you need; the co-pilot drafts items, questionnaire and terms.")
     key_notice()
     if "draft" not in st.session_state:
         st.session_state.draft, st.session_state.draft_hist, st.session_state.draft_chat = copilot.new_draft(), [], []
@@ -433,7 +422,7 @@ def page_draft():
         d = st.session_state.draft
         st.subheader(d["header"].get("title") or "Your RFQ draft")
         if not (d["header"] or d["line_items"]):
-            st.markdown('<p class="small">The draft builds here as you talk: scope, line items, questionnaire and terms.</p>', unsafe_allow_html=True)
+            st.caption("Builds here as you talk.")
         if d["header"]:
             st.markdown('<table class="terms">' + "".join(f"<tr><td>{E(k.replace('_', ' ').capitalize())}</td><td>{E(str(v))}</td></tr>"
                                                          for k, v in d["header"].items()) + "</table>", unsafe_allow_html=True)
@@ -471,8 +460,7 @@ def _pdf_pages(path: str, resolution: int, mtime: float) -> list[bytes]:
 def page_replies():
     from core import readers
     s = get_state()
-    header("Vendor replies", "What each vendor actually sent, side by side with what was read from it. "
-           "Every price shows the vendor's own words and where they appear.")
+    header("Vendor replies", "What each vendor sent, next to what was read from it.")
     key_notice()
     dirs = vendor_dirs()
     names = {d.name: s.vendor_names.get(d.name, d.name.split("_")[-1].title()) for d in dirs}
@@ -580,8 +568,7 @@ def page_replies():
 # ================================================================== Comparison
 def page_compare():
     s = get_state()
-    header("Comparison", "Every vendor on the same basis: rupees per RFQ unit, excluding GST, delivered to Waluj, with the questionnaire, "
-           "terms and documents alongside. Pick any line and vendor at the bottom to see exactly how a number was worked out.")
+    header("Comparison", "Every price in ₹ per unit, ex-GST, delivered to Waluj.")
     if not s.ready():
         need_replies(); return
     lines = extract.load_rfx_lines()
@@ -595,8 +582,8 @@ def page_compare():
     with tab_q:
         _vendor_summary(s, vendors)
     if data:
-        st.download_button("Download the comparison (Excel: prices, scorecard, questionnaire and terms)",
-                           _comparison_xlsx(s, pd.DataFrame(data)), file_name="comparison.xlsx")
+        st.download_button("Download Excel", _comparison_xlsx(s, pd.DataFrame(data)), file_name="comparison.xlsx",
+                           help="Prices, scorecard, questionnaire and terms in one workbook")
     st.subheader("How was this number worked out?")
     c1, c2 = st.columns(2)
     lid = c1.selectbox("Line", [l["line_id"] for l in lines], format_func=lambda x: f"{x} · {next(l['description'] for l in lines if l['line_id'] == x)}")
@@ -614,10 +601,9 @@ def _price_table(s, lines, vendors, by):
     only_q = c2.toggle("Only qualified vendors", value=False)
     disc_note = (f'<span>† after {", ".join(f"{short(s.vendor_names.get(v, v))} {p:g}%" for v, p in disc.items())} volume discount</span>'
                  if disc else "")
-    st.markdown(f"""<div class="legend"><span><span class="l1">L1</span> recommended award: lowest qualified, on-spec landed price</span>
-        <span><span class="sw" style="background:#DCEFE4"></span>awarded</span>
-        <span><span class="sw" style="background:{CHECK_BG}"></span>more than one possible reading (shown at the higher one)</span>
-        <span><span class="sw" style="background:{STOP_BG}"></span>lower spec than asked</span>
+    st.markdown(f"""<div class="legend"><span><span class="l1">L1</span> <span class="sw" style="background:#DCEFE4"></span>awarded: cheapest qualified, on-spec</span>
+        <span><span class="sw" style="background:{CHECK_BG}"></span>unclear reading (higher one used)</span>
+        <span><span class="sw" style="background:{STOP_BG}"></span>lower spec</span>
         <span>– not quoted</span><span>* not qualified yet</span>{disc_note}</div>""", unsafe_allow_html=True)
     shown = [v for v in vendors if (not only_q or v in s.eligible)]
     colname = {v: short(s.vendor_names[v]) + ("" if v in s.eligible else " *") for v in shown}
@@ -664,11 +650,8 @@ def _price_table(s, lines, vendors, by):
 
 def _scorecard(s):
     from core.scorecard import DIMENSIONS, DEFAULT_WEIGHTS, build
-    st.markdown('<p class="small">A second lens for approvers: every vendor scored 0-100 by formula on five dimensions. '
-                '<b>The award still follows the RFQ rule</b> (lowest landed price per item among qualified vendors); the scorecard shows '
-                'who is strong overall and what the trade-offs are. Change the weights to test how sensitive the ranking is.</p>',
-                unsafe_allow_html=True)
-    with st.expander("Weights and how each score is calculated"):
+    st.caption("A cross-check for approvers. The award still follows the RFQ rule: cheapest qualified price per item.")
+    with st.expander("Change weights · how scores work"):
         cols = st.columns(5)
         w = {k: cols[i].number_input(k.title(), 0, 100, DEFAULT_WEIGHTS[k], 5, key=f"w_{k}") for i, k in enumerate(DEFAULT_WEIGHTS)}
         for k, txt in DIMENSIONS.items():
@@ -739,8 +722,7 @@ def _vendor_rows(s, vendors):
 
 
 def _vendor_summary(s, vendors):
-    st.markdown('<p class="small">The same vendors, side by side on everything that isn\'t a unit price. ✓ pass, ✗ fail, ? unclear.</p>',
-                unsafe_allow_html=True)
+    st.caption("✓ pass · ✗ fail · ? unclear")
     rows, kinds = _vendor_rows(s, vendors)
     df = pd.DataFrame(rows)
 
@@ -894,8 +876,7 @@ def _issue_card(s, i, compact=False):
 
 def page_issues():
     s = get_state()
-    header("Open issues", "Every uncertainty, ranked by the money it can move. Each one has been tested by re-running the award under "
-           "every possible answer, so you only spend time on what changes the decision.")
+    header("Open issues", "Every uncertainty, ranked by how much money it can move.")
     if not s.ready():
         need_replies(); return
     issues = s.issues()
@@ -911,7 +892,6 @@ def page_issues():
             _issue_card(s, i, compact=True)
     dec = load_decisions()
     with st.expander(f"Decision log ({len(dec.get('log', []))} entries)"):
-        st.write("Everything you and the system decided, in order. It ships with the award pack.")
         if dec.get("log"):
             st.dataframe(pd.DataFrame(dec["log"]).rename(columns={"ts": "When", "actor": "Who", "action": "What", "detail": "Detail"}),
                          hide_index=True, width="stretch")
@@ -934,8 +914,7 @@ SUGGESTED = [
 def page_ask():
     from core.analyst import Analyst
     s = get_state()
-    header("Ask a question", "Ask in plain language. Answers come from real queries and award runs over the comparison, "
-           "and every answer shows how it was worked out.")
+    header("Ask a question", "Plain-language questions, answered from the data. Every step is shown.")
     key_notice()
     if not s.ready():
         need_replies(); return
@@ -950,7 +929,7 @@ def page_ask():
             st.markdown(turn["a"])
     q = None
     if not st.session_state.an_view:
-        st.markdown('<p class="small">Questions buyers ask most. Click one, or type your own below.</p>', unsafe_allow_html=True)
+        st.caption("Try one, or type your own below.")
         cols = st.columns(3)
         for k, (lbl, sq) in enumerate(SUGGESTED):
             with cols[k % 3]:
@@ -1018,8 +997,7 @@ def _render_outputs(outs):
 def page_memo():
     from core.memo import write_memo, memo_workbook
     s = get_state()
-    header("Award and approvals", "The system prepares the case; people sign it off. Write a one-page recommendation from the computed "
-           "numbers only, send it to the stakeholders who need to validate it, and download the award pack with the full audit trail.")
+    header("Award and approvals", "Write the memo, get sign-off, download the audit trail.")
     key_notice()
     if not s.ready():
         need_replies(); return
@@ -1049,9 +1027,7 @@ def page_memo():
 def _validation(s, res):
     from core import review
     st.subheader("2. Stakeholder validation")
-    st.markdown('<p class="small">Each reviewer gets a short list of exactly what to check, built from the award and the open issues. '
-                'Sending is simulated in this demo; record their answer here and it goes into the decision log and the memo.</p>',
-                unsafe_allow_html=True)
+    st.caption("Each reviewer gets a checklist built from the award. Sending is simulated; their answers are logged.")
     dec = load_decisions()
     rs = review.status(dec)
     asks = review.asks(s)
@@ -1093,8 +1069,7 @@ def _validation(s, res):
 def page_accuracy():
     from core.evaluate import score
     s = get_state()
-    header("Reading accuracy", "This demo's vendor files have a hidden answer key the AI never sees. Here the live reading is scored against it. "
-           "The number that matters most is <b>confidently wrong</b>: a wrong price shown without any warning.")
+    header("Reading accuracy", "The AI's reading, scored against a hidden answer key. The number that matters: <b>confidently wrong</b>.")
     if not s.ready():
         need_replies(); return
     r = score(s.norms, s.extractions, s.verdicts)
@@ -1143,5 +1118,7 @@ st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Dec
 nav = st.navigation(pages)
 with st.sidebar:
     st.markdown('<div class="brand">Quote desk</div><div class="flute" style="margin:8px 0 10px 0"></div>', unsafe_allow_html=True)
-    st.caption("From vendor replies to a defensible award. Demo for Deccan Peak Breweries; all companies are fictional.")
+    st.caption("From vendor replies to a defensible award. Demo data; all companies are fictional.")
+    if not api_key_present():
+        st.caption("AI actions are off (no API key). Everything already read still works.")
 nav.run()
