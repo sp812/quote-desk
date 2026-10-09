@@ -1,11 +1,17 @@
 [theme]
 base = "light"
-primaryColor = "#1D2B3A"
-backgroundColor = "#FBFBF9"
-secondaryBackgroundColor = "#EEF1F4"
-textColor = "#1D2B3A"
+primaryColor = "#16243A"
+backgroundColor = "#F4F6F8"
+secondaryBackgroundColor = "#EDF0F3"
+textColor = "#16243A"
+font = "Anek Latin, sans-serif"
+
+[[theme.fontFaces]]
+family = "Anek Latin"
+url = "app/static/AnekLatin.ttf"
 
 [server]
+enableStaticServing = true
 headless = true
 maxUploadSize = 50
 
