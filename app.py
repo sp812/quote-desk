@@ -36,16 +36,26 @@ MUTED, MUTED_BG = "#5F6B7A", "#EDF0F3"
 
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
-html, body, .stApp, .stMarkdown, button, input, textarea, select, label {{ font-family: 'IBM Plex Sans', sans-serif !important; }}
+@import url('https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,300..800&display=swap');
+@font-face {{ font-family: 'Anek Latin'; src: url('/app/static/AnekLatin.ttf') format('truetype');
+  font-weight: 100 800; font-stretch: 75% 125%; font-display: swap; }}
+html, body, .stApp, .stMarkdown, button, input, textarea, select, label, p, li, td, th {{ font-family: 'Anek Latin', 'Segoe UI', sans-serif !important; font-stretch: 100%; }}
+h1, h2, h3, .hero .big, .kpi-value, .issue .stake, .brand {{ font-family: 'Anek Latin', sans-serif !important; font-stretch: 82%; }}
+.flute {{ height: 10px; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='10'><path d='M0 7 Q4.5 1 9 7 T18 7' fill='none' stroke='%239A6A2F' stroke-width='1.8'/></svg>") repeat-x; background-size: 18px 10px; opacity: .9; }}
+.intro {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 10px; padding: 16px 22px 14px 22px; margin: 2px 0 18px 0; }}
+.intro .what {{ font-size: 1.12rem; line-height: 1.5; color: {INK}; max-width: 92ch; }}
+.intro .what b {{ color: {INK}; }}
+.intro .how {{ display: flex; flex-wrap: wrap; gap: 6px 26px; margin-top: 10px; color: {INK_2}; font-size: .92rem; }}
+.intro .how span b {{ color: {KRAFT}; font-weight: 700; margin-right: 4px; }}
+.brand {{ font-size: 1.5rem; font-weight: 750; letter-spacing: .01em; color: #FFFFFF !important; line-height: 1; }}
 .stApp {{ background: {PAGE}; color: {INK}; }}
 [data-testid="stAppViewContainer"] p, [data-testid="stAppViewContainer"] li, [data-testid="stAppViewContainer"] label,
 [data-testid="stAppViewContainer"] h1, [data-testid="stAppViewContainer"] h2, [data-testid="stAppViewContainer"] h3,
 [data-testid="stAppViewContainer"] summary, [data-testid="stAppViewContainer"] span:not(.pill):not(.l1) {{ color: {INK}; }}
 [data-testid="stHeader"] {{ background: {PAGE}; }}
-.block-container {{ padding-top: 2.2rem; max-width: 1320px; }}
+.block-container {{ padding-top: 3.6rem; max-width: 1320px; }}
 p, li {{ font-size: 1rem; line-height: 1.55; }}
-h1 {{ font-size: 1.9rem !important; font-weight: 700 !important; letter-spacing: -0.015em; margin-bottom: .2rem !important; }}
+h1 {{ font-size: 2.15rem !important; font-weight: 750 !important; letter-spacing: 0; margin-bottom: .2rem !important; }}
 h2 {{ font-size: 1.3rem !important; font-weight: 600 !important; margin-top: 1.6rem !important; }}
 h3 {{ font-size: 1.08rem !important; font-weight: 600 !important; }}
 .num, td, .kpi-value {{ font-variant-numeric: tabular-nums; }}
@@ -99,6 +109,32 @@ section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"] {{ color: #9
 .step {{ border-left: 2px solid {KRAFT}; padding: 3px 0 3px 12px; margin: 5px 0; font-size: .93rem; color: {INK}; }}
 .terms td {{ padding: 4px 14px 4px 0; font-size: .93rem; }} .terms td:first-child {{ color: {INK_2}; }}
 .small {{ color: {INK_2}; font-size: .86rem; }}
+.hero {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 10px; padding: 20px 24px; height: 100%; }}
+.hero .eyebrow {{ color: {INK_2}; font-size: .9rem; font-weight: 500; }}
+.hero .big {{ font-size: 2.5rem; font-weight: 700; color: {INK}; line-height: 1.15; margin: 4px 0 14px 0; font-variant-numeric: tabular-nums; }}
+.hero .big .per {{ font-size: 1rem; font-weight: 500; color: {INK_2}; }}
+.hero .big .pill {{ font-size: .85rem; vertical-align: middle; margin-left: 6px; }}
+.hero .bar {{ display: flex; height: 22px; border-radius: 6px; overflow: hidden; background: {MUTED_BG}; }}
+.hero .bar div {{ height: 100%; border-right: 2px solid {CARD}; }}
+.legend2 {{ display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 4px 0; font-size: .9rem; color: {INK}; }}
+.legend2 b {{ color: {INK}; }}
+.dot {{ display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }}
+.hero .meta, .meta {{ color: {INK_2}; font-size: .86rem; margin-top: 8px; }}
+.warn-line {{ margin-top: 10px; padding: 8px 12px; background: {CHECK_BG}; color: {CHECK}; border-radius: 6px; font-size: .9rem; }}
+.hero.side {{ border-top: 4px solid {STOP}; }}
+ol.todo {{ margin: 8px 0 0 0; padding-left: 1.2rem; }}
+ol.todo li {{ margin: 0 0 12px 0; color: {INK}; }}
+ol.todo .it {{ font-weight: 600; color: {INK}; line-height: 1.35; }}
+ol.todo .iv {{ color: {INK_2}; font-size: .86rem; }}
+table.vt {{ width: 100%; border-collapse: separate; border-spacing: 0; background: {CARD}; border: 1px solid {LINE}; border-radius: 10px; overflow: hidden; }}
+table.vt th {{ text-align: left; font-weight: 500; font-size: .84rem; color: {INK_2}; padding: 10px 14px; border-bottom: 1px solid {LINE}; background: #FAFBFC; }}
+table.vt td {{ padding: 12px 14px; border-bottom: 1px solid {LINE}; vertical-align: top; color: {INK}; font-size: .93rem; }}
+table.vt tr:last-child td {{ border-bottom: none; }}
+table.vt td.n {{ font-variant-numeric: tabular-nums; }}
+table.vt .sub {{ color: {INK_2}; font-size: .8rem; margin-top: 2px; }}
+table.vt td.why {{ color: {INK_2}; font-size: .86rem; max-width: 340px; }}
+.mini {{ width: 120px; height: 8px; background: {MUTED_BG}; border-radius: 4px; overflow: hidden; margin-top: 6px; }}
+.mini div {{ height: 100%; }}
 @media (max-width: 900px) {{ .kpis {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
 </style>""", unsafe_allow_html=True)
 
@@ -171,8 +207,8 @@ def issue_headline(i) -> str:
     v = short(i["vendor_name"])
     k = i["kind"]
     if k == "eligibility":
-        lbl = STATUS.get(i.get("status"), (i.get("status", ""),))[0].lower()
-        return f"{v} is {lbl}"
+        return {"fail": f"{v} is not qualified", "pending": f"{v}'s qualification documents are pending",
+                "exclude": f"{v} was excluded by you"}.get(i.get("status"), f"{v}: {i.get('status')}")
     if k == "illegible":
         return f"{v}'s rate can't be read reliably on lines {', '.join(i['lines'][:3])}{'…' if len(i['lines']) > 3 else ''}"
     if k == "unit":
@@ -189,11 +225,25 @@ def issue_headline(i) -> str:
 
 
 # ================================================================== Decision board
+def _link(key, label):
+    page = st.session_state.get("_pages", {}).get(key)
+    if page is not None:
+        st.page_link(page, label=label, icon=":material/arrow_forward:")
+
+
+VENDOR_COLORS = ["#16243A", "#4F7CAC", "#9A6A2F", "#6E9E80", "#B5655A", "#7A6FA8"]
+
+
 def page_board():
     s = get_state()
+    st.markdown(f"""<div class="intro"><div class="what"><b>Quote desk</b> reads every vendor reply however it arrives (an Excel sheet,
+        a letterhead PDF, a Word letter, a phone photo, a WhatsApp message), puts every price on one like-for-like basis, and tells you
+        what to award, what is still uncertain, and what each uncertainty is worth in rupees.</div>
+        <div class="how"><span><b>1</b>Read any format, never retype</span><span><b>2</b>Compare landed cost, same units and currency</span>
+        <span><b>3</b>Resolve what changes the award</span><span><b>4</b>Ask questions, then approve with an audit trail</span></div>
+        </div>""", unsafe_allow_html=True)
     header("Corrugated packaging, FY27 annual contract",
-           f"Waluj brewery · {config.RFX_ID} · 30 lines · bids closed 7 Oct 2026. "
-           "<b>Start here:</b> the recommendation, what could change it, and where each vendor stands.")
+           f"Deccan Peak Breweries, Waluj plant · {config.RFX_ID} · 30 lines · bids closed 7 Oct 2026")
     key_notice()
     missing = s.missing_extractions()
     if missing:
@@ -218,86 +268,82 @@ def page_board():
     issues = s.issues()
     hot = [i for i in issues if i["decision_relevant"]]
     covered = 30 - len(res["uncovered_lines"])
+    color = {v: VENDOR_COLORS[k % len(VENDOR_COLORS)] for k, v in enumerate(s.extractions)}
+    name_to_key = {s.vendor_names[v]: v for v in s.extractions}
 
-    # the recommendation, in one sentence
-    split = sorted(res["by_vendor"].items(), key=lambda kv: -kv[1]["value"])
-    if not split:
-        lead = "No vendor is qualified yet, so nothing can be awarded under the RFQ rule."
-    else:
-        if len(split) == 1:
-            who = short(split[0][0])
+    left, right = st.columns([7, 5], gap="medium")
+    # ---------------- the award, as one picture
+    with left:
+        split = sorted(res["by_vendor"].items(), key=lambda kv: -kv[1]["value"])
+        if res["total"]:
+            sav = res["savings_vs_fy26"]
+            delta = (f'<span class="pill good">↓ {money(sav)} vs last year</span>' if sav >= 0 else
+                     f'<span class="pill stop">↑ {money(-sav)} vs last year</span>') if res["fy26_comparable_base"] else ""
+            bar = "".join(f'<div title="{n}: {money(d["value"])}" style="width:{d["value"] / res["total"] * 100:.2f}%;'
+                          f'background:{color[name_to_key[n]]}"></div>' for n, d in split)
+            legend = "".join(f'<div class="lg"><span class="dot" style="background:{color[name_to_key[n]]}"></span>'
+                             f'<b>{short(n)}</b> {d["lines"]} lines · {money(d["value"])} · {d["value"] / res["total"]:.0%}</div>' for n, d in split)
+            flags = []
+            if res["uncovered_lines"]:
+                flags.append(f'{len(res["uncovered_lines"])} lines have no qualified quote yet')
+            if res.get("top_share", 0) > 0.7:
+                sp = s.award(max_share=0.7).get("split") or {}
+                if sp.get("feasible") and sp.get("moved"):
+                    flags.append(f'{short(res["top_vendor"])} holds {res["top_share"]:.0%} of spend. A 70/30 cap costs {money(sp["premium"])} a year, '
+                                 f'or nothing with L1 matching')
+                else:
+                    flags.append(f'{short(res["top_vendor"])} holds {res["top_share"]:.0%} of spend and no other vendor is qualified yet: '
+                                 f'single-source risk through peak season')
+            flag_html = "".join(f'<div class="warn-line">⚠ {f}</div>' for f in flags)
+            qual = sum(1 for v in s.status.values() if v == "pass")
+            inc = sum(1 for v in s.status.values() if v == "include")
+            st.markdown(f"""<div class="hero"><div class="eyebrow">Recommended award</div><div class="flute" style="width:120px;margin:6px 0 2px 0"></div>
+                <div class="big">{money(res['total'])} <span class="per">a year</span> {delta}</div>
+                <div class="bar">{bar}</div><div class="legend2">{legend}</div>
+                <div class="meta">{covered} of 30 lines covered · {qual} of {len(s.extractions)} vendors qualified{f" + {inc} included by you" if inc else ""} ·
+                lowest landed cost per line among qualified, on-spec quotes</div>{flag_html}</div>""", unsafe_allow_html=True)
         else:
-            parts = [f"{short(n)} ({d['lines']} lines)" for n, d in split]
-            who = ", ".join(parts[:-1]) + " and " + parts[-1]
-        scope = "all 30 lines" if covered == 30 else f"{covered} of 30 lines"
-        lead = f"Award {scope} to {who} for {money(res['total'])} a year"
-        if res["fy26_comparable_base"]:
-            lead += f", {money(res['savings_vs_fy26'])} below last year's contract" if res["savings_vs_fy26"] >= 0 else \
-                    f", {money(-res['savings_vs_fy26'])} above last year's contract"
-        lead += "."
-    if hot:
-        top = hot[0]
-        sub = (f"{len(hot)} open issue{'s' if len(hot) != 1 else ''} could change this. The largest: {issue_headline(top)} "
-               f"({money(_stake(top)[0])} at stake).")
-    else:
-        sub = "No open issue can change this recommendation."
-    if res["uncovered_lines"]:
-        sub += f" {len(res['uncovered_lines'])} lines have no qualified quote yet."
-    st.markdown(f'<div class="reco"><div class="lead">{lead}</div><div class="sub">{sub}</div></div>', unsafe_allow_html=True)
-    if res.get("top_share", 0) > 0.7:
-        sp = s.award(max_share=0.7).get("split") or {}
-        if sp.get("feasible") and sp.get("moved"):
-            fix = (f"Capping any vendor at 70% moves {len(sp['moved'])} line{'s' if len(sp['moved']) != 1 else ''} to the next-cheapest qualified "
-                   f"vendor for {money(sp['premium'])} a year, and nothing if they agree to match the L1 price (L1 matching).")
+            st.markdown('<div class="hero"><div class="eyebrow">Recommended award</div><div class="big">No award possible yet</div>'
+                        '<div class="meta">No vendor is qualified under the RFQ rule. See what each one is missing on the right.</div></div>',
+                        unsafe_allow_html=True)
+    # ---------------- what stands between her and approval
+    with right:
+        if hot:
+            items = "".join(f'<li><div class="it">{issue_headline(i)}</div><div class="iv">{money(_stake(i)[0])} · '
+                            f'{"changes L1 on " + str(len(i["lines_flipping"])) + " lines" if i["lines_flipping"] else "assumption to confirm"}</div></li>'
+                            for i in hot[:4])
+            more = f'<div class="meta">+{len(hot) - 4} more</div>' if len(hot) > 4 else ""
+            st.markdown(f'<div class="hero side"><div class="eyebrow">Before you approve</div><ol class="todo">{items}</ol>{more}</div>',
+                        unsafe_allow_html=True)
+            _link("issues", "Resolve these in Open issues")
         else:
-            fix = "No other qualified vendor quotes these lines, so qualifying a second vendor is the only way to reduce this risk."
-        st.markdown(f'<div class="issue"><div class="head">Supply risk: {short(res["top_vendor"])} would hold {res["top_share"]:.0%} of spend</div>'
-                    f'<div class="detail">One plant outage or strike during peak season (March to May) would stop shipments. {fix}</div></div>',
-                    unsafe_allow_html=True)
+            st.markdown('<div class="hero side"><div class="eyebrow">Before you approve</div><div class="big" style="font-size:1.4rem">'
+                        'Nothing open</div><div class="meta">No open issue can change this award.</div></div>', unsafe_allow_html=True)
+            _link("memo", "Write the award memo")
 
-    # progress through the sourcing event
-    n_prices = sum(1 for n in s.norms if n.status != "missing")
-    n_review = sum(1 for n in s.norms if n.status == "review")
-    steps = [("done", "RFQ issued", "28 Sep 2026"), ("done", "Replies read", f"{len(s.extractions)} of {len(vendor_dirs())}"),
-             ("done" if not n_review else "wait", "Prices normalised", f"{n_prices} prices · {n_review} to confirm"),
-             ("done" if not hot else "wait", "Open issues", f"{len(hot)} could change the award"),
-             ("done" if (not hot and not res["uncovered_lines"]) else ("block" if res["uncovered_lines"] else "wait"), "Award",
-              "Ready to approve" if (not hot and not res["uncovered_lines"]) else "Needs your decisions")]
-    st.markdown('<div class="steps">' + "".join(f'<div class="stp {c}"><div class="t">{t}</div><div class="v">{v}</div></div>' for c, t, v in steps)
-                + "</div>", unsafe_allow_html=True)
-
-    pct = (f"{res['savings_vs_fy26']/res['fy26_comparable_base']:.1%} on comparable lines" if res["fy26_comparable_base"] else "no comparable lines")
-    tiles = [("Recommended award", money(res["total"]) if res["total"] else "None yet", f"{covered} of 30 lines covered"),
-             ("Savings vs last year", money(res["savings_vs_fy26"]) if res["fy26_comparable_base"] else "-", pct),
-             ("Qualified vendors", f"{sum(1 for v in s.status.values() if v == 'pass')} of {len(s.extractions)}",
-              f"{sum(1 for v in s.status.values() if v == 'include')} more included by you"),
-             ("Decisions waiting on you", str(len(hot)), "open issues that change the award")]
-    st.markdown('<div class="kpis">' + "".join(f'<div class="kpi"><div class="kpi-label">{a}</div><div class="kpi-value">{b}</div>'
-                                               f'<div class="kpi-note">{c}</div></div>' for a, b, c in tiles) + "</div>", unsafe_allow_html=True)
-
-    st.subheader("Where each vendor stands")
-    cols = st.columns(len(s.extractions))
-    for col, (v, ex) in zip(cols, s.extractions.items()):
+    # ---------------- vendors, one row each
+    st.subheader("Vendors")
+    rows = []
+    for v, ex in s.extractions.items():
         lbl, cls = STATUS.get(s.status[v], ("Unknown", "muted"))
         ns = [n for n in s.norms if n.vendor == v]
         quoted = sum(1 for n in ns if n.status != "missing")
-        rev = sum(1 for n in ns if n.status == "review")
+        conf = sum(1 for n in ns if n.status == "review")
         won = res["by_vendor"].get(s.vendor_names[v], {"lines": 0, "value": 0})
-        fmt = ", ".join(sorted({f.split(".")[-1].upper().replace("TXT", "email") for f in ex.get("_meta", {}).get("files", [])}))
-        why = vendor_reason(s, v)
-        col.markdown(f"""<div class="vcard"><div class="name">{s.vendor_names[v]}</div>
-            <div class="meta">{place(ex.get('vendor_location'))} · sent {fmt}</div>{pill(lbl, cls)}
-            <div class="row">{quoted} of 30 lines quoted{f' · {rev} to confirm' if rev else ''}</div>
-            <div class="row"><b>{'L1 on ' + str(won['lines']) + ' lines · ' + money(won['value']) if won['lines'] else 'Not L1 on any line'}</b></div>
-            {f'<div class="why">{why}</div>' if why and s.status[v] != 'pass' else ''}</div>""", unsafe_allow_html=True)
-
-    st.subheader("Decide these first")
-    if not hot:
-        st.success("Nothing open can change the award. Go to Award memo when you are ready.")
-    for i in hot[:3]:
-        _issue_card(s, i, compact=True)
-    if len(hot) > 3:
-        st.caption(f"{len(hot) - 3} more in Open issues.")
+        share = won["value"] / res["total"] if res["total"] else 0
+        fmt = ", ".join(sorted({f.split(".")[-1].upper().replace("TXT", "Email") for f in ex.get("_meta", {}).get("files", [])}))
+        why = vendor_reason(s, v) if s.status[v] != "pass" else ""
+        rows.append(f"""<tr><td><span class="dot" style="background:{color[v]}"></span><b>{s.vendor_names[v]}</b>
+            <div class="sub">{place(ex.get('vendor_location'))}{' · ' + fmt if fmt else ''}</div></td>
+            <td>{pill(lbl, cls)}</td><td class="n">{quoted}/30{f'<div class="sub">{conf} to confirm</div>' if conf else ''}</td>
+            <td class="n">{won['lines'] or '–'}</td>
+            <td><div class="mini"><div style="width:{share * 100:.1f}%;background:{color[v]}"></div></div>
+                <div class="sub">{money(won['value']) + ' · ' + f'{share:.0%}' if won['lines'] else 'none'}</div></td>
+            <td class="why">{why or '–'}</td></tr>""")
+    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th>Status</th><th>Lines quoted</th><th>L1 on</th>'
+                '<th>Share of award</th><th>What is holding them back</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>",
+                unsafe_allow_html=True)
+    st.write("")
     _saved_results()
 
 
@@ -849,7 +895,7 @@ def _render_outputs(outs):
                     fig = px.scatter(df, x=o["x"], y=o["y"], color=o.get("color"), title=o["title"])
                 else:
                     fig = px.density_heatmap(df, x=o["x"], y=o["y"], z=o.get("color"), title=o["title"])
-                fig.update_layout(font_family="IBM Plex Sans", font_color=INK, plot_bgcolor="white", paper_bgcolor="white",
+                fig.update_layout(font_family="Anek Latin, sans-serif", font_color=INK, plot_bgcolor="white", paper_bgcolor="white",
                                   colorway=[INK, KRAFT, "#4F7CAC", "#6E9E80", "#B5655A"], margin=dict(l=10, r=10, t=50, b=10))
                 fig.update_xaxes(gridcolor=LINE); fig.update_yaxes(gridcolor=LINE)
                 st.plotly_chart(fig, width="stretch", key=f"ch{id(o)}{k}")
@@ -942,8 +988,9 @@ pages = {
     "Decide": [st.Page(page_memo, title="Award memo", url_path="memo")],
     "Trust": [st.Page(page_accuracy, title="Reading accuracy", url_path="accuracy")],
 }
+st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Decide"][0]}
 nav = st.navigation(pages)
 with st.sidebar:
-    st.markdown("**Quote desk**")
-    st.caption("Deccan Peak Breweries · Packaging. Demo data; all companies are fictional.")
+    st.markdown('<div class="brand">Quote desk</div><div class="flute" style="margin:8px 0 10px 0"></div>', unsafe_allow_html=True)
+    st.caption("From vendor replies to a defensible award. Demo for Deccan Peak Breweries; all companies are fictional.")
 nav.run()
