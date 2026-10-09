@@ -1,0 +1,9 @@
+q_id,question,type,pass_criterion
+Q1,Is your manufacturing plant ISO 9001 certified? Attach a valid certificate.,Mandatory,"Yes, with certificate valid on the contract start date"
+Q2,Do you have an in-house testing lab for BCT/ECT/burst strength?,Mandatory,"Yes, in-house"
+Q3,Do you use low-migration / food-safe printing inks?,Mandatory,Yes
+Q4,Rejection rate (%) on supplies over the last 12 months?,Mandatory,<= 2.0%
+Q5,Can you commit capacity of at least 120% of our monthly peak (Mar-May) volume?,Mandatory,Yes
+Q6,Standard lead time from PO to delivery at Waluj (days)?,Mandatory,<= 10 days
+Q7,Is your paper FSC-certified or from certified recycled fibre?,Preferred,Yes
+Q8,Distance of your manufacturing plant from Waluj (km)?,Info,-

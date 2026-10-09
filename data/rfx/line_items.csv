@@ -1,0 +1,31 @@
+line_id,description,style,ply,dimensions_mm,flute,board_spec,print,target_weight_kg,annual_qty,uom
+L01,Shipper 650 ml x 12 bottles - Deccan Classic Lager,RSC,5,375x285x300,BC,"150/22BF top, 120/18BF inner",2-col flexo,0.58,220000,pc
+L02,Shipper 650 ml x 12 bottles - Deccan Strong,RSC,5,375x285x300,BC,"150/22BF top, 120/18BF inner",2-col flexo,0.58,180000,pc
+L03,Shipper 650 ml x 12 bottles - Peak Wheat (premium),RSC,5,375x285x300,BC,"180/24BF top, 120/18BF inner",4-col flexo,0.61,30000,pc
+L04,Shipper 330 ml x 24 bottles - Deccan Classic,RSC,5,410x275x235,BC,"150/22BF top, 120/18BF inner",2-col flexo,0.55,60000,pc
+L05,Shipper 330 ml x 24 cans - Deccan Classic,RSC,5,400x270x125,BC,"150/22BF top, 120/18BF inner",2-col flexo,0.38,150000,pc
+L06,Shipper 500 ml x 24 cans - Deccan Strong,RSC,5,400x270x170,BC,"150/22BF top, 120/18BF inner",2-col flexo,0.44,90000,pc
+L07,Shipper 500 ml x 24 cans - Peak Wheat (premium),RSC,5,400x270x170,BC,"180/24BF top, 120/18BF inner",4-col flexo,0.46,20000,pc
+L08,Shipper 650 ml x 12 - plain (contract bottling),RSC,5,375x285x300,BC,"140/20BF top, 120/18BF inner",Plain,0.56,40000,pc
+L09,Shipper 330 ml x 24 cans - plain,RSC,5,400x270x125,BC,"140/20BF top, 120/18BF inner",Plain,0.37,30000,pc
+L10,Master carton 4 x 6-pack cans 330 ml,RSC,3,395x265x130,B,150/20BF,1-col flexo,0.24,50000,pc
+L11,Master carton 4 x 6-pack cans 500 ml,RSC,3,395x265x175,B,150/20BF,1-col flexo,0.28,30000,pc
+L12,Mono carton outer - gift pack 2 x 650 ml,RSC,3,200x100x300,E,180/22BF,1-col flexo,0.15,15000,pc
+L13,Spares carton - general purpose (small),RSC,3,300x200x200,B,120/18BF,Plain,0.18,8000,pc
+L14,Spares carton - general purpose (large),RSC,3,500x400x400,B,120/18BF,Plain,0.48,4000,pc
+L15,"Die-cut tray 24 cans 330 ml, shrink-wrap base",Die-cut tray,3,400x270x40,E,180/22BF,Plain,0.15,110000,pc
+L16,"Die-cut tray 24 cans 500 ml, shrink-wrap base",Die-cut tray,3,400x270x50,E,180/22BF,Plain,0.16,70000,pc
+L17,Die-cut display tray 12 x 650 ml (modern trade),Die-cut tray,5,380x290x120,BE,180/24BF top,2-col flexo,0.33,15000,pc
+L18,Partition set 12-cell for 650 ml bottles (2 long + 3 short),Slotted partition,3,set of 5 strips,B,120/18BF,Plain,0.12,150000,set
+L19,Partition set 24-cell for 330 ml bottles (3 long + 5 short),Slotted partition,3,set of 8 strips,B,120/18BF,Plain,0.14,60000,set
+L20,Layer pad 1000x1200 mm (pallet tier sheet),Pad,3,1000x1200,B,120/18BF,Plain,0.42,25000,pc
+L21,Layer pad 1100x1100 mm (export pallet),Pad,3,1100x1100,B,120/18BF,Plain,0.39,8000,pc
+L22,Top/bottom pad for 650 ml shipper,Pad,3,370x280,B,120/18BF,Plain,0.035,100000,pc
+L23,"Corner edge board 50x50x5 mm, 1000 mm",Edge board,0,50x50x5x1000,-,Laminated kraft,Plain,0.2,20000,pc
+L24,Keg collar sleeve 30 L keg,RSC sleeve,5,420x420x200,BC,150/22BF top,1-col flexo,0.52,6000,pc
+L25,Promo shipper 650 ml x 12 - IPL season limited edition,RSC,5,375x285x300,BC,"180/24BF top, 120/18BF inner",4-col flexo,0.61,25000,pc
+L26,Sample/QA carton 6 x 650 ml,RSC,5,250x190x300,BC,150/22BF top,Plain,0.33,5000,pc
+L27,Glass bottle return crate liner,Pad,3,560x380,B,120/18BF,Plain,0.09,30000,pc
+L28,Export shipper 650 ml x 12 - 7-ply (Nepal/Bhutan),RSC,7,380x290x305,BCB,"180/24BF top, 150/22BF inner",2-col flexo,0.85,12000,pc
+L29,Export shipper 330 ml x 24 cans - 7-ply,RSC,7,405x275x130,BCB,"180/24BF top, 150/22BF inner",2-col flexo,0.56,10000,pc
+L30,Cold-chain shipper 650 ml x 12 - wax/WR coated,RSC,5,375x285x300,BC,"150/22BF top WR coated, 120/18BF inner",2-col flexo,0.62,20000,pc

@@ -1,0 +1,31 @@
+line_id,fy26_description,fy26_vendor,currency,fy26_unit_price,uom,fy26_fx_usd_inr,notes
+L01,Shipper 650 ml x 12 bottles - Deccan Classic Lager,Nordvik Packaging India Pvt. Ltd.,USD,0.44,pc,83.9,FOR Bhiwandi; freight extra
+L02,Shipper 650 ml x 12 bottles - Deccan Strong,Nordvik Packaging India Pvt. Ltd.,USD,0.44,pc,83.9,FOR Bhiwandi; freight extra
+L03,Shipper 650 ml x 12 bottles - Peak Wheat (premium),Nordvik Packaging India Pvt. Ltd.,USD,0.476,pc,83.9,FOR Bhiwandi; freight extra
+L04,Shipper 330 ml x 24 bottles - Deccan Classic,Nordvik Packaging India Pvt. Ltd.,USD,0.408,pc,83.9,FOR Bhiwandi; freight extra
+L05,Shipper 330 ml x 24 cans - Deccan Classic,Nordvik Packaging India Pvt. Ltd.,USD,0.296,pc,83.9,FOR Bhiwandi; freight extra
+L06,Shipper 500 ml x 24 cans - Deccan Strong,Nordvik Packaging India Pvt. Ltd.,USD,0.336,pc,83.9,FOR Bhiwandi; freight extra
+L07,Shipper 500 ml x 24 cans - Peak Wheat (premium),Nordvik Packaging India Pvt. Ltd.,USD,0.374,pc,83.9,FOR Bhiwandi; freight extra
+L08,Shipper 650 ml x 12 - plain (contract bottling),Nordvik Packaging India Pvt. Ltd.,USD,0.382,pc,83.9,FOR Bhiwandi; freight extra
+L09,Shipper 330 ml x 24 cans - plain,Nordvik Packaging India Pvt. Ltd.,USD,0.255,pc,83.9,FOR Bhiwandi; freight extra
+L10,Master carton 4 x 6-pack cans 330 ml,Nordvik Packaging India Pvt. Ltd.,USD,0.174,pc,83.9,FOR Bhiwandi; freight extra
+L11,Master carton 4 x 6-pack cans 500 ml,Nordvik Packaging India Pvt. Ltd.,USD,0.191,pc,83.9,FOR Bhiwandi; freight extra
+L12,Mono carton outer - gift pack 2 x 650 ml,Indrayani Corrupack Pvt. Ltd.,INR,9.86,pc,,FOR Waluj
+L13,Spares carton - general purpose (small),Indrayani Corrupack Pvt. Ltd.,INR,10.91,pc,,FOR Waluj
+L14,Spares carton - general purpose (large),Indrayani Corrupack Pvt. Ltd.,INR,29.52,pc,,FOR Waluj
+L15,"Die-cut tray 24 cans 330 ml, shrink-wrap base",Nordvik Packaging India Pvt. Ltd.,USD,0.121,pc,83.9,FOR Bhiwandi; freight extra
+L16,"Die-cut tray 24 cans 500 ml, shrink-wrap base",Nordvik Packaging India Pvt. Ltd.,USD,0.123,pc,83.9,FOR Bhiwandi; freight extra
+L17,Die-cut display tray 12 x 650 ml (modern trade),Indrayani Corrupack Pvt. Ltd.,INR,24.56,pc,,FOR Waluj
+L18,Partition set 12-cell for 650 ml bottles (2 long + 3 short),Nordvik Packaging India Pvt. Ltd.,USD,0.079,set,83.9,FOR Bhiwandi; freight extra
+L19,Partition set 24-cell for 330 ml bottles (3 long + 5 short),Nordvik Packaging India Pvt. Ltd.,USD,0.092,set,83.9,FOR Bhiwandi; freight extra
+L20,Layer pad 1000x1200 mm (pallet tier sheet),Nordvik Packaging India Pvt. Ltd.,USD,0.258,pc,83.9,FOR Bhiwandi; freight extra
+L21,Layer pad 1100x1100 mm (export pallet),Indrayani Corrupack Pvt. Ltd.,INR,22.32,pc,,FOR Waluj
+L22,Top/bottom pad for 650 ml shipper,Nordvik Packaging India Pvt. Ltd.,USD,0.022,pc,83.9,FOR Bhiwandi; freight extra
+L23,"Corner edge board 50x50x5 mm, 1000 mm",Indrayani Corrupack Pvt. Ltd.,INR,11.42,pc,,FOR Waluj
+L24,Keg collar sleeve 30 L keg,Nordvik Packaging India Pvt. Ltd.,USD,0.395,pc,83.9,FOR Bhiwandi; freight extra
+L25,Promo shipper 650 ml x 12 - IPL season limited edition,Nordvik Packaging India Pvt. Ltd.,USD,0.493,pc,83.9,FOR Bhiwandi; freight extra
+L26,Sample/QA carton 6 x 650 ml,Indrayani Corrupack Pvt. Ltd.,INR,21.09,pc,,FOR Waluj
+L27,Glass bottle return crate liner,Nordvik Packaging India Pvt. Ltd.,USD,0.055,pc,83.9,FOR Bhiwandi; freight extra
+L28,Export shipper 650 ml x 12 - 7-ply (Nepal/Bhutan),,,,pc,,New line in FY27 - no history
+L29,Export shipper 330 ml x 24 cans - 7-ply,,,,pc,,New line in FY27 - no history
+L30,Cold-chain shipper 650 ml x 12 - wax/WR coated,,,,pc,,New line in FY27 - no history

@@ -1,0 +1,31 @@
+line_id,description,annual_qty,A_landed,B_landed,C_landed,D_landed,E_landed
+L01,Shipper 650 ml x 12 bottles - Deccan Classic Lager,220000,38.93,36.56,32.41,39.73,36.75
+L02,Shipper 650 ml x 12 bottles - Deccan Strong,180000,37.32,37.2,31.74,39.73,40.29
+L03,Shipper 650 ml x 12 bottles - Peak Wheat (premium),30000,40.2,40.0,39.9,43.53,43.54
+L04,Shipper 330 ml x 24 bottles - Deccan Classic,60000,36.22,34.46,33.54,37.68,37.39
+L05,Shipper 330 ml x 24 cans - Deccan Classic,150000,25.07,23.66,20.65,26.03,24.78
+L06,Shipper 500 ml x 24 cans - Deccan Strong,90000,29.0,28.75,24.2,30.14,30.76
+L07,Shipper 500 ml x 24 cans - Peak Wheat (premium),20000,32.0,31.61,31.13,33.26,34.16
+L08,Shipper 650 ml x 12 - plain (contract bottling),40000,33.87,33.9,32.86,32.76,35.11
+L09,Shipper 330 ml x 24 cans - plain,30000,21.83,21.32,20.75,21.64,23.43
+L10,Master carton 4 x 6-pack cans 330 ml,50000,14.15,13.95,14.04,14.28,15.96
+L11,Master carton 4 x 6-pack cans 500 ml,30000,17.09,17.19,16.78,16.66,17.55
+L12,Mono carton outer - gift pack 2 x 650 ml,15000,8.94,9.0,8.5,8.92,
+L13,Spares carton - general purpose (small),8000,10.05,10.56,9.82,10.08,
+L14,Spares carton - general purpose (large),4000,27.46,26.56,26.74,26.88,
+L15,"Die-cut tray 24 cans 330 ml, shrink-wrap base",110000,10.23,10.26,9.55,10.35,11.06
+L16,"Die-cut tray 24 cans 500 ml, shrink-wrap base",70000,10.58,10.59,10.24,11.04,11.25
+L17,Die-cut display tray 12 x 650 ml (modern trade),15000,21.89,21.59,21.84,22.77,
+L18,Partition set 12-cell for 650 ml bottles (2 long + 3 short),150000,6.66,6.59,6.31,6.48,7.27
+L19,Partition set 24-cell for 330 ml bottles (3 long + 5 short),60000,7.51,7.49,7.66,7.56,8.47
+L20,Layer pad 1000x1200 mm (pallet tier sheet),25000,21.67,23.0,22.24,21.84,23.82
+L21,Layer pad 1100x1100 mm (export pallet),8000,21.15,21.3,19.83,20.28,
+L22,Top/bottom pad for 650 ml shipper,100000,1.8,1.9,1.8,1.82,2.02
+L23,"Corner edge board 50x50x5 mm, 1000 mm",20000,10.71,10.52,10.6,,
+L24,Keg collar sleeve 30 L keg,6000,33.72,32.92,32.67,35.62,36.17
+L25,Promo shipper 650 ml x 12 - IPL season limited edition,25000,40.15,41.72,38.99,43.53,45.04
+L26,Sample/QA carton 6 x 650 ml,5000,19.55,19.87,18.84,19.3,
+L27,Glass bottle return crate liner,30000,4.62,4.75,4.61,4.68,5.08
+L28,Export shipper 650 ml x 12 - 7-ply (Nepal/Bhutan),12000,57.78,55.73,,54.4,
+L29,Export shipper 330 ml x 24 cans - 7-ply,10000,38.17,36.52,,35.84,
+L30,Cold-chain shipper 650 ml x 12 - wax/WR coated,20000,39.72,39.45,,41.68,
