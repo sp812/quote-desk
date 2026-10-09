@@ -56,6 +56,29 @@ def new_draft() -> dict:
     return {"header": {}, "line_items": [], "questionnaire": [], "terms": [], "vendors": list(DEFAULT_VENDORS)}
 
 
+def issued_draft() -> dict:
+    """The RFQ as actually issued for this sourcing event (no AI involved): lets the buyer reopen it and follow the replies."""
+    from .config import RFX_ID
+    with open(RFX_DIR / "line_items.csv") as f:
+        lines = [{k: r[k] for k in ("line_id", "description", "ply", "dimensions_mm", "board_spec", "print", "annual_qty", "uom")}
+                 for r in csv.DictReader(f)]
+    with open(RFX_DIR / "questionnaire.csv") as f:
+        qs = list(csv.DictReader(f))
+    header = {"title": f"{RFX_ID}: Annual rate contract, corrugated packaging FY2026-27 (Waluj)",
+              "contract_period": "01-Nov-2026 to 31-Oct-2027", "issued": "28-Sep-2026", "bid_due": "07-Oct-2026",
+              "price_basis": "Per piece (per set for partitions), FOR Waluj plant, ex-GST",
+              "payment_terms": "45 days from GRN", "award_basis": "Lowest landed cost per line among vendors who pass the mandatory questionnaire"}
+    header["freight"] = "Included (FOR destination)"
+    header["delivery"] = "Waluj Brewery, MIDC Waluj, Chhatrapati Sambhajinagar"
+    terms = ["Scope: corrugated shippers, trays, partitions and pads under an annual rate contract; weekly call-offs, peak March-May",
+             "Quantities are annual estimates; award may be split by line",
+             "Boxes must meet the specified board grade and pass BCT testing per DPB standard PS-04",
+             "Only suppliers passing all mandatory questionnaire items are eligible",
+             "Award on lowest landed cost per line: price + freight to Waluj, net of discounts, ex-GST",
+             "Quote in the attached template; other formats are accepted"]
+    return {"header": header, "line_items": lines, "questionnaire": qs, "terms": terms, "vendors": list(DEFAULT_VENDORS)}
+
+
 def chat(draft: dict, history: list[dict], user_msg: str, on_step=None):
     def run_tool(name, inp):
         if name == "get_spec_master":

@@ -227,3 +227,12 @@ def test_analyst_sql_cannot_touch_files(norms, ex):
         con.execute("select * from read_csv('/etc/passwd')").fetchall()
     with pytest.raises(Exception):
         con.execute("SET enable_external_access = true")
+
+
+def test_issued_rfq_matches_the_files_vendors_replied_to():
+    from core.copilot import issued_draft
+    from core.extract import load_rfx_lines, load_questionnaire
+    d = issued_draft()
+    assert [l["line_id"] for l in d["line_items"]] == [l["line_id"] for l in load_rfx_lines()]
+    assert [q["q_id"] for q in d["questionnaire"]] == [q["q_id"] for q in load_questionnaire()]
+    assert len(d["vendors"]) == 5

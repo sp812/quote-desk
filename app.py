@@ -410,6 +410,10 @@ def page_draft():
             st.markdown('<p class="small">For example: "Annual rate contract for all corrugated packaging at Waluj from November, same items as '
                         'last year plus the new 7-ply export shippers and the cold-chain carton. Quality matters, we had rejection problems last year."</p>',
                         unsafe_allow_html=True)
+        if not st.session_state.draft_chat and not st.session_state.draft["line_items"]:
+            if st.button(f"Or open the RFQ already issued ({config.RFX_ID})", key="load_issued"):
+                st.session_state.draft = copilot.issued_draft()
+                st.rerun()
         msg = st.chat_input("What do you need to buy?", disabled=not api_key_present())
         if msg:
             st.session_state.draft_chat.append(("user", msg))
@@ -425,13 +429,13 @@ def page_draft():
             st.caption("Builds here as you talk.")
         if d["header"]:
             st.markdown('<table class="terms">' + "".join(f"<tr><td>{E(k.replace('_', ' ').capitalize())}</td><td>{E(str(v))}</td></tr>"
-                                                         for k, v in d["header"].items()) + "</table>", unsafe_allow_html=True)
+                                                         for k, v in d["header"].items() if k != "title") + "</table>", unsafe_allow_html=True)
         if d["line_items"]:
             st.markdown(f"**Line items ({len(d['line_items'])})**")
-            st.dataframe(pd.DataFrame(d["line_items"]), hide_index=True, width="stretch", height=280)
+            st.dataframe(pd.DataFrame(d["line_items"]).rename(columns=lambda c: c.replace("_", " ").capitalize()), hide_index=True, width="stretch", height=280)
         if d["questionnaire"]:
             st.markdown("**Supplier questionnaire**")
-            st.dataframe(pd.DataFrame(d["questionnaire"]), hide_index=True, width="stretch")
+            st.dataframe(pd.DataFrame(d["questionnaire"]).rename(columns=lambda c: c.replace("_", " ").capitalize()), hide_index=True, width="stretch")
         if d["terms"]:
             st.markdown("**Terms**\n" + "\n".join(f"- {t}" for t in d["terms"]))
         if d["line_items"]:
@@ -445,8 +449,74 @@ def page_draft():
                 st.session_state.sent = channel
                 log(load_decisions(), "rfq sent", f"Sent to {len(d['vendors'])} vendors by {channel} (simulated)")
             if st.session_state.get("sent"):
-                st.success(f"Sent to {len(d['vendors'])} vendors by {st.session_state.sent}. Sending is simulated in this demo; "
-                           f"the five replies to {config.RFX_ID} are already in Vendor replies, including one that arrived as a WhatsApp photo.")
+                st.success(f"Sent to {len(d['vendors'])} vendors by {st.session_state.sent} (simulated). Replies are tracked below.")
+    if st.session_state.get("sent"):
+        st.subheader("Replies")
+        _reply_tracker(get_state(), key="draft")
+
+
+
+FORMAT = {".xlsx": "Excel", ".xlsm": "Excel", ".pdf": "PDF", ".docx": "Word", ".jpg": "Photo", ".jpeg": "Photo", ".png": "Photo"}
+
+
+def _reply_meta(vdir):
+    """Who replied, when, on which channel and in what format, taken from what actually arrived."""
+    from email.utils import parsedate_to_datetime
+    sender, when = vdir.name.split("_")[-1].title(), None
+    mail = vdir / "email.txt"
+    if mail.exists():
+        for ln in mail.read_text(errors="ignore").splitlines()[:12]:
+            if ln.lower().startswith("from:"):
+                sender = ln[5:].split("<")[0].strip() or sender
+            if ln.lower().startswith("date:"):
+                try:
+                    when = parsedate_to_datetime(ln[5:].strip())
+                except Exception:
+                    pass
+    files = [f for f in vdir.iterdir() if f.is_file()]
+    kinds = []
+    for f in files:
+        k = FORMAT.get(f.suffix.lower())
+        if k and k not in kinds:
+            kinds.append(k)
+    photo = "Photo" in kinds
+    return dict(sender=sender, when=when, channel="WhatsApp" if photo else "Email",
+                formats=kinds or ["Email text"], attachments=sum(1 for f in files if f.name != "email.txt"))
+
+
+def _reply_tracker(s, key="tracker"):
+    """The handoff between sending the RFQ and reading the replies: one row per vendor, as they came in."""
+    from core.config import EXTRACT_CACHE
+    dirs = vendor_dirs()
+    rows, unread = [], []
+    for d in sorted(dirs, key=lambda d: (_reply_meta(d)["when"] is None, _reply_meta(d)["when"] or 0)):
+        m = _reply_meta(d)
+        name = s.vendor_names.get(d.name) or m["sender"]
+        read = (EXTRACT_CACHE / f"{d.name}.json").exists() and d.name in s.extractions
+        if read:
+            ns = [n for n in s.norms if n.vendor == d.name]
+            priced = sum(1 for n in ns if n.status != "missing")
+            status = pill("Read", "good") + f'<div class="sub">{priced} of 30 priced</div>'
+        else:
+            unread.append(d)
+            status = pill("Not read yet", "check")
+        when = m["when"].strftime("%a %d %b, %H:%M") if m["when"] else "–"
+        rows.append(f"""<tr><td><b>{E(name)}</b></td><td class="n">{when}</td><td>{m['channel']}</td>
+            <td>{E(' + '.join(m['formats']))}{f'<div class="sub">{m["attachments"]} file{"s" if m["attachments"] != 1 else ""}</div>' if m['attachments'] else ''}</td>
+            <td>{status}</td></tr>""")
+    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th>Received</th><th>Channel</th><th>Format</th><th>Status</th></tr></thead>'
+                f'<tbody>{"".join(rows)}</tbody></table>', unsafe_allow_html=True)
+    st.write("")
+    c1, c2 = st.columns([2, 3])
+    if unread and c1.button(f"Read {len(unread)} repl{'ies' if len(unread) != 1 else 'y'}", type="primary",
+                            disabled=not api_key_present(), key=f"read_{key}"):
+        from core.pipeline import run_many
+        with st.spinner(f"Reading {len(unread)} replies, usually 1-3 minutes"):
+            run_many(unread)
+        refresh(); st.rerun()
+    if not unread:
+        with c1:
+            _link("compare", "Open the comparison")
 
 
 # ================================================================== Vendor replies
@@ -462,6 +532,8 @@ def page_replies():
     s = get_state()
     header("Vendor replies", "What each vendor sent, next to what was read from it.")
     key_notice()
+    with st.expander(f"Inbox: {len(vendor_dirs())} replies to {config.RFX_ID}", expanded=not s.ready()):
+        _reply_tracker(s, key="replies")
     dirs = vendor_dirs()
     names = {d.name: s.vendor_names.get(d.name, d.name.split("_")[-1].title()) for d in dirs}
     pick = st.segmented_control("Vendor", [d.name for d in dirs], format_func=lambda k: short(names[k]),
@@ -1114,7 +1186,7 @@ pages = {
     "Decide": [st.Page(page_memo, title="Award and approvals", url_path="memo")],
     "Trust": [st.Page(page_accuracy, title="Reading accuracy", url_path="accuracy")],
 }
-st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Decide"][0]}
+st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Decide"][0], "compare": pages["Evaluate"][0]}
 nav = st.navigation(pages)
 with st.sidebar:
     st.markdown('<div class="brand">Quote desk</div><div class="flute" style="margin:8px 0 10px 0"></div>', unsafe_allow_html=True)
