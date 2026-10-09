@@ -116,6 +116,32 @@ def agent_loop(system: str, messages: list[dict], tools: list[dict], run_tool: C
     return "I stopped after too many steps. Try a narrower question.", msgs
 
 
+def trim_history(msgs: list[dict], keep_turns: int = 6) -> list[dict]:
+    """Keep the last few question-and-answer turns so a long conversation never overflows the context.
+    Cuts only at a plain user question, so tool calls and their results are never separated."""
+    starts = [i for i, m in enumerate(msgs) if m.get("role") == "user" and isinstance(m.get("content"), str)]
+    return msgs[starts[-keep_turns]:] if len(starts) > keep_turns else msgs
+
+
+def friendly_error(e: Exception) -> str:
+    """What to tell a buyer when an AI call fails, instead of a stack trace."""
+    status = getattr(e, "status_code", None)
+    msg = str(e).lower()
+    if status in (401, 403) or "api key" in msg or "authentication" in msg:
+        return "The AI service rejected the API key. Check ANTHROPIC_API_KEY in the app's secrets."
+    if status == 429 or "rate" in msg:
+        return "The AI service is busy (rate limit). Wait a minute and try again."
+    if status == 529 or "overloaded" in msg:
+        return "The AI service is overloaded right now. Try again in a minute."
+    if status == 413 or "too large" in msg or "too long" in msg or "prompt is too long" in msg:
+        return "That was too much for one request (file or conversation too large). Try a smaller file or start a new conversation."
+    if "timeout" in msg or "timed out" in msg or "connection" in msg:
+        return "The AI service did not respond in time. Try again."
+    if status == 400:
+        return f"The AI service could not process this request: {str(e)[:200]}"
+    return f"Something went wrong: {str(e)[:200]}"
+
+
 def simple_text(system: str, prompt: str, model: str = MODEL, max_tokens: int = 8000, effort: str | None = "medium") -> str:
     resp = _create(effort=effort, model=model, max_tokens=max_tokens, system=system,
                    messages=[{"role": "user", "content": prompt}])

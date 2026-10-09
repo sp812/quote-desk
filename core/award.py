@@ -25,6 +25,7 @@ class Scenario:
     max_vendors: int | None = None           # e.g. 2 = consolidate to at most two vendors
     max_share: float | None = None           # e.g. 0.7 = no vendor above 70% of spend (supply security)
     overrides: dict[str, int] = field(default_factory=dict)   # group -> candidate index
+    unblock: set[str] = field(default_factory=set)            # held-out quotes (block_group) to treat as accepted
 
 
 def _price(n: NormQuote, overrides: dict[str, int]) -> float | None:
@@ -48,6 +49,8 @@ def _solve(norms, sc: Scenario, discount_on: dict[str, float]):
         opts = []
         for n in by.get(lid, []):
             if n.vendor not in sc.eligible or n.status == "missing":
+                continue
+            if not n.awardable and (n.block_group is None or n.block_group not in sc.unblock):
                 continue
             if not n.spec_compliant and not sc.allow_spec_deviation:
                 continue
@@ -280,11 +283,33 @@ def impact(norms: list[NormQuote], sc: Scenario, discounts, vendor_status: dict[
                            newly_covered_value=round(sum(new_by[l]["line_total"] for l in newly_covered), 2),
                            decision_relevant=bool(flips), resolvable=False, status=st))
 
+    # 2b) quotes held out of the award (e.g. far below every other vendor) - what if the buyer accepts them?
+    held: dict[str, list[NormQuote]] = {}
+    for n in norms:
+        if not n.awardable and n.block_group and n.vendor in sc.eligible:
+            held.setdefault(n.block_group, []).append(n)
+    for g, ns in held.items():
+        sc2 = copy.copy(sc); sc2.unblock = set(sc.unblock) | {g}
+        r = award(norms, sc2, discounts)
+        w = winners(r)
+        flips = [lid for lid in w if w[lid] != base_w[lid]]
+        issues.append(dict(id=g, kind="outlier", vendor=ns[0].vendor, vendor_name=ns[0].vendor_name,
+                           title=next((f.text for f in ns[0].flags if f.group == g), g), lines=sorted(n.line_id for n in ns),
+                           quote_value_swing=0.0, award_swing=round(base["total"] - r["total"], 2), lines_flipping=flips,
+                           decision_relevant=bool(flips), resolvable=False, acceptable=True))
+
     # 3) single-value assumptions (freight estimate, FX, history) - exposure in the current award
     seen = set()
     for n in norms:
         for f in n.flags:
             if f.group and f.type in ("freight", "fx", "history", "spec") and f.group not in seen:
+                if f.severity == "critical" and f.type in ("freight", "fx"):   # quote held out: no landed price to compare
+                    seen.add(f.group)
+                    affected = sorted({m.line_id for m in norms if any(ff.group == f.group for ff in m.flags)})
+                    issues.append(dict(id=f.group, kind=f.type, vendor=n.vendor, vendor_name=n.vendor_name, title=f.text,
+                                       lines=affected, quote_value_swing=0.0, award_swing=0.0, lines_flipping=[],
+                                       decision_relevant=False, resolvable=False, held_out=True))
+                    continue
                 seen.add(f.group)
                 affected = [m for m in norms if any(ff.group == f.group for ff in m.flags)]
                 in_award = [m.line_id for m in affected if base_w.get(m.line_id) == m.vendor]

@@ -11,9 +11,21 @@ from .award import award, Scenario, impact
 
 # ---------------- buyer decisions & audit log ----------------
 def load_decisions() -> dict:
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
-    return {"choices": {}, "eligibility": {}, "log": []}
+    """Never let a damaged decisions file take the app down: keep a copy of it and start clean."""
+    blank = {"choices": {}, "eligibility": {}, "log": []}
+    if not STATE_FILE.exists():
+        return blank
+    try:
+        d = json.loads(STATE_FILE.read_text())
+        if not isinstance(d, dict):
+            raise ValueError("not an object")
+    except Exception:
+        STATE_FILE.rename(STATE_FILE.with_suffix(f".damaged-{datetime.now():%Y%m%d%H%M%S}.json"))
+        return blank
+    for k, v in blank.items():
+        if not isinstance(d.get(k), type(v)):
+            d[k] = type(v)()
+    return d
 
 
 def save_decisions(d: dict) -> None:
@@ -48,8 +60,9 @@ def run_many(dirs, progress=None, workers=3):
                 f.result(); out[d.name] = None
                 if progress: progress(f"Read {d.name}")
             except Exception as e:
-                out[d.name] = str(e)
-                if progress: progress(f"Could not read {d.name}: {e}")
+                from .llm import friendly_error
+                out[d.name] = friendly_error(e)
+                if progress: progress(f"Could not read {d.name}: {friendly_error(e)}")
     dec = load_decisions()
     log(dec, "extraction", f"Read {sum(1 for v in out.values() if v is None)} of {len(out)} replies", actor="system")
     return out
@@ -71,6 +84,16 @@ def run_extraction(vdir, progress=None):
     return ex, q
 
 
+def _unique_names(names: dict[str, str]) -> dict[str, str]:
+    """Two replies from vendors with the same name would merge in every total; keep them apart."""
+    out, seen = {}, {}
+    for k, n in names.items():
+        n = n.strip() or k
+        seen[n] = seen.get(n, 0) + 1
+        out[k] = n if seen[n] == 1 else f"{n} ({seen[n]})"
+    return out
+
+
 class State:
     """Everything the UI and the analyst need, rebuilt from cached extractions + buyer decisions."""
 
@@ -80,7 +103,9 @@ class State:
         self.q_evals = questionnaire.load_cached()
         self.norms = normalize_all(self.extractions, self.decisions) if self.extractions else []
         self.discounts = conditional_discounts(self.extractions)
-        self.vendor_names = {k: v.get("vendor_name", k) for k, v in self.extractions.items()}
+        self.vendor_names = _unique_names({k: (v.get("vendor_name") or k) for k, v in self.extractions.items()})
+        for n in self.norms:
+            n.vendor_name = self.vendor_names[n.vendor]
         self.verdicts = {}
         for v in self.extractions:
             if v in self.q_evals:

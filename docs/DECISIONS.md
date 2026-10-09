@@ -14,6 +14,7 @@
 - **A scorecard as a second lens, not the rule.** Price, quality, delivery, commercial terms and coverage are scored 0-100 by visible formulas with adjustable weights. The award still follows the RFQ rule; the scorecard shows approvers the trade-offs (in the demo, the only qualified vendor is 3% above the cheapest like-for-like price).
 - **AI prepares, people validate.** Quality, Logistics, Finance and the VP each get a specific checklist built from the award; their sign-off is logged, and goes stale if the award changes afterwards. Including a vendor needs a written reason. Everything ships in the award pack.
 - **Channel: email, WhatsApp and vendor portal** (simulated). Small Indian vendors answer on WhatsApp, and vendor participation decides whether a sourcing event works.
+- **A price that can't be trusted never enters the award.** Unknown currency, a zero price, freight extra with no known lane, or a price more than 50% below every other vendor is shown but held out until the buyer accepts it with a written reason.
 - **Guardrails.** Vendor documents are treated as data (instructions inside them are ignored and flagged); the analyst's SQL cannot read files or the network; vendor text is escaped before display.
 
 ## Deliberately left out

@@ -235,6 +235,7 @@ class Analyst:
 
     def ask(self, history: list[dict], question: str, on_step=None) -> tuple[str, list[dict], list[dict]]:
         self.outputs = []
-        msgs = history + [{"role": "user", "content": question}]
+        from .llm import trim_history
+        msgs = trim_history(history) + [{"role": "user", "content": question}]
         text, msgs = agent_loop(SYSTEM, msgs, TOOLS, self.run_tool, on_step=on_step, max_steps=12)
         return text, msgs, self.outputs

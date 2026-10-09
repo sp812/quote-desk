@@ -56,6 +56,8 @@ class NormQuote:
     confidence: float | None = None
     group: str | None = None
     resolved_by_buyer: bool = False
+    awardable: bool = True                  # False = shown, but kept out of the award until the buyer acts
+    block_group: str | None = None          # issue id that, when accepted by the buyer, makes it awardable
 
     def to_dict(self):
         d = asdict(self)
@@ -73,6 +75,21 @@ def load_fy26() -> dict:
 def load_freight() -> dict:
     with open(RECORDS / "freight_benchmarks.csv") as f:
         return {r["lane"]: float(r["inr_per_kg"]) for r in csv.DictReader(f)}
+
+
+def canon_currency(c) -> str:
+    """'Rs.', 'INR/-', '₹', 'rupees', '' -> INR; 'US$', '$', 'usd' -> USD; anything else upper-cased as given."""
+    t = str(c or "").strip().upper()
+    letters = "".join(ch for ch in t if ch.isalpha())
+    if "$" in t and "₹" not in t:
+        return "USD"
+    if not letters and ("₹" in t or not t):
+        return "INR"
+    if letters in ("INR", "RS", "RUPEES", "RUPEE", "UNSTATED", "NONE", "NA", "") or "₹" in t or letters.startswith("INR"):
+        return "INR"
+    if letters in ("USD", "US", "USDOLLAR", "USDOLLARS", "DOLLAR", "DOLLARS") or t in ("$", "US$"):
+        return "USD"
+    return letters or t
 
 
 def lane_for(location: str) -> str | None:
@@ -123,8 +140,11 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
             continue
         nq.source, nq.source_quote = q.get("source", ""), q.get("source_quote", "")
         nq.vendor_item_text, nq.confidence = q.get("vendor_item_text", ""), q.get("confidence")
-        cands = [v for v in (num(c) for c in (q.get("price_candidates") or [])) if v is not None]
-        cur = (q.get("currency") or terms.get("currency") or "INR").upper()
+        raw = [v for v in (num(c) for c in (q.get("price_candidates") or [])) if v is not None]
+        cands = [v for v in raw if v > 0]
+        if raw and not cands:
+            nq.flags.append(Flag("missing", "critical", f"Price read as {raw[0]:g}: a zero or negative price is not a price. Ask the vendor."))
+        cur = canon_currency(q.get("currency") or terms.get("currency"))
         unit = q.get("price_unit", "per_piece")
         wt = float(line["target_weight_kg"])
         nq.steps.append(f"Vendor wrote: '{q.get('source_quote','')}' ({q.get('unit_as_written','')}) at {q.get('source','')}")
@@ -134,7 +154,7 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
             rec = fy26.get(lid)
             if rec and rec.get("fy26_unit_price") and _vendor_matches(rec.get("fy26_vendor", ""), vname):
                 cands = [float(rec["fy26_unit_price"])]
-                cur = rec["currency"].upper()
+                cur = canon_currency(rec["currency"])
                 unit = "per_set" if line["uom"] == "set" else "per_piece"
                 nq.steps.append(f"'Same as last year' -> FY26 contract price {rec['currency']} {rec['fy26_unit_price']} from buyer records")
                 nq.flags.append(Flag("history", "warn", "Price taken from FY26 contract because vendor wrote 'same as last year'. Not confirmed by vendor for FY27.",
@@ -205,12 +225,17 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
             nq.flags.append(Flag("gst", "warn", "GST treatment not stated; assumed exclusive."))
 
         # ---- FX
-        if cur in ("USD", "US$", "$"):
+        if cur == "USD":
             variants = [(lbl + f" x {USD_INR} INR/USD", v * USD_INR) for lbl, v in variants]
             nq.steps.append(f"USD converted at {USD_INR} INR/USD ({USD_INR_SOURCE})")
             nq.flags.append(Flag("fx", "warn", f"Quoted in USD; converted at {USD_INR}. A 3% rupee move shifts this price ~3%.", group=f"{vkey}|fx"))
-        elif cur not in ("INR", "RS", "RS.", "₹", "UNSTATED"):
-            nq.flags.append(Flag("fx", "critical", f"Currency {cur} not supported"))
+        elif cur != "INR":
+            nq.flags.append(Flag("fx", "critical", f"Quoted in {cur}, which has no reference rate here. Not converted and kept out of "
+                                                   f"the award; ask the vendor for an INR price.", group=f"{vkey}|currency"))
+            nq.steps.append(f"Quoted {' or '.join(f'{v:g}' for _, v in variants)} {cur} per {line['uom']}: no INR reference rate, not converted")
+            nq.status, nq.awardable = "review", False
+            out.append(nq)
+            continue
 
         # ---- unconditional discounts
         for d in unconditional:
@@ -227,7 +252,11 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
             nq.flags.append(Flag("freight", "warn", f"Freight estimated from buyer benchmark ({lane}); vendor said '{fr_mode.replace('_',' ')}'.",
                                  group=f"{vkey}|freight"))
         else:
-            nq.flags.append(Flag("freight", "critical", "Freight not included and no benchmark lane for this origin."))
+            nq.flags.append(Flag("freight", "critical", f"Freight is extra but there is no rate-card lane from "
+                                                        f"'{ex.get('vendor_location') or 'unknown origin'}'. Landed cost unknown, so kept out of the award; "
+                                                        f"ask the vendor for a delivered price.", group=f"{vkey}|freight-unknown"))
+            nq.awardable = False
+            nq.status = "review"
 
         nq.candidates = [{"label": lbl, "base": round(v, 2), "landed": round(v + nq.freight, 2)} for lbl, v in variants]
 
@@ -265,14 +294,17 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
     return out
 
 
-def peer_check(all_norm: list[NormQuote]) -> None:
+TOO_LOW = -0.5   # a price more than 50% below the other vendors' median is held out of the award until the buyer accepts it
+
+
+def peer_check(all_norm: list[NormQuote], decisions: dict | None = None) -> None:
     """Independent sanity check: compare every candidate with the other vendors' prices for the line."""
     by_line: dict[str, list[NormQuote]] = {}
     for n in all_norm:
         by_line.setdefault(n.line_id, []).append(n)
     for lid, ns in by_line.items():
         for n in ns:
-            peers = [p.landed for p in ns if p is not n and p.landed is not None]
+            peers = [p.landed for p in ns if p is not n and p.landed is not None and p.spec_compliant]
             if len(peers) < 2 or n.landed is None:
                 continue
             med = statistics.median(peers)
@@ -281,7 +313,16 @@ def peer_check(all_norm: list[NormQuote]) -> None:
                 dev = (c["landed"] - med) / med
                 notes.append((c, dev))
             sel_dev = (n.landed - med) / med
-            if abs(sel_dev) > 0.30:
+            if sel_dev < TOO_LOW and n.awardable:
+                g = f"{n.vendor}|outlier|{n.line_id}"
+                if g in (decisions or {}).get("accepted", {}):
+                    n.steps.append(f"Buyer accepted this price although it is {sel_dev:+.0%} vs other vendors: "
+                                   f"{(decisions or {})['accepted'][g]}")
+                else:
+                    n.flags.append(Flag("outlier", "critical", f"{sel_dev:+.0%} vs the other vendors' median {inr(med)}: too good to be "
+                                                               f"true until confirmed (often a unit or reading error). Kept out of the award.", group=g))
+                    n.awardable, n.block_group = False, g
+            elif abs(sel_dev) > 0.30:
                 n.flags.append(Flag("outlier", "warn", f"{sel_dev:+.0%} vs peer median {inr(med)}. Check unit/reading."))
             if len(n.candidates) > 1:
                 desc = "; ".join(f"'{c['label']}' -> {inr(c['landed'])} ({d:+.0%} vs peers)" for c, d in notes)
@@ -292,7 +333,7 @@ def normalize_all(extractions: dict[str, dict], decisions: dict) -> list[NormQuo
     out = []
     for vkey, ex in extractions.items():
         out += normalize_vendor(vkey, ex, decisions)
-    peer_check(out)
+    peer_check(out, decisions)
     return out
 
 

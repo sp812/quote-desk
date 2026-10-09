@@ -162,10 +162,16 @@ _SHORT: dict[str, str] = {}
 def _set_short_names(names):
     """First word of each vendor name; if two vendors share it, use the first two words."""
     _SHORT.clear()
-    first = [n.split()[0] for n in names if n]
+    names = [n for n in names if n]
+    first = [n.split()[0] for n in names]
+    used: set[str] = set()
     for n in names:
-        if n:
-            _SHORT[n] = n.split()[0] if first.count(n.split()[0]) == 1 else " ".join(n.split()[:2])
+        cand = n.split()[0] if first.count(n.split()[0]) == 1 else " ".join(n.split()[:2])
+        k = 2
+        while cand in used:          # still clashing (e.g. 'Acme Ltd' and 'Acme Ltd (2)'): number them
+            cand = f"{' '.join(n.split()[:2])} #{k}"; k += 1
+        used.add(cand)
+        _SHORT[n] = cand
 
 
 def short(name):
@@ -198,6 +204,16 @@ def key_notice():
     return
 
 
+def ai(fn, *args, **kw):
+    """Run an AI step; on failure show the buyer a plain sentence (and keep everything already done), never a stack trace."""
+    from core.llm import friendly_error
+    try:
+        return fn(*args, **kw)
+    except Exception as e:
+        st.error(friendly_error(e))
+        return None
+
+
 def need_replies():
     st.info("No vendor replies have been read yet. Start on the Decision board.")
 
@@ -226,14 +242,20 @@ def issue_headline(i) -> str:
         return f"{v}'s rate can't be read reliably on lines {', '.join(i['lines'][:3])}{'…' if len(i['lines']) > 3 else ''}"
     if k == "unit":
         return f"{v}'s unit of price is ambiguous on {', '.join(i['lines'])}"
-    if k == "freight":
+    if k == "freight" and not i.get("held_out"):
         return f"{v}'s freight is estimated, not quoted"
-    if k == "fx":
+    if k == "fx" and not i.get("held_out"):
         return f"{v} quoted in US dollars"
     if k == "history":
         return f"{v}'s 'same as last year' prices are unconfirmed"
     if k == "spec":
         return f"{v} offered a lower board grade than specified"
+    if k == "outlier":
+        return f"{v}'s price on {', '.join(i['lines'])} is far below every other vendor"
+    if k == "freight" and i.get("held_out"):
+        return f"{v}'s freight is extra and can't be estimated, so it is out of the award"
+    if k == "fx" and i.get("held_out"):
+        return f"{v} quoted in a currency with no reference rate"
     return f"{v}: {i['title'][:80]}"
 
 
@@ -418,10 +440,13 @@ def page_draft():
         if msg:
             st.session_state.draft_chat.append(("user", msg))
             with st.spinner("Drafting the RFQ"):
-                text, hist = copilot.chat(st.session_state.draft, st.session_state.draft_hist, msg)
-            st.session_state.draft_hist = hist
-            st.session_state.draft_chat.append(("assistant", text))
-            st.rerun()
+                out = ai(copilot.chat, st.session_state.draft, st.session_state.draft_hist, msg)
+            if out is None:
+                st.session_state.draft_chat.pop()
+            else:
+                st.session_state.draft_hist = out[1]
+                st.session_state.draft_chat.append(("assistant", out[0] or "Done. The draft is updated on the right."))
+                st.rerun()
     with right:
         d = st.session_state.draft
         st.subheader(d["header"].get("title") or "Your RFQ draft")
@@ -565,17 +590,19 @@ def page_replies():
                 elif suf == ".docx":
                     st.text(readers.read_docx(f))
         if ex and st.button("Read this reply again", disabled=not api_key_present()):
-            with st.spinner("Reading"):
-                run_extraction(vdir)
-            refresh(); st.rerun()
+            with st.spinner("Reading, usually under a minute"):
+                ok = ai(run_extraction, vdir)
+            if ok is not None:
+                refresh(); st.rerun()
     with right:
         st.subheader("What was read")
         if not ex:
             st.info("This reply hasn't been read yet.")
             if st.button("Read this reply", type="primary", disabled=not api_key_present()):
-                with st.spinner("Reading"):
-                    run_extraction(vdir)
-                refresh(); st.rerun()
+                with st.spinner("Reading, usually under a minute"):
+                    ok = ai(run_extraction, vdir)
+                if ok is not None:
+                    refresh(); st.rerun()
             return
         if ex.get("response_summary"):
             st.write(ex["response_summary"])
@@ -621,20 +648,43 @@ def page_replies():
                                        for k, r in sorted(ev["results"].items())]), hide_index=True, width="stretch")
 
     with st.expander("Add a vendor reply (any format)"):
-        name = st.text_input("Vendor name")
-        files = st.file_uploader("Files", accept_multiple_files=True)
-        body = st.text_area("Email text (optional)")
-        if st.button("Add and read", disabled=not (name and (files or body) and api_key_present())):
-            slug = "vendor_X_" + "".join(c for c in name.lower() if c.isalnum())[:20]
+        name = st.text_input("Vendor name", max_chars=80)
+        files = st.file_uploader("Files: Excel, PDF, Word, photo, CSV or a saved email", accept_multiple_files=True,
+                                 type=["xlsx", "xlsm", "pdf", "docx", "jpg", "jpeg", "png", "webp", "csv", "txt", "eml"])
+        body = st.text_area("Or paste the email / WhatsApp text")
+        st.caption("Old .xls or .doc files and iPhone .heic photos: save as .xlsx, .docx or .jpg first.")
+        if st.button("Add and read", disabled=not (name.strip() and (files or body.strip()) and api_key_present())):
+            base = "vendor_X_" + ("".join(c for c in name.lower() if c.isalnum())[:20] or "new")
+            slug, k = base, 2
+            while (INBOX / slug).exists():
+                slug, k = f"{base}{k}", k + 1
             nd = INBOX / slug
-            nd.mkdir(exist_ok=True)
-            if body:
+            nd.mkdir()
+            if body.strip():
                 (nd / "email.txt").write_text(f"From: {name}\nSubject: Quote for {config.RFX_ID}\n\n{body}")
             for f in files or []:
-                (nd / f.name).write_bytes(f.getvalue())
-            with st.spinner("Reading"):
-                run_extraction(nd)
-            refresh(); st.rerun()
+                safe = "".join(c for c in f.name if c.isalnum() or c in "._- ")[:80] or "file"
+                if safe == "email.txt":
+                    safe = "attachment_email.txt"
+                (nd / safe).write_bytes(f.getvalue())
+            with st.spinner("Reading, usually under a minute"):
+                ok = ai(run_extraction, nd)
+            if ok is not None:
+                refresh(); st.rerun()
+            else:
+                st.caption("The files are saved; try Read this reply again in a minute.")
+    added = [d for d in vendor_dirs() if d.name.startswith("vendor_X_")]
+    if added:
+        with st.expander("Remove a vendor you added"):
+            rm = st.selectbox("Vendor", [d.name for d in added], format_func=lambda k: s.vendor_names.get(k, k))
+            if st.button("Remove this vendor and its results"):
+                import shutil
+                from core.config import EXTRACT_CACHE
+                shutil.rmtree(INBOX / rm, ignore_errors=True)
+                for f in EXTRACT_CACHE.glob(f"{rm}.*json"):
+                    f.unlink()
+                log(load_decisions(), "vendor removed", s.vendor_names.get(rm, rm))
+                refresh(); st.rerun()
 
 
 # ================================================================== Comparison
@@ -676,7 +726,7 @@ def _price_table(s, lines, vendors, by):
     st.markdown(f"""<div class="legend"><span><span class="l1">L1</span> <span class="sw" style="background:#DCEFE4"></span>awarded: cheapest qualified, on-spec</span>
         <span><span class="sw" style="background:{CHECK_BG}"></span>unclear reading (higher one used)</span>
         <span><span class="sw" style="background:{STOP_BG}"></span>lower spec</span>
-        <span>– not quoted</span><span>* not qualified yet</span>{disc_note}</div>""", unsafe_allow_html=True)
+        <span>– not quoted</span><span>? price unusable</span><span>⚑ held out until confirmed</span><span>* not qualified yet</span>{disc_note}</div>""", unsafe_allow_html=True)
     shown = [v for v in vendors if (not only_q or v in s.eligible)]
     colname = {v: short(s.vendor_names[v]) + ("" if v in s.eligible else " *") for v in shown}
     data, style = [], []
@@ -695,10 +745,13 @@ def _price_table(s, lines, vendors, by):
         srow = {"Awarded (L1)": f"color:{KRAFT}; font-weight:600" if best_v else f"color:{STOP}"}
         for v in shown:
             n = by.get((v, lid))
-            row[colname[v]] = f"{n.landed:,.2f}" if (n and n.landed is not None and n.status != "missing") else "–"
+            row[colname[v]] = (f"{n.landed:,.2f}" + ("" if n.awardable else " ⚑") if (n and n.landed is not None and n.status != "missing")
+                               else "?" if (n and n.status == "review") else "–")
             css = ""
             if n is None or n.status == "missing":
                 css = f"color:{MUTED}"
+            elif n.landed is None or not n.awardable:
+                css = f"background-color:{CHECK_BG}; color:{CHECK}"
             elif not n.spec_compliant:
                 css = f"background-color:{STOP_BG}; color:{STOP}"
             elif n.status == "review":
@@ -883,6 +936,10 @@ def _show_source(n):
 
 # ================================================================== Open issues
 def _stake(i):
+    if i.get("held_out"):
+        return 0, "kept out of the award until the vendor gives a usable price"
+    if i["kind"] == "outlier":
+        return abs(i["award_swing"]), "lower award cost if you accept this price (kept out until you do)"
     if i["kind"] == "eligibility" and i.get("newly_covered"):
         return i["newly_covered_value"], f"of spend on {len(i['newly_covered'])} lines with no qualified quote today"
     if i["kind"] == "eligibility":
@@ -929,6 +986,13 @@ def _issue_card(s, i, compact=False):
                 dec.setdefault("choices", {})[i["id"]] = opts[choice]
                 log(dec, "value confirmed", f"{i['vendor_name']}: {issue_headline(i)} -> {choice}")
                 refresh(); st.rerun()
+        if i.get("acceptable"):
+            why = st.text_input("Why this price is right (saved to the decision log)", key=f"ac_{i['id']}",
+                                placeholder="e.g. vendor confirmed in writing on 9 Oct")
+            if st.button("Accept this price", key=f"acb_{i['id']}", disabled=not why):
+                dec.setdefault("accepted", {})[i["id"]] = why
+                log(dec, "price accepted", f"{i['vendor_name']}: {issue_headline(i)} ({why})")
+                refresh(); st.rerun()
         if i["kind"] == "eligibility":
             reason = st.text_input("Reason for including (saved to the decision log)", key=f"rs_{i['id']}",
                                    placeholder="e.g. renewed ISO certificate received")
@@ -940,8 +1004,10 @@ def _issue_card(s, i, compact=False):
         if st.button("Draft an email to the vendor", key=f"cl_{i['id']}", disabled=not api_key_present()):
             from core.memo import draft_clarification
             with st.spinner("Drafting"):
-                st.session_state[f"mail_{i['id']}"] = draft_clarification(i, s)
-            log(dec, "clarification drafted", f"{i['vendor_name']}: {issue_headline(i)}")
+                mail = ai(draft_clarification, i, s)
+            if mail:
+                st.session_state[f"mail_{i['id']}"] = mail
+                log(dec, "clarification drafted", f"{i['vendor_name']}: {issue_headline(i)}")
     if st.session_state.get(f"mail_{i['id']}"):
         st.text_area("Email draft: copy, edit and send", st.session_state[f"mail_{i['id']}"], height=230, key=f"ta_{i['id']}")
 
@@ -1018,7 +1084,11 @@ def page_ask():
             box = st.status("Working on it", expanded=False)
             names = {"sql": "Querying the comparison", "award_scenario": "Running the award engine", "chart": "Drawing a chart",
                      "export": "Preparing a download", "evidence": "Checking the source"}
-            text, hist, outs = a.ask(st.session_state.an_hist, q, on_step=lambda stp: box.write(names.get(stp["tool"], stp["tool"])))
+            out = ai(a.ask, st.session_state.an_hist, q, on_step=lambda stp: box.write(names.get(stp["tool"], stp["tool"])))
+            if out is None:
+                box.update(label="Couldn't answer this time", state="error")
+                return
+            text, hist, outs = out
             box.update(label=f"Done · {len(outs)} step{'s' if len(outs) != 1 else ''}", state="complete")
         st.session_state.an_hist = hist
         st.session_state.an_view.append({"q": q, "a": text, "outputs": outs})
@@ -1080,9 +1150,11 @@ def page_memo():
     st.subheader("1. Award memo")
     if st.button("Write the memo", type="primary", disabled=not api_key_present()):
         with st.spinner("Writing the memo"):
-            md, facts, res = write_memo(s)
-        st.session_state.memo = (md, res)
-        log(load_decisions(), "memo written", f"Award {money(res['total'])}")
+            out = ai(write_memo, s)
+        if out:
+            md, facts, res_w = out
+            st.session_state.memo = (md, res_w)
+            log(load_decisions(), "memo written", f"Award {money(res_w['total'])}")
     if st.session_state.get("memo"):
         md, res_m = st.session_state.memo
         if abs(res_m["total"] - res["total"]) > 1:

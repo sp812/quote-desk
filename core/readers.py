@@ -24,7 +24,9 @@ class Evidence:
     files: list[str] = field(default_factory=list)
 
     def as_text(self) -> str:
-        return "\n\n".join(f"===== FILE: {name} =====\n{body}" for name, body in self.texts)
+        def cap(b):
+            return b if len(b) <= MAX_TEXT_CHARS else b[:MAX_TEXT_CHARS] + "\n[... file truncated: too long to read in full; ask the vendor for the relevant section]"
+        return "\n\n".join(f"===== FILE: {name} =====\n{cap(body)}" for name, body in self.texts)
 
 
 def read_email(p: Path) -> str:
@@ -87,12 +89,16 @@ def load_vendor(vendor_dir: Path) -> Evidence:
                 ev.texts.append((f.name, read_xlsx(f)))
             elif suf == ".pdf":
                 ev.texts.append((f.name, read_pdf(f)))
-                ev.pdfs.append((f.name, f.read_bytes()))
+                raw = f.read_bytes()
+                if len(raw) <= MAX_PDF_BYTES and _pdf_pages_count(f) <= MAX_PDF_PAGES:
+                    ev.pdfs.append((f.name, raw))
+                else:   # too big to send as a document; the extracted text (with locators) still goes
+                    ev.texts.append((f.name, f"[NOTE: PDF too large to attach as an image ({len(raw) // 1_000_000} MB); read from its text]"))
             elif suf == ".docx":
                 ev.texts.append((f.name, read_docx(f)))
-            elif suf in (".jpg", ".jpeg", ".png", ".webp"):
-                mt = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}[suf]
-                ev.images.append((f.name, f.read_bytes(), mt))
+            elif suf in (".jpg", ".jpeg", ".png", ".webp", ".gif"):
+                data, mt = _fit_image(f.read_bytes(), suf)
+                ev.images.append((f.name, data, mt))
                 ev.texts.append((f.name, "[image attached - read it visually; cite as "
                                  f"{f.name}:<region>, e.g. {f.name}:row '5 Ply Printed']"))
             elif suf == ".csv":
@@ -102,6 +108,40 @@ def load_vendor(vendor_dir: Path) -> Evidence:
         except Exception as e:  # never crash the pipeline on one bad file; surface it instead
             ev.texts.append((f.name, f"[ERROR reading file: {e}]"))
     return ev
+
+
+MAX_TEXT_CHARS = 180_000      # per file; keeps one huge workbook from overflowing the model's context
+MAX_PDF_BYTES = 25_000_000
+MAX_PDF_PAGES = 90
+MAX_IMAGE_SIDE = 2400         # phone photos are ~4000 px and 3-12 MB; the API takes up to ~5 MB per image
+
+
+def _pdf_pages_count(p: Path) -> int:
+    try:
+        import pdfplumber
+        with pdfplumber.open(p) as pdf:
+            return len(pdf.pages)
+    except Exception:
+        return 10_000
+
+
+def _fit_image(data: bytes, suf: str) -> tuple[bytes, str]:
+    """Phone photos are often too large for the API. Downscale (keeping orientation) and re-encode when needed."""
+    mt = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".gif": "image/gif"}[suf]
+    try:
+        from PIL import Image, ImageOps
+        im = Image.open(io.BytesIO(data))
+        if len(data) <= 3_500_000 and max(im.size) <= MAX_IMAGE_SIDE and mt != "image/gif":
+            return data, mt
+        im = ImageOps.exif_transpose(im).convert("RGB")
+        im.thumbnail((MAX_IMAGE_SIDE, MAX_IMAGE_SIDE))
+        for q in (88, 80, 70, 60):
+            buf = io.BytesIO(); im.save(buf, format="JPEG", quality=q)
+            if buf.tell() <= 3_500_000:
+                break
+        return buf.getvalue(), "image/jpeg"
+    except Exception:
+        return data, mt
 
 
 def to_claude_content(ev: Evidence) -> list[dict]:

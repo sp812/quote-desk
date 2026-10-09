@@ -85,15 +85,28 @@ def chat(draft: dict, history: list[dict], user_msg: str, on_step=None):
             rows = spec_master(inp.get("keyword"))
             return {"count": len(rows), "items": rows}
         if name == "update_draft":
+            from .extract import _loads
             for k in ("header", "line_items", "questionnaire", "terms", "vendors"):
-                if k in inp and inp[k] is not None:
-                    if k == "header":
-                        draft["header"].update(inp[k])
-                    else:
-                        draft[k] = inp[k]
+                v = _loads(inp.get(k))
+                if v is None:
+                    continue
+                if k == "header":
+                    if isinstance(v, dict):
+                        draft["header"].update({str(a): (b if isinstance(b, (str, int, float)) else json.dumps(b)) for a, b in v.items()})
+                    continue
+                if isinstance(v, (str, dict)):
+                    v = [v]
+                if not isinstance(v, list):
+                    continue
+                if k in ("line_items", "questionnaire"):
+                    v = [x for x in (_loads(x) for x in v) if isinstance(x, dict)]
+                else:
+                    v = [str(x) for x in v if x not in (None, "")]
+                draft[k] = v
             return {"ok": True, "lines": len(draft["line_items"]), "questions": len(draft["questionnaire"])}
         raise ValueError(name)
     sys = SYSTEM + "\n\nCURRENT DRAFT:\n" + json.dumps(draft)[:12000]
-    msgs = history + [{"role": "user", "content": user_msg}]
+    from .llm import trim_history
+    msgs = trim_history(history) + [{"role": "user", "content": user_msg}]
     text, msgs = agent_loop(sys, msgs, TOOLS, run_tool, on_step=on_step, max_steps=8, max_tokens=16000)
     return text, msgs

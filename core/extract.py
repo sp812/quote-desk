@@ -6,6 +6,7 @@ adds freight. All arithmetic happens in normalize.py so every number has a visib
 from __future__ import annotations
 import csv
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -139,6 +140,10 @@ def extract_vendor(vendor_dir: Path, model: str = MODEL) -> dict:
     result = structured_call(SYSTEM, content, "submit_extraction",
                              "Submit the structured extraction of this vendor's response.", SCHEMA, model=model)
     result = _repair(result)
+    # files the system could not open are reported, never silently skipped
+    for name, body in ev.texts:
+        if body.startswith("[unsupported file type") or body.startswith("[ERROR reading file"):
+            result["unreadable_or_uncertain"].insert(0, f"{name}: could not be opened ({body.strip('[]')}). Ask the vendor for PDF, Excel, Word or an image.")
     result["_meta"] = {"vendor_dir": vendor_dir.name, "files": ev.files, "model": model,
                        "extracted_at": datetime.now().isoformat(timespec="seconds")}
     (EXTRACT_CACHE / f"{vendor_dir.name}.json").write_text(json.dumps(result, indent=2))
@@ -193,10 +198,28 @@ def coerce(r) -> dict:
     return r
 
 
+def canon_line_id(x, ids: set[str]) -> str | None:
+    """'L01', 'l1', 'Line 1', '01', 1 -> 'L01' when that line exists in the RFx."""
+    if x is None:
+        return None
+    t = str(x).strip().upper()
+    if t in ids:
+        return t
+    m = re.fullmatch(r"(?:L|LINE|ITEM|SR\.?|NO\.?)?\s*[-#:.]?\s*0*(\d{1,3})", t)
+    if m:
+        c = f"L{int(m.group(1)):02d}"
+        return c if c in ids else None
+    return None
+
+
 def _repair(r: dict) -> dict:
     """Guardrail: every RFx line accounted for exactly once; drop lines that are not in the RFx."""
     r = coerce(r)
     ids = {l["line_id"] for l in load_rfx_lines()}
+    for x in r.get("line_quotes", []) + r.get("lines_not_quoted", []):
+        c = canon_line_id(x.get("rfx_line_id"), ids)
+        if c:
+            x["rfx_line_id"] = c
     seen, quotes = set(), []
     for q in r.get("line_quotes", []):
         lid = q.get("rfx_line_id")
