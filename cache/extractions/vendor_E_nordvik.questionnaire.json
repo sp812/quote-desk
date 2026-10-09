@@ -1,0 +1,48 @@
+{
+  "vendor": "vendor_E_nordvik",
+  "results": {
+    "Q1": {
+      "q_id": "Q1",
+      "status": "unclear",
+      "reason": "Vendor says 'ISO certified via a group certificate' but attached no certificate, number or expiry, so validity on 2026-11-01 can't be confirmed."
+    },
+    "Q2": {
+      "q_id": "Q2",
+      "status": "pass",
+      "reason": "Vendor states 'Yes, in-house lab'."
+    },
+    "Q3": {
+      "q_id": "Q3",
+      "status": "pass",
+      "reason": "Vendor confirms food-safe / low-migration inks."
+    },
+    "Q4": {
+      "q_id": "Q4",
+      "status": "fail",
+      "reason": "Rejection rate of 3.8% exceeds the 2.0% limit; the claimed fix doesn't change the 12-month figure.",
+      "rule_note": "Rule check skipped: '3.8% last year, mostly from the Feb batch issue, which the vendor says is fixed now.' is not a plain figure, so the AI's judgement stands."
+    },
+    "Q5": {
+      "q_id": "Q5",
+      "status": "unclear",
+      "reason": "'Capacity fine from Bhiwandi + Vapi' is vague and gives no explicit 120% commitment."
+    },
+    "Q6": {
+      "q_id": "Q6",
+      "status": "pass",
+      "reason": "Lead time of 10 days meets the <= 10 days criterion.",
+      "check": "rule",
+      "rule_note": "Rule check: 10 vs limit 10 -> pass."
+    },
+    "Q7": {
+      "q_id": "Q7",
+      "status": "pass",
+      "reason": "Vendor states 'Yes, FSC'. No certificate was provided, but the criterion is only Preferred."
+    },
+    "Q8": {
+      "q_id": "Q8",
+      "status": "unclear",
+      "reason": "Info only: no distance was given. Plants are named as Bhiwandi and Vapi."
+    }
+  }
+}

@@ -1,0 +1,767 @@
+{
+  "vendor_name": "Godavari Box Works",
+  "vendor_location": "Plot W-77, MIDC Waluj, Aurangabad (3 km from buyer's Waluj plant per email)",
+  "response_summary": "Vendor sent a phone photo of a per-kg rate card (2026-27) and a short email answering the questionnaire. All items are quoted per kg by ply/print category, with weight 'as per party approved spec'. Two rate-card values (5 Ply Printed 2 col and 7 Ply) are blurred. Edge board is not available. The ISO certificate has not been attached yet (promised for the next day).",
+  "terms": {
+    "currency": "INR",
+    "gst": "extra",
+    "freight": "free_local",
+    "lead_time_days": 4,
+    "payment_days": 30,
+    "moq_or_min_order": null,
+    "validity": "Rates valid till 31-03-2027",
+    "price_variation_clause": null,
+    "source": "IMG_20261007_WA0012.jpg: Terms block (GST 18% extra; free delivery within MIDC Waluj; box wt per party approved spec; payment 30 days; valid till 31-03-2027); email:L17 (lead time 3-4 days); email:L09"
+  },
+  "discounts": [],
+  "line_quotes": [
+    {
+      "rfx_line_id": "L01",
+      "vendor_item_text": "5 Ply Printed (2 col)",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'",
+      "source_quote": "68.50 (blurred)",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [],
+      "notes": "Rate is per kg; weight per party approved spec (target 0.58 kg). Blurred digit.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L02",
+      "vendor_item_text": "5 Ply Printed (2 col)",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'",
+      "source_quote": "68.50 (blurred)",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [],
+      "notes": "Per kg; weight per approved spec (target 0.58 kg).",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L03",
+      "vendor_item_text": "5 Ply Printed (2 col) + 4 colour print extra",
+      "mapping_confidence": 0.85,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'; handwritten note '4 colour print - extra Rs 1.75/box'",
+      "source_quote": "68.50 (blurred); 4 colour print - extra Rs 1.75/box",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [
+        {
+          "amount": 1.75,
+          "per": "box",
+          "reason": "4 colour print extra",
+          "source": "IMG_20261007_WA0012.jpg: handwritten note line 1"
+        }
+      ],
+      "notes": "No 4-col rate row; base is 2-col rate plus 4-colour adder per box.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L04",
+      "vendor_item_text": "5 Ply Printed (2 col)",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'",
+      "source_quote": "68.50 (blurred)",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [],
+      "notes": "Per kg; target wt 0.55 kg.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L05",
+      "vendor_item_text": "5 Ply Printed (2 col)",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'",
+      "source_quote": "68.50 (blurred)",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [],
+      "notes": "Per kg; target wt 0.38 kg.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L06",
+      "vendor_item_text": "5 Ply Printed (2 col)",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'",
+      "source_quote": "68.50 (blurred)",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [],
+      "notes": "Per kg; target wt 0.44 kg.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L07",
+      "vendor_item_text": "5 Ply Printed (2 col) + 4 colour print extra",
+      "mapping_confidence": 0.85,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'; handwritten note '4 colour print - extra Rs 1.75/box'",
+      "source_quote": "68.50 (blurred); 4 colour print - extra Rs 1.75/box",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [
+        {
+          "amount": 1.75,
+          "per": "box",
+          "reason": "4 colour print extra",
+          "source": "IMG_20261007_WA0012.jpg: handwritten note line 1"
+        }
+      ],
+      "notes": "Per kg plus per-box adder; target wt 0.46 kg.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L08",
+      "vendor_item_text": "5 Ply Plain",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        58.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Plain'",
+      "source_quote": "58.50",
+      "confidence": 0.95,
+      "rate_category": "5 Ply Plain",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": "Target wt 0.56 kg.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L09",
+      "vendor_item_text": "5 Ply Plain",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        58.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Plain'",
+      "source_quote": "58.50",
+      "confidence": 0.95,
+      "rate_category": "5 Ply Plain",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": "Target wt 0.37 kg.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L10",
+      "vendor_item_text": "3 Ply Printed",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        59.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '3 Ply Printed'",
+      "source_quote": "59.50",
+      "confidence": 0.95,
+      "rate_category": "3 Ply Printed",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": "1-col flexo assumed covered by 3 Ply Printed.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L11",
+      "vendor_item_text": "3 Ply Printed",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        59.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '3 Ply Printed'",
+      "source_quote": "59.50",
+      "confidence": 0.95,
+      "rate_category": "3 Ply Printed",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L12",
+      "vendor_item_text": "3 Ply Printed",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        59.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '3 Ply Printed'",
+      "source_quote": "59.50",
+      "confidence": 0.95,
+      "rate_category": "3 Ply Printed",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L13",
+      "vendor_item_text": "3 Ply Plain",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        56.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '3 Ply Plain'",
+      "source_quote": "56.00",
+      "confidence": 0.95,
+      "rate_category": "3 Ply Plain",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L14",
+      "vendor_item_text": "3 Ply Plain",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        56.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '3 Ply Plain'",
+      "source_quote": "56.00",
+      "confidence": 0.95,
+      "rate_category": "3 Ply Plain",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L15",
+      "vendor_item_text": "Die-cut Trays",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        69.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Die-cut Trays'",
+      "source_quote": "69.00",
+      "confidence": 0.95,
+      "rate_category": "Die-cut Trays",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L16",
+      "vendor_item_text": "Die-cut Trays",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        69.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Die-cut Trays'",
+      "source_quote": "69.00",
+      "confidence": 0.95,
+      "rate_category": "Die-cut Trays",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L17",
+      "vendor_item_text": "Die-cut Trays",
+      "mapping_confidence": 0.8,
+      "price_candidates": [
+        69.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Die-cut Trays'",
+      "source_quote": "69.00",
+      "confidence": 0.9,
+      "rate_category": "Die-cut Trays",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": "RFx line is 5-ply, 2-col printed die-cut tray; vendor has a single Die-cut Trays rate with no stated print/ply adder. Unclear whether the 2-col print is included.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L18",
+      "vendor_item_text": "Partitions / Dividers",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        54.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Partitions / Dividers'",
+      "source_quote": "54.00",
+      "confidence": 0.95,
+      "rate_category": "Partitions / Dividers",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": "Per kg; RFx buys per set (target 0.12 kg/set).",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L19",
+      "vendor_item_text": "Partitions / Dividers",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        54.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Partitions / Dividers'",
+      "source_quote": "54.00",
+      "confidence": 0.95,
+      "rate_category": "Partitions / Dividers",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": "Per kg; RFx buys per set (target 0.14 kg/set).",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L20",
+      "vendor_item_text": "Pads / Sheets",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        52.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Pads / Sheets'",
+      "source_quote": "52.00",
+      "confidence": 0.95,
+      "rate_category": "Pads / Sheets",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L21",
+      "vendor_item_text": "Pads / Sheets",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        52.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Pads / Sheets'",
+      "source_quote": "52.00",
+      "confidence": 0.95,
+      "rate_category": "Pads / Sheets",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L22",
+      "vendor_item_text": "Pads / Sheets",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        52.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Pads / Sheets'",
+      "source_quote": "52.00",
+      "confidence": 0.95,
+      "rate_category": "Pads / Sheets",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L24",
+      "vendor_item_text": "5 Ply Printed (2 col)",
+      "mapping_confidence": 0.7,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'",
+      "source_quote": "68.50 (blurred)",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [],
+      "notes": "RFx is 5-ply 1-col sleeve; nearest card row is 5 Ply Printed (2 col) (or 5 Ply Plain 58.50). Mapping to be confirmed.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L25",
+      "vendor_item_text": "5 Ply Printed (2 col) + 4 colour print extra",
+      "mapping_confidence": 0.85,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'; handwritten note '4 colour print - extra Rs 1.75/box'",
+      "source_quote": "68.50 (blurred); 4 colour print - extra Rs 1.75/box",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [
+        {
+          "amount": 1.75,
+          "per": "box",
+          "reason": "4 colour print extra",
+          "source": "IMG_20261007_WA0012.jpg: handwritten note line 1"
+        }
+      ],
+      "notes": "Per kg plus per-box adder; target wt 0.61 kg.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L26",
+      "vendor_item_text": "5 Ply Plain",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        58.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Plain'",
+      "source_quote": "58.50",
+      "confidence": 0.95,
+      "rate_category": "5 Ply Plain",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L27",
+      "vendor_item_text": "Pads / Sheets",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        52.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row 'Pads / Sheets'",
+      "source_quote": "52.00",
+      "confidence": 0.95,
+      "rate_category": "Pads / Sheets",
+      "ambiguity_id": null,
+      "adders": [],
+      "notes": null,
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L28",
+      "vendor_item_text": "7 Ply",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        60.0,
+        69.0,
+        68.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '7 Ply'",
+      "source_quote": "60.00 (blurred)",
+      "confidence": 0.3,
+      "rate_category": "7 Ply",
+      "ambiguity_id": "GBW-7ply-blurred",
+      "adders": [],
+      "notes": "Blurred second digit. Unclear whether 2-col print is included in the 7 Ply rate.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L29",
+      "vendor_item_text": "7 Ply",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        60.0,
+        69.0,
+        68.0
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '7 Ply'",
+      "source_quote": "60.00 (blurred)",
+      "confidence": 0.3,
+      "rate_category": "7 Ply",
+      "ambiguity_id": "GBW-7ply-blurred",
+      "adders": [],
+      "notes": "Blurred second digit. Unclear whether 2-col print is included.",
+      "spec_deviation": null
+    },
+    {
+      "rfx_line_id": "L30",
+      "vendor_item_text": "5 Ply Printed (2 col) + WR coating",
+      "mapping_confidence": 0.85,
+      "price_candidates": [
+        68.5,
+        62.5
+      ],
+      "price_unit": "per_kg",
+      "unit_as_written": "Rs. per Kg",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "IMG_20261007_WA0012.jpg: row '5 Ply Printed (2 col)'; handwritten note 'WR coating + Rs 2/box'",
+      "source_quote": "68.50 (blurred); WR coating + Rs 2/box",
+      "confidence": 0.4,
+      "rate_category": "5 Ply Printed (2 col)",
+      "ambiguity_id": "GBW-5ply-printed-2col-blurred",
+      "adders": [
+        {
+          "amount": 2.0,
+          "per": "box",
+          "reason": "WR coating extra",
+          "source": "IMG_20261007_WA0012.jpg: handwritten note line 2"
+        }
+      ],
+      "notes": "Per kg plus per-box WR coating adder.",
+      "spec_deviation": null
+    }
+  ],
+  "lines_not_quoted": [
+    {
+      "rfx_line_id": "L23",
+      "reason": "Vendor states edge board is not available",
+      "source": "IMG_20261007_WA0012.jpg: handwritten note 'Edge board - not available'; email:L09"
+    }
+  ],
+  "questionnaire": [
+    {
+      "q_id": "Q1",
+      "answer": "Yes, ISO certified; certificate to be sent 'tomorrow' (not attached)",
+      "source": "email:L12"
+    },
+    {
+      "q_id": "Q2",
+      "answer": "Partial: has burst tester in-house; BCT done at customer end; ECT not mentioned",
+      "source": "email:L13"
+    },
+    {
+      "q_id": "Q3",
+      "answer": "Yes, food-safe ink",
+      "source": "email:L14"
+    },
+    {
+      "q_id": "Q4",
+      "answer": "Under 2%",
+      "source": "email:L15"
+    },
+    {
+      "q_id": "Q5",
+      "answer": "Yes - 'no problem', will increase shifts in peak season (no specific 120% commitment stated)",
+      "source": "email:L16"
+    },
+    {
+      "q_id": "Q6",
+      "answer": "3-4 days",
+      "source": "email:L17"
+    },
+    {
+      "q_id": "Q7",
+      "answer": "No (not FSC); recycled fibre not mentioned",
+      "source": "email:L18"
+    },
+    {
+      "q_id": "Q8",
+      "answer": "3 km",
+      "source": "email:L09"
+    }
+  ],
+  "document_facts": [],
+  "unreadable_or_uncertain": [
+    "5 Ply Printed (2 col) rate is blurred: first digits read as '68.50' but could be 62.50 or similar. It affects L01-L07, L24, L25, L30.",
+    "7 Ply rate is blurred: reads as '60.00' but the second digit could be 9 or 8 (69.00/68.00). It affects L28 and L29.",
+    "All rates are per kg; no per-box prices. Weight is 'as per party approved spec', so the buyer's target weights apply.",
+    "The ISO certificate was not attached, so no certificate number or validity date is available.",
+    "Handwritten note 'For Deccan Peak - A. Jadhav' appears to be a sender reference. It states no price.",
+    "The card gives no 1-col print rate, so L10-L12 are mapped to 3 Ply Printed and L24 to 5 Ply Printed (2 col).",
+    "Vendor's board GSM/BF, ECT and bursting factor are not stated; the quote assumes the RFx spec."
+  ],
+  "_meta": {
+    "vendor_dir": "vendor_D_godavari",
+    "files": [
+      "IMG_20261007_WA0012.jpg",
+      "email.txt"
+    ],
+    "model": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-09T13:27:57"
+  }
+}

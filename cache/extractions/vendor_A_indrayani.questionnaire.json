@@ -1,0 +1,49 @@
+{
+  "vendor": "vendor_A_indrayani",
+  "results": {
+    "Q1": {
+      "q_id": "Q1",
+      "status": "pass",
+      "reason": "Certificate QMS/IN/25/51988 valid until 14-Mar-2028, covering the 2026-11-01 start; the Chakan site scope is manufacturing."
+    },
+    "Q2": {
+      "q_id": "Q2",
+      "status": "pass",
+      "reason": "In-house BCT and burst tester; the test report says 'tested in-house' and includes an ECT result of 7.1 kN/m, so ECT is covered too."
+    },
+    "Q3": {
+      "q_id": "Q3",
+      "status": "pass",
+      "reason": "Vendor answered 'Yes' to low-migration/food-safe inks."
+    },
+    "Q4": {
+      "q_id": "Q4",
+      "status": "pass",
+      "reason": "1.1% is within the 2.0% limit.",
+      "check": "rule",
+      "rule_note": "Rule check: 1.1 vs limit 2 -> pass."
+    },
+    "Q5": {
+      "q_id": "Q5",
+      "status": "pass",
+      "reason": "Vendor committed 'Yes' to at least 120% of peak capacity."
+    },
+    "Q6": {
+      "q_id": "Q6",
+      "status": "pass",
+      "reason": "7 days is within the 10-day limit.",
+      "check": "rule",
+      "rule_note": "Rule check: 7 vs limit 10 -> pass."
+    },
+    "Q7": {
+      "q_id": "Q7",
+      "status": "pass",
+      "reason": "Vendor says 'Recycled fibre, no FSC'. The criterion accepts certified recycled fibre, but no recycled-fibre certification is cited, so this is a weak pass."
+    },
+    "Q8": {
+      "q_id": "Q8",
+      "status": "pass",
+      "reason": "Info only; 245 km recorded, no pass criterion."
+    }
+  }
+}

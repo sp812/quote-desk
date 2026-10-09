@@ -1,0 +1,51 @@
+{
+  "vendor": "vendor_B_seabreeze",
+  "results": {
+    "Q1": {
+      "q_id": "Q1",
+      "status": "fail",
+      "check": "deterministic",
+      "reason": "Certificate attached is valid only until 31-Aug-2026, before contract start 01-Nov-2026.",
+      "evidence": "Seabreeze_ISO9001_Certificate.pdf:p1:L10-L11"
+    },
+    "Q2": {
+      "q_id": "Q2",
+      "status": "pass",
+      "reason": "Vendor answered 'Yes' to in-house testing lab; no contradicting evidence."
+    },
+    "Q3": {
+      "q_id": "Q3",
+      "status": "pass",
+      "reason": "Vendor answered 'Yes' to low-migration/food-safe inks."
+    },
+    "Q4": {
+      "q_id": "Q4",
+      "status": "pass",
+      "reason": "1.6% is within the <= 2.0% limit.",
+      "check": "rule",
+      "rule_note": "Rule check: 1.6 vs limit 2 -> pass."
+    },
+    "Q5": {
+      "q_id": "Q5",
+      "status": "pass",
+      "reason": "Vendor answered 'Yes' to committing 120% of peak capacity."
+    },
+    "Q6": {
+      "q_id": "Q6",
+      "status": "pass",
+      "reason": "9 days is within the <= 10 days limit.",
+      "check": "rule",
+      "rule_note": "Rule check: 9 vs limit 10 -> pass."
+    },
+    "Q7": {
+      "q_id": "Q7",
+      "status": "unclear",
+      "reason": "Vendor claims 'FSC Mix certified' but attached no FSC certificate, so it is unverified."
+    },
+    "Q8": {
+      "q_id": "Q8",
+      "status": "pass",
+      "reason": "Info only: 410 km recorded; no pass criterion."
+    }
+  }
+}

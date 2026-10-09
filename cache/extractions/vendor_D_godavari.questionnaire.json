@@ -1,0 +1,48 @@
+{
+  "vendor": "vendor_D_godavari",
+  "results": {
+    "Q1": {
+      "q_id": "Q1",
+      "status": "unclear",
+      "reason": "Vendor says 'certificate to be sent tomorrow' and none is attached, so validity on 2026-11-01 can't be verified."
+    },
+    "Q2": {
+      "q_id": "Q2",
+      "status": "fail",
+      "reason": "Only a burst tester is in-house; 'BCT done at customer end' and ECT not mentioned, so the lab is not fully in-house."
+    },
+    "Q3": {
+      "q_id": "Q3",
+      "status": "pass",
+      "reason": "Vendor answered 'Yes, food-safe ink'."
+    },
+    "Q4": {
+      "q_id": "Q4",
+      "status": "pass",
+      "reason": "'Under 2%' meets the <=2.0% limit.",
+      "rule_note": "Rule check skipped: 'Under 2%' is not a plain figure, so the AI's judgement stands."
+    },
+    "Q5": {
+      "q_id": "Q5",
+      "status": "unclear",
+      "reason": "Vendor said 'no problem' and will add shifts, but gave no specific 120% capacity commitment."
+    },
+    "Q6": {
+      "q_id": "Q6",
+      "status": "pass",
+      "reason": "3-4 days is within the 10-day limit.",
+      "check": "rule",
+      "rule_note": "Rule check: 4 vs limit 10 -> pass."
+    },
+    "Q7": {
+      "q_id": "Q7",
+      "status": "fail",
+      "reason": "Vendor answered 'No (not FSC)' and did not mention recycled fibre."
+    },
+    "Q8": {
+      "q_id": "Q8",
+      "status": "pass",
+      "reason": "Info only: plant is 3 km from Waluj."
+    }
+  }
+}

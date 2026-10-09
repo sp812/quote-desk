@@ -1,0 +1,639 @@
+{
+  "vendor_name": "Kaveri Kraftline Pvt. Ltd.",
+  "vendor_location": "Hosur, Tamil Nadu (SIPCOT Phase II, Hosur 635109)",
+  "response_summary": "Proposal letter (docx) with prices in running prose, plus a short cover email. Prices are stated as delivered to Waluj and inclusive of 18% GST. Quoted 27 of 30 lines. The vendor declined L28, L29 and L30 (7-ply and WR-coated). On L01, L02, L05 and L06 it offered a lower 120/18BF top liner instead of the specified 150/22BF. Partition prices are \"per pc\" although the RFx buys sets of strips. Testing is outsourced and no ISO certificate was attached.",
+  "terms": {
+    "currency": "unstated",
+    "gst": "unclear",
+    "freight": "unclear",
+    "source": "\n<parameter name=\"currency\">INR"
+  },
+  "gst": "included",
+  "freight": "included_delivered",
+  "lead_time_days": 12,
+  "payment_days": 60,
+  "moq_or_min_order": null,
+  "validity": null,
+  "price_variation_clause": null,
+  "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para7; Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16",
+  "discounts": [],
+  "line_quotes": [
+    {
+      "rfx_line_id": "L01",
+      "vendor_item_text": "650 ml x 12 shipper for Classic Lager, 5-ply with 120 GSM / 18 BF top liner",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        38.24
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per box",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "Classic Lager and Strong ... 120 GSM / 18 BF top liner ... Rs. 38.24 and Rs. 37.45 per box respectively",
+      "confidence": 0.95,
+      "spec_deviation": "Top liner offered 120 GSM/18BF versus RFx 150/22BF top (inner liner not stated).",
+      "notes": "Value-engineered lower-spec board.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L02",
+      "vendor_item_text": "650 ml x 12 shipper for Strong, 5-ply with 120 GSM / 18 BF top liner",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        37.45
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per box",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "Rs. 38.24 and Rs. 37.45 per box respectively",
+      "confidence": 0.95,
+      "spec_deviation": "Top liner offered 120 GSM/18BF versus RFx 150/22BF top (inner liner not stated).",
+      "notes": "Value-engineered lower-spec board.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L03",
+      "vendor_item_text": "Premium Peak Wheat 650 ml shipper, exactly to 180/24BF spec, 4-colour",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        47.08
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per box",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "made exactly to your 180/24BF specification with 4-colour printing at Rs. 47.08 per box",
+      "confidence": 0.97,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L04",
+      "vendor_item_text": "330 ml x 24 bottle shipper",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        39.58
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "offered at Rs. 39.58 (no unit stated; context 'per box')",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "The 330 ml x 24 bottle shipper is offered at Rs. 39.58.",
+      "confidence": 0.9,
+      "spec_deviation": null,
+      "notes": "Board spec not stated for this line. The email says value-engineered board was offered on 'high-volume items', so the board may be lower than the RFx spec. Needs confirmation.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L05",
+      "vendor_item_text": "330 ml x 24 Classic can shipper, economical 120/18BF top construction",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        24.37
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per box",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "offered in the same economical 120/18BF top construction at Rs. 24.37 and Rs. 28.56 per box",
+      "confidence": 0.95,
+      "spec_deviation": "Top liner offered 120/18BF versus RFx 150/22BF top.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L06",
+      "vendor_item_text": "500 ml x 24 Strong can shipper, economical 120/18BF top construction",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        28.56
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per box",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "Rs. 24.37 and Rs. 28.56 per box",
+      "confidence": 0.95,
+      "spec_deviation": "Top liner offered 120/18BF versus RFx 150/22BF top.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L07",
+      "vendor_item_text": "Premium 500 ml can shipper to your specification",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        36.73
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per box (context)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "the premium 500 ml can shipper to your specification at Rs. 36.73",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L08",
+      "vendor_item_text": "Plain shipper for contract bottling (650 ml)",
+      "mapping_confidence": 0.93,
+      "price_candidates": [
+        38.77
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 38.77 (650 ml)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "Plain shippers for contract bottling will be Rs. 38.77 (650 ml) and Rs. 24.48 (330 ml cans)",
+      "confidence": 0.93,
+      "spec_deviation": null,
+      "notes": "Plain 650 ml is priced higher than the printed Classic/Strong 650 ml (38.24/37.45). Board spec not stated. Worth checking.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L09",
+      "vendor_item_text": "Plain shipper for contract bottling (330 ml cans)",
+      "mapping_confidence": 0.93,
+      "price_candidates": [
+        24.48
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 24.48 (330 ml cans)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "Rs. 24.48 (330 ml cans)",
+      "confidence": 0.93,
+      "spec_deviation": null,
+      "notes": "Board spec not stated.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L10",
+      "vendor_item_text": "Master carton 4 x 6-pack cans 330 ml",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        16.57
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 16.57 for 330 ml",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para11",
+      "source_quote": "Rs. 16.57 for 330 ml and Rs. 19.80 for 500 ml",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L11",
+      "vendor_item_text": "Master carton 4 x 6-pack cans 500 ml",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        19.8
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 19.80 for 500 ml",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para11",
+      "source_quote": "Rs. 19.80 for 500 ml",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L12",
+      "vendor_item_text": "Gift-pack outer for 2 x 650 ml",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        10.03
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 10.03",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para11",
+      "source_quote": "The gift-pack outer for 2 x 650 ml works out to Rs. 10.03.",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L13",
+      "vendor_item_text": "General-purpose spares carton, small",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        11.59
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 11.59 for the small size",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para11",
+      "source_quote": "Rs. 11.59 for the small size and Rs. 31.55 for the large size",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L14",
+      "vendor_item_text": "General-purpose spares carton, large",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        31.55
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 31.55 for the large size",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para11",
+      "source_quote": "Rs. 31.55 for the large size",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L15",
+      "vendor_item_text": "Die-cut shrink tray 330 ml cans",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        11.27
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 11.27 (330 ml cans)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "Die-cut shrink trays are offered at Rs. 11.27 (330 ml cans) and Rs. 12.08 (500 ml cans)",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L16",
+      "vendor_item_text": "Die-cut shrink tray 500 ml cans",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        12.08
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 12.08 (500 ml cans)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "Rs. 12.08 (500 ml cans)",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L17",
+      "vendor_item_text": "Modern-trade display tray",
+      "mapping_confidence": 0.93,
+      "price_candidates": [
+        25.77
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 25.77",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "the modern-trade display tray at Rs. 25.77",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L18",
+      "vendor_item_text": "Partitions for 650 ml bottles",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        1.49
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per pc",
+      "unit_ambiguous": true,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "Partitions for 650 ml bottles are Rs. 1.49 per pc",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "notes": "The RFx buys a set of 5 strips, and 'per pc' could mean per strip or per set. If per strip, a set costs about 5 x 1.49 = 7.45. Buyer must confirm.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L19",
+      "vendor_item_text": "Partitions for 330 ml bottles",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        1.13
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per pc",
+      "unit_ambiguous": true,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "for 330 ml bottles Rs. 1.13 per pc",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "notes": "The RFx buys a set of 8 strips, and 'per pc' could mean per strip or per set. If per strip, a set costs about 8 x 1.13 = 9.04. Buyer must confirm.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L20",
+      "vendor_item_text": "Layer pad 1000x1200",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        26.24
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 26.24",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "Layer pads are Rs. 26.24 for 1000x1200 and Rs. 23.40 for 1100x1100",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L21",
+      "vendor_item_text": "Layer pad 1100x1100",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        23.4
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 23.40",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "Rs. 23.40 for 1100x1100",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L22",
+      "vendor_item_text": "Top/bottom pad for 650 ml shipper",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        2.12
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 2.12",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "The top/bottom pad for the 650 ml shipper is Rs. 2.12",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L23",
+      "vendor_item_text": "Edge boards, 'metre piece'",
+      "mapping_confidence": 0.9,
+      "price_candidates": [
+        12.51
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "per metre piece",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "edge boards Rs. 12.51 per metre piece",
+      "confidence": 0.9,
+      "spec_deviation": null,
+      "notes": "The RFx piece is 1000 mm, which is 1 metre, so per piece should equal per metre. The wording is slightly loose. Laminated kraft spec is not confirmed.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L24",
+      "vendor_item_text": "Keg collar sleeve",
+      "mapping_confidence": 0.93,
+      "price_candidates": [
+        38.55
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 38.55",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "The keg collar sleeve is Rs. 38.55",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L25",
+      "vendor_item_text": "IPL limited-edition promo shipper",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        46.01
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 46.01",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "the IPL limited-edition promo shipper Rs. 46.01",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L26",
+      "vendor_item_text": "6 x 650 ml QA sample carton",
+      "mapping_confidence": 0.95,
+      "price_candidates": [
+        22.23
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 22.23",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para9",
+      "source_quote": "the 6 x 650 ml QA sample carton Rs. 22.23",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L27",
+      "vendor_item_text": "Crate liners",
+      "mapping_confidence": 0.93,
+      "price_candidates": [
+        5.44
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rs. 5.44",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": true,
+      "references_history": false,
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para13",
+      "source_quote": "and crate liners Rs. 5.44",
+      "confidence": 0.95,
+      "spec_deviation": null,
+      "adders": []
+    }
+  ],
+  "lines_not_quoted": [
+    {
+      "rfx_line_id": "L28",
+      "reason": "Declined: 'unable to quote for the 7-ply export shippers ... 7-ply line is fully booked'",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para14"
+    },
+    {
+      "rfx_line_id": "L29",
+      "reason": "Declined: 'unable to quote for the 7-ply export shippers ... 7-ply line is fully booked'",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para14"
+    },
+    {
+      "rfx_line_id": "L30",
+      "reason": "Declined: unable to quote the WR-coated cold-chain shipper",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para14"
+    }
+  ],
+  "questionnaire": [
+    {
+      "q_id": "Q1",
+      "answer": "Claims 'ISO 9001:2015 certified'. No certificate was attached, and no certificate number or expiry date was given.",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "q_id": "Q2",
+      "answer": "No in-house lab. Box compression and burst testing is done by the Indian Institute of Packaging, Mumbai, on a quarterly basis.",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "q_id": "Q3",
+      "answer": "Yes. Uses low-migration inks on all beverage work.",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "q_id": "Q4",
+      "answer": "1.9% over the last twelve months",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "q_id": "Q5",
+      "answer": "Yes. 'We can comfortably commit 120% of your peak monthly volume.' Note that the 7-ply line is stated to be fully booked.",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "q_id": "Q6",
+      "answer": "About 12 days from PO including transit to Waluj",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "q_id": "Q7",
+      "answer": "Not FSC-certified as stated. 'Paper is sourced from domestic mills with recycled content.' No certification was claimed.",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "q_id": "Q8",
+      "answer": "Approximately 1,050 km",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    }
+  ],
+  "document_facts": [
+    {
+      "document": "Kaveri_Kraftline_Proposal_DeccanPeak.docx",
+      "fact_type": "iso_certificate_claim",
+      "value": "ISO 9001:2015 claimed in text only. No certificate number, issue date or expiry date, and no certificate attached.",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "document": "Kaveri_Kraftline_Proposal_DeccanPeak.docx",
+      "fact_type": "test_result",
+      "value": "Rejection rate 1.9% over the last 12 months. No BCT/ECT/burst test results were provided.",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para16"
+    },
+    {
+      "document": "Kaveri_Kraftline_Proposal_DeccanPeak.docx",
+      "fact_type": "gstin",
+      "value": "33AADCK8845M1ZT",
+      "source": "Kaveri_Kraftline_Proposal_DeccanPeak.docx:para2"
+    }
+  ],
+  "unreadable_or_uncertain": [
+    "Partition prices (L18, L19) are 'per pc'. The RFx buys sets of 5 and 8 strips, so it is unclear whether the price is per strip or per set.",
+    "L01, L02, L05 and L06 are quoted on 120/18BF top liner, below the RFx 150/22BF. These prices are not like-for-like with the RFx.",
+    "L04, L08, L09 and the other lines have no board spec stated. The email says value-engineered board was offered 'on high-volume items', so some of these may also be below spec. Needs confirmation.",
+    "No quote validity, MOQ or price variation terms were stated. No discounts were mentioned.",
+    "Prices are 'delivered to Waluj, inclusive of GST at 18%' by a general statement in para7. No line has its own tax or freight note.",
+    "Q5 capacity commitment is a bare assertion, with no supporting detail."
+  ],
+  "_meta": {
+    "vendor_dir": "vendor_C_kaveri",
+    "files": [
+      "Kaveri_Kraftline_Proposal_DeccanPeak.docx",
+      "email.txt"
+    ],
+    "model": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-09T13:26:59"
+  }
+}

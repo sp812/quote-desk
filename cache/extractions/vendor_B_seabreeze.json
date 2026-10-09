@@ -1,0 +1,656 @@
+{
+  "vendor_name": "Seabreeze Packaging Industries",
+  "vendor_location": "Nani Daman (Kachigam Industrial Area), U.T. of DNH & DD",
+  "response_summary": "Vendor quoted all 30 RFx lines at a flat Rs/pc rate, ex-works Daman, GST 18% extra, with freight and insurance at actuals borne by buyer. A 4% conditional trade discount sits in the small print (annual order value above Rs 50 lakh, paid by quarterly credit note). The attached ISO 9001 certificate expired on 31-Aug-2026, before the offer date of 07-Oct-2026, although the vendor answers Q1 'Yes - cert attached'.",
+  "terms": {
+    "currency": "INR",
+    "gst": "extra",
+    "freight": "ex_works_buyer_pays",
+    "lead_time_days": 9,
+    "moq_or_min_order": "Minimum order per call-off: one full truck (approx. 6 MT) or freight surcharge applies",
+    "payment_days": 30,
+    "price_variation_clause": "Prices subject to revision in case of kraft paper increase above 5%",
+    "validity": "90 days",
+    "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L4-L9 (terms 1-6); p1:L11 header 'Rate (Rs/pc)*'"
+  },
+  "discounts": [
+    {
+      "percent": 4,
+      "condition": "Trade discount of 4% on total invoice value if cumulative annual order value placed exceeds Rs. 50,00,000 (fifty lakh), settled quarterly by credit note",
+      "min_annual_value_inr": 5000000,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L22-L23 (footnote *, small print)"
+    }
+  ],
+  "line_quotes": [
+    {
+      "rfx_line_id": "L01",
+      "vendor_item_text": "RSC Box 650 ml x 12 bottles - Classic Lager",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        36.15
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L12",
+      "source_quote": "1 RSC Box 650 ml x 12 bottles - Classic Lager 375x285x300 5 36.15",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L02",
+      "vendor_item_text": "RSC Box 650 ml x 12 bottles - Strong",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        36.82
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L13",
+      "source_quote": "2 RSC Box 650 ml x 12 bottles - Strong 375x285x300 5 36.82",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L03",
+      "vendor_item_text": "RSC Box 650 ml x 12 bottles - Peak Wheat (premium)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        39.63
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L14",
+      "source_quote": "3 RSC Box 650 ml x 12 bottles - Peak Wheat (premium) 375x285x300 5 39.63",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L04",
+      "vendor_item_text": "RSC Box 330 ml x 24 bottles - Classic",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        34.06
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L15",
+      "source_quote": "4 RSC Box 330 ml x 24 bottles - Classic 410x275x235 5 34.06",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L05",
+      "vendor_item_text": "RSC Box 330 ml x 24 cans - Classic",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        23.38
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L16",
+      "source_quote": "5 RSC Box 330 ml x 24 cans - Classic 400x270x125 5 23.38",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L06",
+      "vendor_item_text": "RSC Box 500 ml x 24 cans - Strong",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        28.48
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L17",
+      "source_quote": "6 RSC Box 500 ml x 24 cans - Strong 400x270x170 5 28.48",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L07",
+      "vendor_item_text": "RSC Box 500 ml x 24 cans - Peak Wheat (premium)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        31.39
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L18-L19",
+      "source_quote": "7 400x270x170 5 31.39 / RSC Box 500 ml x 24 cans - Peak Wheat (premium)",
+      "confidence": 0.97,
+      "notes": "Row text is split across two lines in the text layer; the PDF image shows 31.39 on the row for item 7.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L08",
+      "vendor_item_text": "RSC Box 650 ml x 12 - plain (contract bottling)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        33.45
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L20",
+      "source_quote": "8 RSC Box 650 ml x 12 - plain (contract bottling) 375x285x300 5 33.45",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L09",
+      "vendor_item_text": "RSC Box 330 ml x 24 cans - plain",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        20.97
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L21",
+      "source_quote": "9 RSC Box 330 ml x 24 cans - plain 400x270x125 5 20.97",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L10",
+      "vendor_item_text": "Master carton 4 x 6-pack cans 330 ml",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        13.73
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L22",
+      "source_quote": "10 Master carton 4 x 6-pack cans 330 ml 395x265x130 3 13.73",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L11",
+      "vendor_item_text": "Master carton 4 x 6-pack cans 500 ml",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        16.97
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L23",
+      "source_quote": "11 Master carton 4 x 6-pack cans 500 ml 395x265x175 3 16.97",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L12",
+      "vendor_item_text": "Mono carton outer - gift pack 2 x 650 ml",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        8.88
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L24",
+      "source_quote": "12 Mono carton outer - gift pack 2 x 650 ml 200x100x300 3 8.88",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L13",
+      "vendor_item_text": "Spares carton - general purpose (small)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        10.4
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L25",
+      "source_quote": "13 Spares carton - general purpose (small) 300x200x200 3 10.40",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L14",
+      "vendor_item_text": "Spares carton - general purpose (large)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        26.07
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L26",
+      "source_quote": "14 Spares carton - general purpose (large) 500x400x400 3 26.07",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L15",
+      "vendor_item_text": "Die-cut tray 24 cans 330 ml, shrink-wrap base",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        10.19
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L27",
+      "source_quote": "15 Die-cut tray 24 cans 330 ml, shrink-wrap base 400x270x40 3 10.19",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L16",
+      "vendor_item_text": "Die-cut tray 24 cans 500 ml, shrink-wrap base",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        10.5
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L28",
+      "source_quote": "16 Die-cut tray 24 cans 500 ml, shrink-wrap base 400x270x50 3 10.50",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L17",
+      "vendor_item_text": "Die-cut display tray 12 x 650 ml (modern trade)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        21.39
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L29",
+      "source_quote": "17 Die-cut display tray 12 x 650 ml (modern trade) 380x290x120 5 21.39",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L18",
+      "vendor_item_text": "Partition set 12-cell for 650 ml bottles (2 long + 3 short)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        6.46
+      ],
+      "price_unit": "per_set",
+      "unit_as_written": "Rate (Rs/pc) \u2013 item described as 'set of 5 strips'",
+      "unit_ambiguous": true,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L30",
+      "source_quote": "18 Partition set 12-cell for 650 ml bottles (2 long + 3 short) set of 5 strips 3 6.46",
+      "confidence": 0.95,
+      "notes": "Column header says Rs/pc but the item is a set of 5 strips; the rate could be per set or per individual strip. It is probably per set, but this is not confirmed.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L19",
+      "vendor_item_text": "Partition set 24-cell for 330 ml bottles (3 long + 5 short)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        7.34
+      ],
+      "price_unit": "per_set",
+      "unit_as_written": "Rate (Rs/pc) \u2013 item described as 'set of 8 strips'",
+      "unit_ambiguous": true,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L31",
+      "source_quote": "19 Partition set 24-cell for 330 ml bottles (3 long + 5 short) set of 8 strips 3 7.34",
+      "confidence": 0.95,
+      "notes": "Column header says Rs/pc but the item is a set of 8 strips; the rate could be per set or per individual strip. It is probably per set, but this is not confirmed.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L20",
+      "vendor_item_text": "Layer pad 1000x1200 mm (pallet tier sheet)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        22.56
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L32",
+      "source_quote": "20 Layer pad 1000x1200 mm (pallet tier sheet) 1000x1200 3 22.56",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L21",
+      "vendor_item_text": "Layer pad 1100x1100 mm (export pallet)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        20.89
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L33",
+      "source_quote": "21 Layer pad 1100x1100 mm (export pallet) 1100x1100 3 20.89",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L22",
+      "vendor_item_text": "Top/bottom pad for 650 ml shipper",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        1.86
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L34",
+      "source_quote": "22 Top/bottom pad for 650 ml shipper 370x280 3 1.86",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L23",
+      "vendor_item_text": "Corner edge board 50x50x5 mm, 1000 mm",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        10.29
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L35",
+      "source_quote": "23 Corner edge board 50x50x5 mm, 1000 mm 50x50x5x1000 - 10.29",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L24",
+      "vendor_item_text": "Keg collar sleeve 30 L keg",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        32.56
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L36",
+      "source_quote": "24 Keg collar sleeve 30 L keg 420x420x200 5 32.56",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L25",
+      "vendor_item_text": "Promo shipper 650 ml x 12 - IPL season limited edition",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        41.43
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L37",
+      "source_quote": "25 Promo shipper 650 ml x 12 - IPL season limited edition 375x285x300 5 41.43",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L26",
+      "vendor_item_text": "Sample/QA carton 6 x 650 ml",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        19.6
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L38",
+      "source_quote": "26 Sample/QA carton 6 x 650 ml 250x190x300 5 19.60",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L27",
+      "vendor_item_text": "Glass bottle return crate liner",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        4.65
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L39",
+      "source_quote": "27 Glass bottle return crate liner 560x380 3 4.65",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L28",
+      "vendor_item_text": "Export shipper 650 ml x 12 - 7-ply (Nepal/Bhutan)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        55.22
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L40",
+      "source_quote": "28 Export shipper 650 ml x 12 - 7-ply (Nepal/Bhutan) 380x290x305 7 55.22",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L29",
+      "vendor_item_text": "Export shipper 330 ml x 24 cans - 7-ply",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        36.18
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L41",
+      "source_quote": "29 Export shipper 330 ml x 24 cans - 7-ply 405x275x130 7 36.18",
+      "confidence": 0.98,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L30",
+      "vendor_item_text": "Cold-chain shipper 650 ml x 12 - wax/WR coated",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        39.03
+      ],
+      "price_unit": "per_piece",
+      "unit_as_written": "Rate (Rs/pc)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p1:L42",
+      "source_quote": "30 Cold-chain shipper 650 ml x 12 - wax/WR coated 375x285x300 5 39.03",
+      "confidence": 0.98,
+      "adders": []
+    }
+  ],
+  "lines_not_quoted": [],
+  "questionnaire": [
+    {
+      "q_id": "Q1",
+      "answer": "Yes - cert attached (attached certificate shows validity until 31-Aug-2026, i.e. expired before the offer date of 07-Oct-2026)",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L11"
+    },
+    {
+      "q_id": "Q2",
+      "answer": "Yes",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L12"
+    },
+    {
+      "q_id": "Q3",
+      "answer": "Yes",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L13"
+    },
+    {
+      "q_id": "Q4",
+      "answer": "1.6%",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L14"
+    },
+    {
+      "q_id": "Q5",
+      "answer": "Yes",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L15"
+    },
+    {
+      "q_id": "Q6",
+      "answer": "9 days",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L16"
+    },
+    {
+      "q_id": "Q7",
+      "answer": "FSC Mix certified (no FSC certificate attached)",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L17"
+    },
+    {
+      "q_id": "Q8",
+      "answer": "410 km",
+      "source": "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf:p2:L18"
+    }
+  ],
+  "document_facts": [
+    {
+      "document": "Seabreeze_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_number",
+      "value": "QMS/IN/23/40712 (ISO 9001:2015, issued by Meridian Assurance Services Pvt. Ltd.)",
+      "source": "Seabreeze_ISO9001_Certificate.pdf:p1:L9"
+    },
+    {
+      "document": "Seabreeze_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_issue_date",
+      "value": "01-Sep-2023 (original approval 01-Sep-2023)",
+      "source": "Seabreeze_ISO9001_Certificate.pdf:p1:L9-L10"
+    },
+    {
+      "document": "Seabreeze_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_valid_until",
+      "value": "31-Aug-2026 (before the offer date of 07-Oct-2026, so expired at the time of the offer; validity also 'subject to successful surveillance audits')",
+      "source": "Seabreeze_ISO9001_Certificate.pdf:p1:L10-L11"
+    },
+    {
+      "document": "Seabreeze_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_scope",
+      "value": "Manufacture and supply of corrugated boxes, sheets and allied packaging products; site: Survey No. 88/2, Kachigam Industrial Area, Nani Daman 396210",
+      "source": "Seabreeze_ISO9001_Certificate.pdf:p1:L4,L7-L8"
+    }
+  ],
+  "unreadable_or_uncertain": [
+    "ISO 9001 certificate valid-until date 31-Aug-2026 precedes the offer date 07-Oct-2026, so the certificate appears expired. Vendor's Q1 answer says 'cert attached' without mentioning this.",
+    "L18 and L19 (partition sets): the rate column is headed Rs/pc but the items are 'set of 5 strips' / 'set of 8 strips', so it is unclear whether the price is per set or per strip.",
+    "No board grade, GSM or BF is stated in the offer; the vendor says only 'manufactured strictly as per your specification', so no spec deviations are recorded.",
+    "FSC Mix is claimed (Q7 and letterhead) but no FSC certificate was attached.",
+    "The text layer splits row 7 across two lines (p1:L18-L19); the price 31.39 was read from the row as rendered.",
+    "The 4% discount applies only if cumulative annual order value exceeds Rs 50 lakh, and the email does not change this. 'Freight surcharge' for orders below one full truck (approx. 6 MT) is not quantified."
+  ],
+  "_meta": {
+    "vendor_dir": "vendor_B_seabreeze",
+    "files": [
+      "Seabreeze_Commercial_Offer_SPI-2026-DPB-112.pdf",
+      "Seabreeze_ISO9001_Certificate.pdf",
+      "email.txt"
+    ],
+    "model": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-09T13:27:00"
+  }
+}

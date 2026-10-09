@@ -1,0 +1,717 @@
+{
+  "vendor_name": "Indrayani Corrupack Pvt. Ltd.",
+  "vendor_location": "Chakan, Pune (Gat No. 312, Kharabwadi, Chakan, Pune 410501)",
+  "response_summary": "Vendor quoted all 30 lines in its own format (rate per 100 Nos, INR, GST extra, F.O.R. Waluj) with its own item names and ordering, plus a compliance tab, ISO 9001 certificate (valid to 14-Mar-2028) and an in-house BCT test report for the Classic 650x12 shipper. No discounts are stated. Quotation has a kraft paper price variation clause (+/-5%, IPPTA-linked) and \u00b15% quantity tolerance.",
+  "terms": {
+    "currency": "INR",
+    "gst": "extra",
+    "freight": "included_delivered",
+    "lead_time_days": 7,
+    "moq_or_min_order": null,
+    "payment_days": 45,
+    "price_variation_clause": "Rates valid for 12 months subject to kraft paper price variation beyond +/- 5% (linked to IPPTA index). Quantity tolerance +/- 5%.",
+    "validity": "12 months (subject to kraft paper price variation clause)",
+    "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!A39:A44"
+  },
+  "discounts": [],
+  "line_quotes": [
+    {
+      "rfx_line_id": "L01",
+      "vendor_item_text": "Classic Lager 650x12 shipper (ICP-C5-107)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        3893
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G7",
+      "source_quote": "3893",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L02",
+      "vendor_item_text": "Strong 650x12 shipper (ICP-C5-114)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        3732
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G8",
+      "source_quote": "3732",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L03",
+      "vendor_item_text": "Wheat 650x12 (premium) shipper (ICP-C5-121)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        4020
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G9",
+      "source_quote": "4020",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L04",
+      "vendor_item_text": "Classic 330 btl x24 (ICP-C5-128)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        3622
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G10",
+      "source_quote": "3622",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L05",
+      "vendor_item_text": "Classic CAN 330 x24 (ICP-C5-135)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        2507
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G11",
+      "source_quote": "2507",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L06",
+      "vendor_item_text": "Strong CAN 500 x24 (ICP-C5-142)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        2900
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G12",
+      "source_quote": "2900",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L07",
+      "vendor_item_text": "Wheat CAN 500 x24 (ICP-C5-149)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        3200
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G13",
+      "source_quote": "3200",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L08",
+      "vendor_item_text": "650x12 PLAIN (CB) (ICP-C5-156)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        3387
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G16",
+      "source_quote": "3387",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L09",
+      "vendor_item_text": "330 CAN x24 PLAIN (ICP-C5-163)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        2183
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G17",
+      "source_quote": "2183",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L10",
+      "vendor_item_text": "Master ctn 4x6 can 330 (ICP-C3-170)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        1415
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G22",
+      "source_quote": "1415",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L11",
+      "vendor_item_text": "Master ctn 4x6 can 500 (ICP-C3-177)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        1709
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G23",
+      "source_quote": "1709",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L12",
+      "vendor_item_text": "Gift pack outer 2x650 (ICP-C3-184)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        894
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G24",
+      "source_quote": "894",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L13",
+      "vendor_item_text": "GP spares ctn small (ICP-C3-191)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        1005
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G25",
+      "source_quote": "1005",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L14",
+      "vendor_item_text": "GP spares ctn large (ICP-C3-198)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        2746
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G26",
+      "source_quote": "2746",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L15",
+      "vendor_item_text": "Tray 24 can 330 (shrink) (ICP-C3-205)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        1023
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G27",
+      "source_quote": "1023",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L16",
+      "vendor_item_text": "Tray 24 can 500 (shrink) (ICP-C3-212)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        1058
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G28",
+      "source_quote": "1058",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L17",
+      "vendor_item_text": "Display tray 12x650 MT (ICP-C5-219)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        2189
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G29",
+      "source_quote": "2189",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L18",
+      "vendor_item_text": "Partition 12 cell 650ml (set) (ICP-C3-226)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        666
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": true,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G30",
+      "source_quote": "666",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "notes": "Column header is 'Rate / 100 Nos'; item labelled '(set)' with size 'set of 5 strips'. 'Nos' is presumably 100 sets but could be read as 100 strips; RFx buys per set.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L19",
+      "vendor_item_text": "Partition 24 cell 330ml (set) (ICP-C3-233)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        751
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": true,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G31",
+      "source_quote": "751",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "notes": "Column header is 'Rate / 100 Nos'; item labelled '(set)' with size 'set of 8 strips'. 'Nos' presumably 100 sets but could be read as 100 strips; RFx buys per set.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L20",
+      "vendor_item_text": "Layer pad 1000x1200 (ICP-C3-240)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        2167
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G32",
+      "source_quote": "2167",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L21",
+      "vendor_item_text": "Layer pad 1100x1100 export (ICP-C3-247)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        2115
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G33",
+      "source_quote": "2115",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L22",
+      "vendor_item_text": "Top-bottom pad 650 shipper (ICP-C3-254)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        180
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G34",
+      "source_quote": "180",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L23",
+      "vendor_item_text": "Edge board 50x50x5 1 mtr (ICP-EB-261)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        1071
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G35",
+      "source_quote": "1071",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L24",
+      "vendor_item_text": "Keg collar 30L (ICP-C5-268)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        3372
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G14",
+      "source_quote": "3372",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L25",
+      "vendor_item_text": "IPL promo 650x12 (4 col) (ICP-C5-275)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        4015
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G15",
+      "source_quote": "4015",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L26",
+      "vendor_item_text": "QA sample ctn 6x650 (ICP-C5-282)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        1955
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G18",
+      "source_quote": "1955",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L27",
+      "vendor_item_text": "Crate liner (ICP-C3-289)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        462
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G36",
+      "source_quote": "462",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L28",
+      "vendor_item_text": "EXPORT 650x12 7ply (ICP-C7-296)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        5778
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G19",
+      "source_quote": "5778",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "notes": "Vendor states '7 ply / 180/24BF'; inner liner grade (RFx 150/22BF) not stated.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L29",
+      "vendor_item_text": "EXPORT can 330x24 7ply (ICP-C7-303)",
+      "mapping_confidence": 0.97,
+      "price_candidates": [
+        3817
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G20",
+      "source_quote": "3817",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "notes": "Vendor states '7 ply / 180/24BF'; inner liner grade (RFx 150/22BF) not stated.",
+      "adders": []
+    },
+    {
+      "rfx_line_id": "L30",
+      "vendor_item_text": "Cold chain 650x12 WR coated (ICP-C5-310)",
+      "mapping_confidence": 0.98,
+      "price_candidates": [
+        3972
+      ],
+      "price_unit": "per_100",
+      "unit_as_written": "Rate / 100 Nos (Rs.)",
+      "unit_ambiguous": false,
+      "currency": "INR",
+      "gst_included": false,
+      "references_history": false,
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Quotation!G21",
+      "source_quote": "3972",
+      "confidence": 0.98,
+      "spec_deviation": null,
+      "notes": "Remark: 'WR coating incl.'",
+      "adders": []
+    }
+  ],
+  "lines_not_quoted": [],
+  "questionnaire": [
+    {
+      "q_id": "Q1",
+      "answer": "Yes - cert attached (valid to 2028); certificate ISO 9001:2015 No. QMS/IN/25/51988 valid until 14-Mar-2028",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B3"
+    },
+    {
+      "q_id": "Q2",
+      "answer": "Yes, in-house BCT & burst tester (ECT not explicitly mentioned in answer; test report includes ECT result)",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B4"
+    },
+    {
+      "q_id": "Q3",
+      "answer": "Yes",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B5"
+    },
+    {
+      "q_id": "Q4",
+      "answer": "1.1%",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B6"
+    },
+    {
+      "q_id": "Q5",
+      "answer": "Yes",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B7"
+    },
+    {
+      "q_id": "Q6",
+      "answer": "7 days",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B8"
+    },
+    {
+      "q_id": "Q7",
+      "answer": "Recycled fibre, no FSC",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B9"
+    },
+    {
+      "q_id": "Q8",
+      "answer": "245 km",
+      "source": "Indrayani_Quotation_DeccanPeak_2026-27.xlsx!Compliance!B10"
+    }
+  ],
+  "document_facts": [
+    {
+      "document": "ICP_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_number",
+      "value": "QMS/IN/25/51988 (ISO 9001:2015), issued by Meridian Assurance Services Pvt. Ltd.",
+      "source": "ICP_ISO9001_Certificate.pdf:p1:L8"
+    },
+    {
+      "document": "ICP_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_issue_date",
+      "value": "15-Mar-2025 (original approval 15-Mar-2019)",
+      "source": "ICP_ISO9001_Certificate.pdf:p1:L9"
+    },
+    {
+      "document": "ICP_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_valid_until",
+      "value": "14-Mar-2028 (subject to successful surveillance audits)",
+      "source": "ICP_ISO9001_Certificate.pdf:p1:L9"
+    },
+    {
+      "document": "ICP_ISO9001_Certificate.pdf",
+      "fact_type": "certificate_site_scope",
+      "value": "Gat No. 312, Kharabwadi, Chakan, Pune 410501; scope: design and manufacture of corrugated boxes, trays, partitions and pads",
+      "source": "ICP_ISO9001_Certificate.pdf:p1:L4,L7"
+    },
+    {
+      "document": "ICP_BCT_Test_Report_Sep26.pdf",
+      "fact_type": "test_report_ref",
+      "value": "Report No. ICP/QC/2026/0917 dated 22-09-2026; sample 5-ply RSC 375x285x300 (Classic Lager 650x12); tested in-house, tester calibrated 04-2026",
+      "source": "ICP_BCT_Test_Report_Sep26.pdf:p1:L2,L9"
+    },
+    {
+      "document": "ICP_BCT_Test_Report_Sep26.pdf",
+      "fact_type": "test_result",
+      "value": "BCT 512 kgf (spec >=450) PASS",
+      "source": "ICP_BCT_Test_Report_Sep26.pdf:p1:L4"
+    },
+    {
+      "document": "ICP_BCT_Test_Report_Sep26.pdf",
+      "fact_type": "test_result",
+      "value": "Bursting strength 12.4 kg/cm2 (spec >=11.0) PASS",
+      "source": "ICP_BCT_Test_Report_Sep26.pdf:p1:L5"
+    },
+    {
+      "document": "ICP_BCT_Test_Report_Sep26.pdf",
+      "fact_type": "test_result",
+      "value": "ECT 7.1 kN/m (spec >=6.5) PASS",
+      "source": "ICP_BCT_Test_Report_Sep26.pdf:p1:L6"
+    },
+    {
+      "document": "ICP_BCT_Test_Report_Sep26.pdf",
+      "fact_type": "test_result",
+      "value": "Moisture 7.8% (spec 7-9) PASS",
+      "source": "ICP_BCT_Test_Report_Sep26.pdf:p1:L7"
+    },
+    {
+      "document": "ICP_BCT_Test_Report_Sep26.pdf",
+      "fact_type": "test_result",
+      "value": "Board GSM total 702 (spec >=690) PASS",
+      "source": "ICP_BCT_Test_Report_Sep26.pdf:p1:L8"
+    }
+  ],
+  "unreadable_or_uncertain": [
+    "Partition sets (L18, L19): rate is under the 'Rate / 100 Nos' header; 'Nos' presumably means sets (item labelled '(set)') but unit wording is not explicit.",
+    "Export 7-ply lines (L28, L29): vendor lists only '7 ply / 180/24BF'; inner liner grade not stated.",
+    "Test report only covers the Classic 650x12 shipper, not other items.",
+    "Email says 'standard quotation format for internal reasons' - vendor item names/order differ from RFx; mapping done by size, ply, print and brand.",
+    "Delivery term 'F.O.R. your Waluj plant' interpreted as delivered/freight included; not explicitly stated as freight-inclusive."
+  ],
+  "_meta": {
+    "vendor_dir": "vendor_A_indrayani",
+    "files": [
+      "ICP_BCT_Test_Report_Sep26.pdf",
+      "ICP_ISO9001_Certificate.pdf",
+      "Indrayani_Quotation_DeccanPeak_2026-27.xlsx",
+      "email.txt"
+    ],
+    "model": "claude-sonnet-5-5",
+    "extracted_at": "2026-10-09T13:27:01"
+  }
+}

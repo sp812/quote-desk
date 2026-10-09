@@ -1,0 +1,47 @@
+{
+  "vendor": "vendor_C_kaveri",
+  "results": {
+    "Q1": {
+      "q_id": "Q1",
+      "status": "unclear",
+      "reason": "Claims 'ISO 9001:2015 certified' but no certificate, number or expiry was provided, so validity on 2026-11-01 cannot be verified."
+    },
+    "Q2": {
+      "q_id": "Q2",
+      "status": "fail",
+      "reason": "'No in-house lab'; testing is outsourced to the Indian Institute of Packaging, Mumbai, but in-house is required."
+    },
+    "Q3": {
+      "q_id": "Q3",
+      "status": "pass",
+      "reason": "'Yes. Uses low-migration inks on all beverage work.'"
+    },
+    "Q4": {
+      "q_id": "Q4",
+      "status": "pass",
+      "reason": "1.9% over the last twelve months is within the 2.0% limit.",
+      "rule_note": "Rule check skipped: '1.9% over the last twelve months' is not a plain figure, so the AI's judgement stands."
+    },
+    "Q5": {
+      "q_id": "Q5",
+      "status": "unclear",
+      "reason": "Vendor says 'Yes' to committing 120% of peak, but notes the 7-ply line is fully booked, which casts doubt on the commitment."
+    },
+    "Q6": {
+      "q_id": "Q6",
+      "status": "fail",
+      "reason": "'About 12 days from PO including transit to Waluj' exceeds the 10-day limit.",
+      "rule_note": "Rule check skipped: 'About 12 days from PO including transit to Waluj' is not a plain figure, so the AI's judgement stands."
+    },
+    "Q7": {
+      "q_id": "Q7",
+      "status": "fail",
+      "reason": "'Not FSC-certified'; recycled content is claimed with no certification, so it does not meet the criterion."
+    },
+    "Q8": {
+      "q_id": "Q8",
+      "status": "pass",
+      "reason": "Informational only: approximately 1,050 km."
+    }
+  }
+}
