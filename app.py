@@ -244,6 +244,16 @@ def page_board():
     if res["uncovered_lines"]:
         sub += f" {len(res['uncovered_lines'])} lines have no qualified quote yet."
     st.markdown(f'<div class="reco"><div class="lead">{lead}</div><div class="sub">{sub}</div></div>', unsafe_allow_html=True)
+    if res.get("top_share", 0) > 0.7:
+        sp = s.award(max_share=0.7).get("split") or {}
+        if sp.get("feasible") and sp.get("moved"):
+            fix = (f"Capping any vendor at 70% moves {len(sp['moved'])} line{'s' if len(sp['moved']) != 1 else ''} to the next-cheapest qualified "
+                   f"vendor for {money(sp['premium'])} a year, and nothing if they agree to match the L1 price (L1 matching).")
+        else:
+            fix = "No other qualified vendor quotes these lines, so qualifying a second vendor is the only way to reduce this risk."
+        st.markdown(f'<div class="issue"><div class="head">Supply risk: {short(res["top_vendor"])} would hold {res["top_share"]:.0%} of spend</div>'
+                    f'<div class="detail">One plant outage or strike during peak season (March to May) would stop shipments. {fix}</div></div>',
+                    unsafe_allow_html=True)
 
     # progress through the sourcing event
     n_prices = sum(1 for n in s.norms if n.status != "missing")
@@ -360,12 +370,14 @@ def page_draft():
             st.markdown("**Terms**\n" + "\n".join(f"- {t}" for t in d["terms"]))
         if d["line_items"]:
             st.markdown("**Send to:** " + ", ".join(d["vendors"]))
+            channel = st.radio("Channel", ["Email", "WhatsApp Business", "Email and WhatsApp"], index=2, horizontal=True,
+                               help="Small vendors often answer on WhatsApp; replies from both land in Vendor replies.")
             if st.button("Send RFQ to vendors", type="primary"):
-                st.session_state.sent = True
-                log(load_decisions(), "rfq sent", f"Sent to {len(d['vendors'])} vendors (simulated email)")
+                st.session_state.sent = channel
+                log(load_decisions(), "rfq sent", f"Sent to {len(d['vendors'])} vendors by {channel} (simulated)")
             if st.session_state.get("sent"):
-                st.success(f"Sent to {len(d['vendors'])} vendors. Email is simulated in this demo; the five replies to {config.RFX_ID} "
-                           "are already in Vendor replies.")
+                st.success(f"Sent to {len(d['vendors'])} vendors by {st.session_state.sent}. Sending is simulated in this demo; "
+                           f"the five replies to {config.RFX_ID} are already in Vendor replies, including one that arrived as a WhatsApp photo.")
 
 
 # ================================================================== Vendor replies
@@ -533,15 +545,85 @@ def page_compare():
         df = pd.DataFrame(data)
         sty = df.style.apply(lambda _: pd.DataFrame([{**{c: "" for c in df.columns}, **r} for r in style], columns=df.columns), axis=None) \
             .set_properties(subset=[colname[v] for v in shown] + ["Annual qty"], **{"text-align": "right"})
-        st.dataframe(sty, hide_index=True, width="stretch", height=min(38 * (len(df) + 1) + 4, 1150),
+        st.dataframe(sty, hide_index=True, width="stretch", height=min(35 * (len(df) + 1) + 3, 1150),
                      column_config={colname[v]: st.column_config.Column(width="small") for v in shown} |
                      {"Line": st.column_config.Column(width=48), "Item": st.column_config.Column(width="medium"),
                       "Annual qty": st.column_config.Column(width="small"), "L1": st.column_config.Column(width="medium")})
+    if data:
+        st.download_button("Download this comparison (Excel)", _comparison_xlsx(s, pd.DataFrame(data)), file_name="comparison.xlsx")
+    _vendor_summary(s, shown)
     st.subheader("How was this number worked out?")
     c1, c2 = st.columns(2)
     lid = c1.selectbox("Line", [l["line_id"] for l in lines], format_func=lambda x: f"{x} · {next(l['description'] for l in lines if l['line_id'] == x)}")
     v = c2.selectbox("Vendor", vendors, format_func=lambda k: s.vendor_names[k])
     _evidence(s, by.get((v, lid)))
+
+
+def _vendor_rows(s, vendors):
+    """Questionnaire answers, commercial terms and attached documents, one column per vendor."""
+    qs = extract.load_questionnaire()
+    mark = {"pass": "✓", "fail": "✗", "unclear": "?"}
+    rows, kinds = [], []
+
+    def add(label, vals, kind="text"):
+        rows.append({"": label, **vals}); kinds.append(kind)
+
+    add("Qualification", {short(s.vendor_names[v]): STATUS.get(s.status[v], ("-",))[0] for v in vendors}, "status")
+    for q in qs:
+        vals = {}
+        for v in vendors:
+            ans = {a_.get("q_id"): a_.get("answer") for a_ in s.extractions[v].get("questionnaire", [])}.get(q["q_id"]) or "No answer"
+            res = s.q_evals.get(v, {}).get("results", {}).get(q["q_id"], {})
+            vals[short(s.vendor_names[v])] = f"{mark.get(res.get('status'), '·')} {ans}"
+        add(f"{q['q_id']} {q['question'].split('?')[0][:58]}? ({q['type']})", vals, "q")
+    for label, fn in [("Payment terms", lambda t: f"{t.get('payment_days')} days" if t.get("payment_days") else "Not stated"),
+                      ("Lead time", lambda t: f"{t.get('lead_time_days')} days" if t.get("lead_time_days") else "Not stated"),
+                      ("Freight", lambda t: FREIGHT.get(t.get("freight"), t.get("freight") or "-")),
+                      ("GST", lambda t: GST.get(t.get("gst"), t.get("gst") or "-")),
+                      ("Currency", lambda t: t.get("currency") or "-"),
+                      ("Price validity", lambda t: t.get("validity") or "Not stated"),
+                      ("Price variation clause", lambda t: t.get("price_variation_clause") or "None stated"),
+                      ("Minimum order", lambda t: t.get("moq_or_min_order") or "None stated")]:
+        add(label, {short(s.vendor_names[v]): fn(s.extractions[v].get("terms", {})) for v in vendors})
+    add("Discounts", {short(s.vendor_names[v]): "; ".join(f"{d.get('percent')}% if {d.get('condition')}" for d in s.extractions[v].get("discounts", []))
+                      or "None" for v in vendors})
+    add("Documents attached", {short(s.vendor_names[v]): ", ".join(f for f in s.extractions[v].get("_meta", {}).get("files", []) if f != "email.txt") or "None"
+                               for v in vendors})
+    add("What the documents show", {short(s.vendor_names[v]): "; ".join(f"{d.get('fact_type', '').replace('_', ' ')}: {d.get('value')}"
+                                                                         for d in s.extractions[v].get("document_facts", []) if isinstance(d, dict)) or "-"
+                                    for v in vendors})
+    return rows, kinds
+
+
+def _vendor_summary(s, vendors):
+    st.subheader("Questionnaire, terms and documents")
+    st.markdown('<p class="small">The same vendors, side by side on everything that isn\'t a unit price. ✓ pass, ✗ fail, ? unclear.</p>',
+                unsafe_allow_html=True)
+    rows, kinds = _vendor_rows(s, vendors)
+    df = pd.DataFrame(rows)
+
+    def color(val, kind):
+        if kind == "status":
+            return {"Qualified": f"background-color:{GOOD_BG}; color:{GOOD}", "Not qualified": f"background-color:{STOP_BG}; color:{STOP}",
+                    "Documents pending": f"background-color:{CHECK_BG}; color:{CHECK}",
+                    "Included by you": f"background-color:{GOOD_BG}; color:{GOOD}"}.get(val, "")
+        if kind == "q" and isinstance(val, str):
+            return {"✓": f"color:{GOOD}", "✗": f"background-color:{STOP_BG}; color:{STOP}", "?": f"background-color:{CHECK_BG}; color:{CHECK}"}.get(val[:1], "")
+        return ""
+    sty = df.style.apply(lambda d: pd.DataFrame([[("" if c == "" else color(d.iloc[i][c], kinds[i])) for c in d.columns] for i in range(len(d))],
+                                                columns=d.columns, index=d.index), axis=None)
+    st.dataframe(sty, hide_index=True, width="stretch", height=35 * (len(df) + 1) + 3,
+                 column_config={"": st.column_config.Column(width="medium")})
+
+
+def _comparison_xlsx(s, prices: pd.DataFrame) -> bytes:
+    import io
+    rows, _ = _vendor_rows(s, list(s.extractions))
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as xw:
+        prices.to_excel(xw, sheet_name="Landed prices", index=False)
+        pd.DataFrame(rows).to_excel(xw, sheet_name="Questionnaire & terms", index=False)
+    return buf.getvalue()
 
 
 def _evidence(s, n):
@@ -692,10 +774,10 @@ def page_issues():
 # ================================================================== Ask a question
 SUGGESTED = [
     ("The VP's question", "What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?"),
-    ("Biggest lines", "Who is cheapest on our five biggest lines by annual value, and how confident are we in those prices?"),
+    ("Supply security", "No vendor should hold more than 70% of our spend. What would that split cost, and what would L1 matching save?"),
     ("Test an unreadable value", "If Godavari's blurred 5-ply rate is 62.50 instead of 68.50, what changes in the award?"),
-    ("Fewer vendors", "Consolidate to two vendors at most. What does it cost us versus the best split?"),
     ("Cheap but risky", "Nordvik is cheapest on the Classic 650 shipper. What would it take to award them, and what's the risk?"),
+    ("Payment terms", "Nordvik offers 90 days credit and Godavari 30. At a 10% cost of capital, does that change who is really cheapest?"),
     ("Chart and export", "Chart landed cost by vendor for the 650 ml shippers and export the full comparison to Excel."),
 ]
 

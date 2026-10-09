@@ -1,36 +1,29 @@
-# What I built, what I decided, what I left out
+# Quote desk: what I decided, and what I left out
 
-**Quote desk** takes a buyer from a conversational RFQ to a defensible award decision. Five vendors reply however they like (a styled Excel, a letterhead PDF, a Word letter, a tilted phone photo, a two-line email); the system reads all of them into one like-for-like comparison, ranks every uncertainty by how much money it can move, and lets the buyer interrogate the result in plain language, all the way to an award memo with an audit trail.
+**Quote desk** takes a buyer from a conversational RFQ to an award she can defend. Five vendors reply however they like (a styled Excel, a letterhead PDF, a Word letter, a tilted WhatsApp photo, a two-line email). The system reads them into one like-for-like comparison, ranks every uncertainty by the money it moves, and answers questions in plain language through to an award memo. Demo: a brewery's annual corrugated contract, 30 lines, about ₹3.7 crore. I chose packaging for its unit chaos (per box, per 100, per kg, per strip) and because beverage and packaging are categories Aerchain serves.
 
-Demo scenario: a mid-size brewery's annual corrugated packaging contract (30 lines, about ₹3.7 crore). I chose packaging because it has the worst unit chaos in indirect spend (per box, per 100, per kg, per strip) and because beverage and packaging are categories Aerchain already serves.
+## Decisions
 
-## The core decision: the AI reads, code does the arithmetic
+- **The AI reads; code does the arithmetic.** The model records prices exactly as written, with a source and a confidence. Code converts units, removes GST, applies FX, adds freight and writes every step out, so any rupee can be traced to the vendor's words.
+- **Never guess an unreadable number.** Every plausible reading is kept and the vendor is evaluated at its least favourable one until the value is confirmed.
+- **Rank uncertainty by money, not count.** Each open issue is re-run through the award under every possible answer. One blurred digit in the demo also tips a rival below its volume-discount threshold and moves other lines: a second-order effect no spreadsheet catches.
+- **Landed cost, not sticker price**, with conditional discounts applied only when the awarded volume meets the threshold.
+- **Code overrides the AI on facts.** Numeric questionnaire limits and certificate expiry are checked in code; a peer check catches unit errors.
+- **Cheapest is not automatically defensible.** The board warns when one vendor would hold most of the spend and prices a split. L1 matching (the next vendor matches L1 for its share) usually removes the premium.
+- **Measured accuracy.** A hidden answer key scores the live reading. The headline metric is *confidently wrong*: a wrong value shown without a warning. It is zero; the only misses were a blur the AI said it couldn't read.
+- **The buyer stays in charge.** Including a vendor needs a written reason; every decision lands in a log that ships with the award pack. The memo states the approval needed and any L1 justification.
+- **Channel: email and WhatsApp** (simulated). Small Indian vendors answer on WhatsApp, and vendor participation decides whether a sourcing event works.
 
-The model extracts prices *exactly as written*, with a source locator and a confidence. It never converts units, removes GST, applies FX or adds freight. Deterministic code does that and writes every step out ("₹68.50/kg × 0.58 kg = ₹39.73"). A buyer with ₹4 crore on the line can trace any number back to the vendor's own words, and a reviewer can test the arithmetic without trusting a model.
+## Deliberately left out
 
-## Decisions that earn trust
-
-- **Never guess an unreadable number.** If a photo digit could be 62.50 or 68.50, the system keeps both, evaluates the vendor at its least favourable reading until confirmed, and says so.
-- **Rank uncertainty by money, not by count.** Every open issue is re-run through the award under each possible reading. The buyer sees "this blurred rate changes the winner on these lines and moves the award by this much", not a page of yellow cells. In the demo data, one blurred digit also pushes a competitor below its volume-discount threshold, moving eight *other* lines. Nobody catches that second-order effect in a spreadsheet.
-- **Compare landed cost, not sticker price.** Freight (estimated from the buyer's own rate card when a vendor quotes ex-works), GST treatment, FX, and conditional discounts applied only when the awarded volume actually meets the threshold.
-- **Independent cross-checks.** A peer check compares every price with the other vendors to catch unit errors. Questionnaire limits (rejection ≤ 2%, lead time ≤ 10 days) are checked in code, and certificate expiry is checked against contract start. When code and AI disagree, code wins and the override is shown.
-- **Measured, not claimed, accuracy.** The fabricated dataset has a hidden answer key the AI never sees. The app scores itself against it, and the headline metric is *confidently wrong*: a wrong value shown without a warning.
-- **The buyer stays in charge.** Eligibility overrides need a written reason; every decision lands in a log that ships with the award pack.
-
-## What I deliberately left out
-
-- **Negotiation.** Aerchain already has a Negotiation Agent; the award memo is where it would pick up.
-- **Real email, vendor portal, login, multi-buyer workflow.** That's plumbing; the brief asked to stub it.
-- **Automatic resolution of ambiguity.** The system drafts a clarification email to the vendor instead of resolving it silently.
-- **Payment terms inside landed cost.** They're shown and available as a cost-of-capital view on request, but kept out of the headline number so it stays a price, not a model.
-- **Multi-category, multi-RFQ, history across years.** One RFQ done properly beats ten done shallowly.
+- **Negotiation and reverse auctions.** Aerchain has a Negotiation Agent; the award memo is where it would pick up.
+- **Real email/WhatsApp, vendor portal, login, approvals workflow.** Plumbing, stubbed as allowed.
+- **Silent auto-resolution.** The system drafts the vendor email instead of deciding for the buyer.
+- **Payment terms inside landed cost.** Kept as an on-request cost-of-capital view, so the headline stays a price.
+- **Re-mapping a line by hand, multi-RFQ history, other categories.** Next on the list; one RFQ done properly first.
 
 ## The better problem
 
-Extraction is largely solved; models read messy documents well. The expensive failure is a *fluent* system that quietly normalises the wrong thing (a per-strip price read as per-set, a blurred digit read confidently) and hands the buyer a clean table that is wrong. The real product is **decision confidence**: knowing which uncertainties actually change the award, and closing them with the vendor before money moves.
+Reading messy quotes is largely solved. The expensive failure is a fluent system that normalises the wrong thing and hands the buyer a clean table that is wrong. The product is **decision confidence**: knowing which uncertainties change the award and closing them with the vendor before money moves. Second, procurement has no **memory**: "rest same as last year" only works if the system remembers last year, and every buyer correction ("it's 68.50") should make the next read of that vendor better.
 
-A second problem hides in "rest same as last year": procurement has no memory. A system that remembers past prices, specs and vendor behaviour turns vague references into verifiable claims and stops vendors hiding behind them.
-
-## What I'd measure in production
-
-Quote-to-decision time; share of values needing human review; confidently-wrong rate on audited samples; how often buyers override the recommendation and why; vendor clarification turnaround.
+**What I'd measure:** quote-to-decision time, share of values needing review, confidently-wrong rate on audited samples, buyer overrides and why, vendor clarification turnaround.

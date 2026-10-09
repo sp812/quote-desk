@@ -144,3 +144,19 @@ def test_request_payloads_respect_model_rules(monkeypatch):
     kw = seen[0]
     assert "temperature" not in kw and "tool_choice" not in kw
     assert kw["extra_body"]["output_config"]["effort"] == "medium"
+
+
+# ---------------- supply security
+def test_share_cap_moves_lines_and_reports_premium(norms, ex):
+    disc = conditional_discounts(ex)
+    base = award(norms, Scenario(eligible={A, B, D}), disc)
+    assert base["top_share"] > 0.7
+    capped = award(norms, Scenario(eligible={A, B, D}, max_share=0.6), disc)
+    sp = capped["split"]
+    assert sp["feasible"] and sp["moved"] and all(v <= 0.6 + 1e-9 for v in capped["shares"].values())
+    assert sp["premium"] == pytest.approx(capped["total"] - base["total"], abs=1)
+
+
+def test_share_cap_reports_when_no_second_vendor(norms, ex):
+    sp = award(norms, Scenario(eligible={A}, max_share=0.7), conditional_discounts(ex))["split"]
+    assert not sp["feasible"] and "qualifying" in sp["note"] or "No other qualified vendor" in sp["note"]

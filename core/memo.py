@@ -17,6 +17,7 @@ def lakh(x):
 def facts(st) -> dict:
     res = st.award()
     issues = st.issues()
+    split = st.award(max_share=0.7).get("split") if res.get("top_share", 0) > 0.7 else None
     return dict(
         rfx=RFX_ID, date=str(date.today()),
         eligible_vendors=[st.vendor_names[v] for v in sorted(st.eligible)],
@@ -31,6 +32,11 @@ def facts(st) -> dict:
         open_issues=[dict(vendor=i["vendor_name"], kind=i["kind"], issue=i["title"], decision_relevant=i["decision_relevant"],
                           award_swing=lakh(i["award_swing"]), exposure=lakh(i.get("exposure_in_award", 0)),
                           lines_flipping=i["lines_flipping"]) for i in issues[:10]],
+        supply_concentration=dict(top_vendor=res.get("top_vendor"), top_share=f"{res.get('top_share', 0):.0%}",
+                                  split_at_70pct=(dict(feasible=split["feasible"], lines_moved=len(split["moved"]),
+                                                       premium=lakh(split["premium"]), note=split["note"]) if split else None)),
+        approval=("Award value above ₹1 crore: per a typical approval matrix this needs CFO/CPO sign-off "
+                  "(adjust to Deccan Peak's actual delegation of authority)."),
         buyer_decisions=st.decisions.get("log", [])[-15:],
     ), res, issues
 

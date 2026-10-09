@@ -4,20 +4,20 @@ Prototype for the Aerchain product take-home "Kill the Quote Spreadsheet".
 
 A buyer drafts an RFQ with an AI co-pilot. Five vendors reply in five messy formats. The system reads every reply into one like-for-like comparison (same lines, same units, same currency, landed at the plant), ranks every uncertainty by how much money it can move, and lets the buyer interrogate the result in plain language, all the way to an award memo with a full audit trail.
 
-The demo data is fabricated (see `datagen/`); all companies are fictional. Design decisions and scope are in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+The demo data is fabricated (see `datagen/`); all companies are fictional. Design decisions and scope are in [`docs/DECISIONS.md`](docs/DECISIONS.md); every line of the brief is mapped to where it is answered in [`docs/BRIEF_COVERAGE.md`](docs/BRIEF_COVERAGE.md).
 
 ## The eight screens
 
 | Screen | What it does |
 |---|---|
-| Overview | Award, savings vs last year, vendor status, the issues worth your attention first |
+| Decision board | The recommendation in one sentence, supply risk, vendor status, the decisions waiting on you |
 | Draft RFQ | Chat with the co-pilot; it pulls approved specs and volumes, proposes questionnaire and terms. Sending is simulated. |
 | Vendor replies | Each vendor's original files next to what was read from them, with sources |
-| Comparison | 30 lines × 5 vendors in ₹ per unit, delivered, ex-GST. Click any cell to see every conversion step and the vendor's own words |
-| Review queue | Every uncertainty ranked by money at stake; confirm values, include vendors (reason logged), draft clarification emails |
-| Ask the data | Plain-language questions answered by real SQL and award-engine runs, shown under each answer; charts and Excel exports |
+| Comparison | 30 lines × 5 vendors in ₹ per unit, delivered, ex-GST, with L1 marked; questionnaire answers, terms and documents alongside; Excel export; every conversion step and the vendor's own words |
+| Open issues | Every uncertainty ranked by money at stake; confirm values, include vendors (reason logged), draft clarification emails |
+| Ask a question | Plain-language questions answered by real SQL and award-engine runs, shown under each answer; charts and Excel exports |
 | Award memo | One-page recommendation written only from computed numbers, plus an Excel pack with the audit trail |
-| Accuracy check | Scores the live reading against a hidden answer key; the headline number is "confidently wrong" |
+| Reading accuracy | Scores the live reading against a hidden answer key; the headline number is "confidently wrong" |
 
 ## How it works
 
@@ -27,7 +27,7 @@ The demo data is fabricated (see `datagen/`); all companies are fictional. Desig
 | Units, GST, FX, freight, discounts, last-year lookups | Code, every step written out | `core/normalize.py` |
 | Questionnaire | AI judgement + code checks for numeric limits and certificate dates | `core/questionnaire.py` |
 | Award and money-weighted review queue | Code | `core/award.py` |
-| Ask the data | AI agent with tools (SQL, award scenarios, charts, exports, evidence) | `core/analyst.py` |
+| Ask a question | AI agent with tools (SQL, award scenarios, charts, exports, evidence) | `core/analyst.py` |
 | RFQ drafting, memo, clarification emails | AI | `core/copilot.py`, `core/memo.py` |
 | Accuracy scoring | Code | `core/evaluate.py` |
 

@@ -90,6 +90,9 @@ RULES
 - Before answering a decision question, check what is uncertain: unresolved readings (readings>1), estimated freight, FX, 'same as last year' prices, failed or pending questionnaires. Say how they affect the answer. If an open issue could change the answer, show both outcomes.
 - 'Cleared the questionnaire' means questionnaire_result='pass'. Say who is pending and why rather than silently dropping or including them.
 - Spec-non-compliant quotes (spec_compliant=false) are not like-for-like; exclude them unless asked, and say so.
+- Supply security: a single vendor holding most of the spend is a risk for a brewery (peak season, plant outage). When the award concentrates
+  spend, say so and offer award_scenario with max_share (e.g. 0.7). Explain 'L1 matching': the next vendor is asked to match the L1 price
+  for its share, which removes the premium. If no other qualified vendor quotes those lines, say that qualifying another vendor is the fix.
 - Payment terms: if asked for a cost-of-capital view, adjusted price = landed_inr * (1 - {COST_OF_CAPITAL} * payment_days/365). Say it is an adjustment, not a price.
 - Format money in Indian style: ₹ lakh (1e5) and ₹ crore (1e7). Unit prices to 2 decimals.
 - Be concise: lead with the answer in 1-3 sentences, then a small table or chart if useful, then 'Watch-outs' bullets only if they matter. Do not repeat tables that a tool already displayed to the user - the buyer sees tool outputs.
@@ -106,6 +109,7 @@ TOOLS = [
          "vendors": {"description": "'eligible' (questionnaire pass + buyer-included), 'all', or a list of vendor names/keys", "anyOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
          "allow_spec_deviation": {"type": "boolean"},
          "max_vendors": {"type": "integer", "description": "consolidate to at most N vendors"},
+         "max_share": {"type": "number", "description": "supply-security cap, e.g. 0.7 = no vendor above 70% of spend; lines move to the next-cheapest qualified vendor and the result reports the premium and what L1 matching would save"},
          "lines": {"type": "array", "items": {"type": "string"}},
          "assume_readings": {"type": "object", "description": "map of issue group id -> reading index, to test an ambiguity (see quotes with readings>1). Use issue ids from the 'issues' list in the result."},
          "title": {"type": "string"}}, "required": ["vendors"]}},
@@ -162,7 +166,8 @@ class Analyst:
             if not keys:
                 return "No vendors matched. Valid names: " + ", ".join(self.st.vendor_names.values())
             res = self.st.award(eligible=keys, allow_spec_deviation=bool(inp.get("allow_spec_deviation")),
-                                max_vendors=inp.get("max_vendors"), lines=set(inp["lines"]) if inp.get("lines") else None,
+                                max_vendors=inp.get("max_vendors"), max_share=inp.get("max_share"),
+                                lines=set(inp["lines"]) if inp.get("lines") else None,
                                 overrides={k: int(v) for k, v in (inp.get("assume_readings") or {}).items()})
             self.last_award = res
             df = pd.DataFrame(res["rows"])[["line_id", "description", "qty", "vendor_name", "unit_price", "line_total", "runner_up", "runner_up_price", "fy26_price", "at_risk"]]
@@ -174,6 +179,8 @@ class Analyst:
                         by_vendor=res["by_vendor"], conditional_discounts_applied=res["discounts_applied"],
                         uncovered_lines=res["uncovered_lines"], at_risk_lines=res["at_risk_lines"], at_risk_value=res["at_risk_value"],
                         savings_vs_fy26=res["savings_vs_fy26"], fy26_comparable_base=res["fy26_comparable_base"],
+                        vendor_share_of_spend={k: round(v, 3) for k, v in res.get("shares", {}).items()},
+                        supply_split=res.get("split"),
                         note=res.get("note"), rows=res["rows"], open_issues=open_issues)
         if name == "chart":
             df = self._q(inp["query"])

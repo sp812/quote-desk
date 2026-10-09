@@ -23,6 +23,7 @@ class Scenario:
     apply_conditional_discounts: bool = True
     lines: set[str] | None = None            # restrict to some lines
     max_vendors: int | None = None           # e.g. 2 = consolidate to at most two vendors
+    max_share: float | None = None           # e.g. 0.7 = no vendor above 70% of spend (supply security)
     overrides: dict[str, int] = field(default_factory=dict)   # group -> candidate index
 
 
@@ -64,6 +65,7 @@ def _solve(norms, sc: Scenario, discount_on: dict[str, float]):
                              vendor_name=n.vendor_name, unit_price=p, line_total=round(p * qty, 2),
                              runner_up=opts[1][1].vendor_name if len(opts) > 1 else None,
                              runner_up_price=opts[1][0] if len(opts) > 1 else None,
+                             _options=[(o[1].vendor, o[1].vendor_name, o[0]) for o in opts],
                              options=len(opts), at_risk=bool(n.status == "review" and n.group not in sc.overrides)))
         else:
             rows.append(dict(line_id=lid, description=l["description"], qty=qty, uom=l["uom"], vendor=None, vendor_name="NO ELIGIBLE QUOTE",
@@ -95,7 +97,64 @@ def award(norms: list[NormQuote], sc: Scenario, discounts: dict[str, list[dict]]
             rows = _solve(norms, sc, on)
         for v, pct in on.items():
             applied.append({"vendor": v, "percent": pct * 100})
-    return _summarize(rows, applied, sc)
+    split = None
+    if sc.max_share:
+        rows, split = _apply_share_cap(rows, sc.max_share)
+    out = _summarize(rows, applied, sc)
+    out["split"] = split
+    return out
+
+
+def _apply_share_cap(rows, cap):
+    """Supply security: move lines away from any vendor above `cap` share of spend, cheapest premium first.
+    Each moved line goes to its next-cheapest qualified vendor. Returns rows and a summary including what
+    'L1 matching' (asking that vendor to match the L1 price) would save. Volume discounts are held as in the
+    unconstrained award."""
+    rows = [dict(r) for r in rows]
+    moved = []
+    for _ in range(len(rows)):
+        total = sum(r["line_total"] for r in rows if r["vendor"])
+        if not total:
+            break
+        share = {}
+        for r in rows:
+            if r["vendor"]:
+                share[r["vendor"]] = share.get(r["vendor"], 0) + r["line_total"] / total
+        top = max(share, key=share.get)
+        if share[top] <= cap + 1e-9:
+            break
+        best = None
+        for r in rows:
+            if r["vendor"] != top:
+                continue
+            for v, name, p in r["_options"]:
+                if v == top:
+                    continue
+                if share.get(v, 0) + p * r["qty"] / total > cap + 1e-9:
+                    continue
+                premium = (p - r["unit_price"]) * r["qty"]
+                ratio = premium / max(r["line_total"], 1)
+                if best is None or ratio < best[0]:
+                    best = (ratio, r, v, name, p, premium)
+                break  # options are sorted: first other vendor is the next cheapest
+        if best is None:
+            break
+        _, r, v, name, p, premium = best
+        moved.append(dict(line_id=r["line_id"], from_vendor=r["vendor_name"], to_vendor=name, l1_price=r["unit_price"],
+                          new_price=p, qty=r["qty"], premium=round(premium, 2)))
+        r.update(vendor=v, vendor_name=name, unit_price=p, line_total=round(p * r["qty"], 2), moved_for_supply=True)
+    total = sum(r["line_total"] for r in rows if r["vendor"])
+    shares = {}
+    for r in rows:
+        if r["vendor"]:
+            shares[r["vendor_name"]] = shares.get(r["vendor_name"], 0) + r["line_total"] / total
+    feasible = all(s <= cap + 1e-9 for s in shares.values())
+    return rows, dict(cap=cap, moved=moved, premium=round(sum(m["premium"] for m in moved), 2), feasible=feasible,
+                      premium_if_l1_matched=0.0,
+                      note=("Each moved line goes to its next-cheapest qualified vendor. Under L1 matching, those vendors are asked "
+                            "to match the L1 price for their share, which would remove the premium.") if moved else
+                           ("No other qualified vendor quotes these lines, so the concentration cannot be reduced yet."
+                            if not feasible else "Already within the cap."))
 
 
 def _award_consolidated(norms, sc: Scenario, discounts):
@@ -143,13 +202,18 @@ def _summarize(rows, applied, sc):
         if r["vendor"]:
             b = by_vendor.setdefault(r["vendor_name"], {"lines": 0, "value": 0.0})
             b["lines"] += 1; b["value"] += r["line_total"]
+    for r in rows:
+        r.pop("_options", None)
+    shares = {k: v["value"] / total for k, v in by_vendor.items()} if total else {}
+    top_vendor = max(shares, key=shares.get) if shares else None
     return dict(rows=rows, total=total, by_vendor=by_vendor, discounts_applied=applied,
+                shares=shares, top_vendor=top_vendor, top_share=shares.get(top_vendor, 0) if top_vendor else 0,
                 uncovered_lines=[r["line_id"] for r in rows if r["vendor"] is None],
                 at_risk_lines=[r["line_id"] for r in rows if r["at_risk"]],
                 at_risk_value=round(sum(r["line_total"] for r in rows if r["at_risk"]), 2),
                 savings_vs_fy26=round(comp_base - comparable, 2), fy26_comparable_base=round(comp_base, 2),
                 scenario=dict(eligible=sorted(sc.eligible), allow_spec_deviation=sc.allow_spec_deviation,
-                              overrides=sc.overrides, max_vendors=sc.max_vendors))
+                              overrides=sc.overrides, max_vendors=sc.max_vendors, max_share=sc.max_share))
 
 
 def winners(res) -> dict[str, str | None]:
@@ -232,6 +296,7 @@ def impact(norms: list[NormQuote], sc: Scenario, discounts, vendor_status: dict[
     for i in issues:
         i.setdefault("exposure_in_award", 0.0)
         i["priority"] = (2 if i["decision_relevant"] and i["kind"] not in ("freight", "fx", "history", "spec") else
-                         1 if i["decision_relevant"] else 0, i["award_swing"] + i["exposure_in_award"] + i.get("newly_covered_value", 0) + i["quote_value_swing"] * 0.01)
+                         1 if i["decision_relevant"] else 0, abs(i["award_swing"]) + i["exposure_in_award"] + i.get("newly_covered_value", 0)
+                      + (0 if i["kind"] == "eligibility" else i["quote_value_swing"] * 0.01))
     issues.sort(key=lambda x: x["priority"], reverse=True)
     return issues
