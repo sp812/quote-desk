@@ -147,9 +147,28 @@ table.vt {{ width: 100%; border-collapse: separate; border-spacing: 0; backgroun
 table.vt th {{ text-align: left; font-weight: 500; font-size: .84rem; color: {INK_2}; padding: 10px 14px; border-bottom: 1px solid {LINE}; background: #FAFBFC; }}
 table.vt td {{ padding: 12px 14px; border-bottom: 1px solid {LINE}; vertical-align: top; color: {INK}; font-size: .93rem; }}
 table.vt tr:last-child td {{ border-bottom: none; }}
-table.vt td.n {{ font-variant-numeric: tabular-nums; }}
+table.vt td.n {{ font-variant-numeric: tabular-nums; white-space: nowrap; }}
 table.vt .sub {{ color: {INK_2}; font-size: .8rem; margin-top: 2px; }}
 table.vt td.why {{ color: {INK_2}; font-size: .86rem; max-width: 340px; }}
+.statusrow {{ display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; margin: -6px 0 14px 0; color: {INK_2}; font-size: .9rem; }}
+.kpi .delta {{ display: inline-block; margin-top: 6px; font-size: .8rem; font-weight: 600; padding: 1px 8px; border-radius: 999px; }}
+.kpi .delta.down {{ background: {GOOD_BG}; color: {GOOD}; }} .kpi .delta.up {{ background: {STOP_BG}; color: {STOP}; }}
+.kpi {{ border-top: 3px solid {LINE}; }}
+.nba {{ background: {CARD}; border: 1px solid {LINE}; border-left: 6px solid {KRAFT}; border-radius: 10px; padding: 14px 20px; margin: 14px 0 4px 0; }}
+.nba.good {{ border-left-color: {GOOD}; }}
+.nba-k {{ font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: {KRAFT}; font-weight: 700; }}
+.nba-t {{ font-size: 1.2rem; font-weight: 650; color: {INK}; margin-top: 2px; }}
+.nba-s {{ color: {INK_2}; font-size: .93rem; margin-top: 4px; max-width: 95ch; }}
+.panel {{ background: {CARD}; border: 1px solid {LINE}; border-radius: 10px; padding: 16px 20px; margin-top: 10px; height: 100%; }}
+.panel-h {{ font-weight: 650; font-size: 1.05rem; color: {INK}; }}
+.panel-s {{ color: {INK_2}; font-size: .85rem; margin: 2px 0 12px 0; }}
+.srow {{ display: grid; grid-template-columns: 120px 1fr 92px; grid-template-rows: auto auto; column-gap: 12px; align-items: center; margin: 0 0 12px 0; }}
+.sname {{ font-weight: 600; color: {INK}; font-size: .95rem; white-space: nowrap; }}
+.sbar {{ height: 12px; background: {MUTED_BG}; border-radius: 6px; overflow: hidden; }} .sbar div {{ height: 100%; border-radius: 6px; }}
+.sval {{ text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; color: {INK}; }}
+.stack {{ display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 8px; background: {MUTED_BG}; }}
+.stack div {{ height: 100%; border-right: 2px solid {CARD}; }}
+.spct {{ grid-column: 2 / 4; color: {INK_2}; font-size: .8rem; }}
 .mini {{ width: 120px; height: 8px; background: {MUTED_BG}; border-radius: 4px; overflow: hidden; margin-top: 6px; }}
 .mini div {{ height: 100%; }}
 table.vt th abbr {{ text-decoration: underline dotted {INK_2}; cursor: help; }}
@@ -296,18 +315,31 @@ def _link(key, label):
 VENDOR_COLORS = ["#16243A", "#4F7CAC", "#9A6A2F", "#6E9E80", "#B5655A", "#7A6FA8"]
 
 
+Q_SHORT = {"Q1": "ISO certificate", "Q2": "In-house test lab", "Q3": "Food-safe inks", "Q4": "Rejection rate",
+           "Q5": "Peak capacity", "Q6": "Lead time", "Q7": "FSC paper", "Q8": "Plant distance"}
+
+
+def _blockers(s, v) -> tuple[str, str]:
+    """Short label of what keeps a vendor out (for the table) and the full reasons (for the hover)."""
+    ev = s.q_evals.get(v, {}).get("results", {})
+    bad = [(q, r) for q, r in sorted(ev.items()) if r.get("status") != "pass" and q != "Q8"]
+    fails = [Q_SHORT.get(q, q) for q, r in bad if r.get("status") == "fail"]
+    unclear = [Q_SHORT.get(q, q) for q, r in bad if r.get("status") != "fail"]
+    short_txt = " · ".join(fails[:3]) + (" · " if fails and unclear else "") + (("unclear: " + ", ".join(unclear[:2])) if unclear else "")
+    full = "\n".join(f"{q} {r.get('status')}: {r.get('reason', '')}" for q, r in bad)
+    return short_txt, full
+
+
 def page_board():
     s = get_state()
-    st.markdown("""<div class="intro"><div class="what"><b>Quote desk</b> turns messy vendor quotes into an award you can defend: the AI reads, code does the maths, you decide.</div>
-        <div class="how"><span><b>1</b>Collect in any format</span><span><b>2</b>Compare like for like</span>
-        <span><b>3</b>Resolve what moves money</span><span><b>4</b>Get sign-off and approve</span></div>
-        </div>""", unsafe_allow_html=True)
-    header("Corrugated packaging, FY27 annual contract", f"Deccan Peak Breweries, Waluj · {config.RFX_ID} · 30 items · bids closed 7 Oct 2026")
+    header("Corrugated packaging, FY27 annual contract",
+           f"Deccan Peak Breweries, Waluj · {config.RFX_ID} · 30 items · bids closed 7 Oct 2026. "
+           "The AI reads every reply, code does the arithmetic, you decide.")
     key_notice()
     missing = s.missing_extractions()
     if missing:
-        st.subheader(f"{len(missing)} vendor replies are waiting to be read")
-        st.write("Any format: Excel, PDF, Word, photo, email. Usually 1-3 minutes.")
+        st.markdown(f'<div class="nba"><div class="nba-k">Next step</div><div class="nba-t">{len(missing)} vendor replies are waiting to be read</div>'
+                    f'<div class="nba-s">Any format: Excel, PDF, Word, photo, email. Usually 1 to 3 minutes.</div></div>', unsafe_allow_html=True)
         if st.button(f"Read {len(missing)} replies", type="primary", disabled=not api_key_present()):
             from core.pipeline import run_many
             box = st.status(f"Reading {len(missing)} replies", expanded=True)
@@ -322,89 +354,120 @@ def page_board():
         _saved_results()
         return
 
+    from core.review import status as review_status
     res = s.award()
     issues = s.issues()
     hot = [i for i in issues if i["decision_relevant"]]
-    covered = 30 - len(res["uncovered_lines"])
     color = {v: VENDOR_COLORS[k % len(VENDOR_COLORS)] for k, v in enumerate(s.extractions)}
     name_to_key = {s.vendor_names[v]: v for v in s.extractions}
+    qual = sum(1 for v in s.status.values() if v in ("pass", "include"))
+    rs = review_status(load_decisions())
+    signed = sum(1 for r in rs.values() if r["status"] == "approved")
+    out = [v for v, st_ in s.status.items() if st_ not in ("pass", "include")]
+    unlocked = s.award(eligible=set(s.extractions)) if out else None
+    gain = (res["total"] - unlocked["total"]) if (unlocked and res["total"] and not unlocked["uncovered_lines"]) else 0
+    stake = max((_stake(i)[0] for i in hot), default=0)   # issues overlap, so they are never summed
 
-    left, right = st.columns([7, 5], gap="medium")
-    # ---------------- the award, as one picture
+    # ---------------- status line
+    if not res["total"]:
+        state_txt, state_cls = "No vendor qualified yet", "stop"
+    elif hot:
+        state_txt, state_cls = f"Not ready: {len(hot)} open item{'s' if len(hot) != 1 else ''} can change the award", "check"
+    elif signed < len(rs):
+        state_txt, state_cls = "Ready for sign-off", "good"
+    else:
+        state_txt, state_cls = "Approved by all reviewers", "good"
+    st.markdown(f'<div class="statusrow">{pill(state_txt, state_cls)}<span>{len(s.extractions)} of {len(vendor_dirs())} replies read</span>'
+                f'<span>{30 - len(res["uncovered_lines"])} of 30 items have a qualified price</span></div>', unsafe_allow_html=True)
+
+    # ---------------- four numbers
+    sav = res["savings_vs_fy26"] if res["fy26_comparable_base"] else None
+    tiles = [
+        ("Recommended award", money(res["total"]) if res["total"] else "–", "a year, landed, ex-GST" if res["total"] else "no qualified vendor yet",
+         (f'<span class="delta {"up" if sav < 0 else "down"}">{"↑" if sav < 0 else "↓"} {money(abs(sav))} vs last year</span>' if sav else "")),
+        ("Qualified vendors", f"{qual} of {len(s.extractions)}", "passed the quality questionnaire", ""),
+        ("Open items", str(len(hot)), f"can change the award; the largest is worth {money(stake)}" if hot else "nothing changes the award", ""),
+        ("Sign-off", f"{signed} of {len(rs)}", "Quality, Logistics, Finance, VP", ""),
+    ]
+    st.markdown('<div class="kpis">' + "".join(
+        f'<div class="kpi"><div class="kpi-label">{a}</div><div class="kpi-value">{b}</div><div class="kpi-note">{n}</div>{d}</div>'
+        for a, b, n, d in tiles) + "</div>", unsafe_allow_html=True)
+
+    # ---------------- the one thing to do next
+    if gain > 0:
+        mv = [short(n) for n in unlocked["by_vendor"] if name_to_key.get(n) in out]
+        movers = ", ".join(mv[:-1]) + " and " + mv[-1] if len(mv) > 1 else (mv[0] if mv else "the other vendors")
+        st.markdown(f"""<div class="nba"><div class="nba-k">Biggest opportunity</div>
+            <div class="nba-t">Clear qualification paperwork: {money(gain)} lower award{' and no single-source risk' if len(unlocked['by_vendor']) > 1 >= len(res['by_vendor']) else ''}</div>
+            <div class="nba-s">The prices are already read. If {E(movers)} cleared the questionnaire, the same quotes give {money(unlocked['total'])}
+            across {len(unlocked['by_vendor'])} vendors instead of {money(res['total'])}. What each vendor is missing is in the table below.</div></div>""",
+                    unsafe_allow_html=True)
+        _link("issues", "Chase the missing documents in Open issues")
+    elif hot:
+        top = hot[0]
+        st.markdown(f'<div class="nba"><div class="nba-k">Next step</div><div class="nba-t">{E(issue_headline(top))}</div>'
+                    f'<div class="nba-s">{money(_stake(top)[0])} {E(_stake(top)[1])}.</div></div>', unsafe_allow_html=True)
+        _link("issues", "Resolve it in Open issues")
+    elif res["total"]:
+        st.markdown('<div class="nba good"><div class="nba-k">Next step</div><div class="nba-t">Nothing open changes the award</div>'
+                    '<div class="nba-s">Write the memo and send it to the reviewers.</div></div>', unsafe_allow_html=True)
+        _link("memo", "Write the memo and get sign-off")
+
+    # ---------------- award split + what blocks approval
+    left, right = st.columns([6, 5], gap="medium")
     with left:
-        split = sorted(res["by_vendor"].items(), key=lambda kv: -kv[1]["value"])
-        if res["total"]:
-            sav = res["savings_vs_fy26"]
-            delta = (f'<span class="pill good">↓ {money(sav)} vs last year</span>' if sav >= 0 else
-                     f'<span class="pill stop">↑ {money(-sav)} vs last year</span>') if res["fy26_comparable_base"] else ""
-            bar = "".join(f'<div title="{E(n)}: {money(d["value"])}" style="width:{d["value"] / res["total"] * 100:.2f}%;'
-                          f'background:{color[name_to_key[n]]}"></div>' for n, d in split)
-            legend = "".join(f'<div class="lg"><span class="dot" style="background:{color[name_to_key[n]]}"></span>'
-                             f'<b>{E(short(n))}</b> {d["lines"]} lines · {money(d["value"])} · {d["value"] / res["total"]:.0%}</div>' for n, d in split)
-            flags = []
-            if res["uncovered_lines"]:
-                flags.append(f'{len(res["uncovered_lines"])} lines have no qualified quote yet')
-            if res.get("top_share", 0) > 0.7:
-                sp = s.award(max_share=0.7).get("split") or {}
-                if sp.get("feasible") and sp.get("moved"):
-                    flags.append(f'{short(res["top_vendor"])} holds {res["top_share"]:.0%} of spend. A 70/30 cap costs {money(sp["premium"])} a year, '
-                                 f'or nothing with L1 matching')
-                else:
-                    flags.append(f'{short(res["top_vendor"])} holds {res["top_share"]:.0%} of spend and no other vendor is qualified yet: '
-                                 f'single-source risk through peak season')
-            flag_html = "".join(f'<div class="warn-line">⚠ {E(f)}</div>' for f in flags)
-            qual = sum(1 for v in s.status.values() if v == "pass")
-            inc = sum(1 for v in s.status.values() if v == "include")
-            st.markdown(f"""<div class="hero"><div class="eyebrow">Recommended award</div><div class="flute" style="width:120px;margin:6px 0 2px 0"></div>
-                <div class="big">{money(res['total'])} <span class="per">a year</span> {delta}</div>
-                <div class="bar">{bar}</div><div class="legend2">{legend}</div>
-                <div class="meta">{covered} of 30 items covered · {qual} of {len(s.extractions)} vendors qualified{f" + {inc} included by you" if inc else ""}</div>{flag_html}</div>""", unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="hero"><div class="eyebrow">Recommended award</div><div class="big">No award possible yet</div>'
-                        '<div class="meta">No vendor is qualified under the RFQ rule. See what each one is missing on the right.</div></div>',
-                        unsafe_allow_html=True)
-    # ---------------- what stands between her and approval
+        rows = sorted(res["by_vendor"].items(), key=lambda kv: -kv[1]["value"])
+        body = "".join(f"""<div class="srow"><div class="sname"><span class="dot" style="background:{color[name_to_key[n]]}"></span>{E(short(n))}</div>
+            <div class="sbar"><div style="width:{d['value'] / res['total'] * 100:.1f}%;background:{color[name_to_key[n]]}"></div></div>
+            <div class="sval">{money(d['value'])}</div><div class="spct">{d['value'] / res['total']:.0%} · {d['lines']} items</div></div>"""
+                       for n, d in rows) if res["total"] else '<div class="small">No qualified vendor yet.</div>'
+        warn = ""
+        if res.get("top_share", 0) > 0.7:
+            warn = (f'<div class="warn-line">{E(short(res["top_vendor"]))} would hold {res["top_share"]:.0%} of spend: '
+                    f'one plant outage stops the brewery\'s packaging in peak season.</div>')
+        alt = ""
+        if gain > 0:
+            seg = "".join(f'<div title="{E(n)}: {money(d["value"])}" style="width:{d["value"] / unlocked["total"] * 100:.1f}%;background:{color[name_to_key[n]]}"></div>'
+                          for n, d in sorted(unlocked["by_vendor"].items(), key=lambda kv: -kv[1]["value"]))
+            lg = "".join(f'<span style="margin-right:14px;white-space:nowrap"><span class="dot" style="background:{color[name_to_key[n]]}"></span>'
+                         f'{E(short(n))} {d["lines"]} items · {money(d["value"])}</span>'
+                         for n, d in sorted(unlocked["by_vendor"].items(), key=lambda kv: -kv[1]["value"]))
+            alt = (f'<div class="panel-h" style="margin-top:16px;font-size:.95rem">If the paperwork is cleared: {money(unlocked["total"])}</div>'
+                   f'<div class="stack">{seg}</div><div class="spct" style="margin-top:8px">{lg}</div>')
+        st.markdown(f'<div class="panel"><div class="panel-h">Award split</div><div class="panel-s">Cheapest qualified, on-spec landed price per item</div>'
+                    f'{body}{warn}{alt}</div>', unsafe_allow_html=True)
     with right:
-        if hot:
-            items = "".join(f'<li><div class="it">{E(issue_headline(i))}</div><div class="iv">{money(_stake(i)[0])} · '
-                            f'{"changes L1 on " + str(len(i["lines_flipping"])) + (" line" if len(i["lines_flipping"]) == 1 else " lines") if i["lines_flipping"] else "assumption to confirm"}</div></li>'
-                            for i in hot[:4])
-            more = f'<div class="meta">+{len(hot) - 4} more</div>' if len(hot) > 4 else ""
-            st.markdown(f'<div class="hero side"><div class="eyebrow">Before you approve</div><ol class="todo">{items}</ol>{more}</div>',
-                        unsafe_allow_html=True)
-            _link("issues", "Resolve these in Open issues")
-            _review_line()
-        else:
-            st.markdown('<div class="hero side"><div class="eyebrow">Before you approve</div><div class="big" style="font-size:1.4rem">'
-                        'Nothing open</div><div class="meta">No open issue can change this award.</div></div>', unsafe_allow_html=True)
-            _link("memo", "Write the memo and get sign-off")
-            _review_line()
+        items = "".join(f'<li><div class="it">{E(issue_headline(i))}</div><div class="iv">{money(_stake(i)[0])} · '
+                        f'{"changes the winner on " + str(len(i["lines_flipping"])) + (" item" if len(i["lines_flipping"]) == 1 else " items") if i["lines_flipping"] else "assumption to confirm"}</div></li>'
+                        for i in hot[:4]) or '<li><div class="it">Nothing open changes the award</div></li>'
+        more = f'<div class="meta">+{len(hot) - 4} more in Open issues</div>' if len(hot) > 4 else ""
+        st.markdown(f'<div class="panel"><div class="panel-h">Before you approve</div><div class="panel-s">Ranked by the money each can move</div>'
+                    f'<ol class="todo">{items}</ol>{more}</div>', unsafe_allow_html=True)
 
-    # ---------------- vendors, one row each
+    # ---------------- vendors
     st.subheader("Vendors")
-    rows = []
+    vrows = []
     for v, ex in s.extractions.items():
         lbl, cls = STATUS.get(s.status[v], ("Unknown", "muted"))
         ns = [n for n in s.norms if n.vendor == v]
         quoted = sum(1 for n in ns if n.status != "missing")
         conf = sum(1 for n in ns if n.status == "review")
-        sub = " · ".join(x for x in [f"{30 - quoted} not quoted" if quoted < 30 else "", f"{conf} to confirm" if conf else ""] if x)
         won = res["by_vendor"].get(s.vendor_names[v], {"lines": 0, "value": 0})
-        share = won["value"] / res["total"] if res["total"] else 0
-        fmt = ", ".join(sorted({f.split(".")[-1].upper().replace("TXT", "Email") for f in ex.get("_meta", {}).get("files", [])}))
-        why = vendor_reason(s, v) if s.status[v] != "pass" else ""
-        rows.append(f"""<tr><td><span class="dot" style="background:{color[v]}"></span><b>{E(s.vendor_names[v])}</b>
+        fmt = ", ".join(sorted({FORMAT.get("." + f.split(".")[-1].lower(), "Email") for f in ex.get("_meta", {}).get("files", [])}))
+        short_b, full_b = _blockers(s, v) if s.status[v] not in ("pass", "include") else ("", "")
+        sub = " · ".join(x for x in [f"{30 - quoted} not quoted" if quoted < 30 else "", f"{conf} to confirm" if conf else ""] if x)
+        vrows.append(f"""<tr><td><span class="dot" style="background:{color[v]}"></span><b>{E(s.vendor_names[v])}</b>
             <div class="sub">{E(place(ex.get('vendor_location')))}{' · ' + fmt if fmt else ''}</div></td>
-            <td>{pill(lbl, cls)}</td><td class="n"><b>{quoted}</b> of 30{f'<div class="sub">{sub}</div>' if sub else ''}</td>
+            <td>{pill(lbl, cls)}</td>
+            <td class="n"><b>{quoted}</b> of 30{f'<div class="sub">{sub}</div>' if sub else ''}</td>
             <td class="n">{won['lines'] or '–'}</td>
-            <td><div class="mini"><div style="width:{share * 100:.1f}%;background:{color[v]}"></div></div>
-                <div class="sub">{money(won['value']) + ' · ' + f'{share:.0%}' if won['lines'] else 'none'}</div></td>
-            <td class="why">{E(why) or '–'}</td></tr>""")
-    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th><abbr title="Quality questionnaire result. Only qualified vendors can win.">Qualification</abbr></th>'
+            <td class="n">{money(won['value']) if won['lines'] else '–'}</td>
+            <td class="why" title="{E(full_b)}">{E(short_b) or '–'}</td></tr>""")
+    st.markdown('<table class="vt"><thead><tr><th>Vendor</th><th>Qualification</th>'
                 '<th><abbr title="How many of the 30 RFQ items this vendor gave a price for">Items priced</abbr></th>'
-                '<th><abbr title="Items where this vendor is the lowest qualified landed price (L1) in the recommended award">Wins (L1)</abbr></th>'
-                '<th>Share of award</th><th>Holding them back</th></tr></thead><tbody>' + "".join(rows) + "</tbody></table>",
-                unsafe_allow_html=True)
+                '<th><abbr title="Items where this vendor is the cheapest qualified landed price">Wins</abbr></th>'
+                '<th>Value</th><th><abbr title="Hover a row for the full reasons">Missing to qualify</abbr></th></tr></thead><tbody>'
+                + "".join(vrows) + "</tbody></table>", unsafe_allow_html=True)
     st.write("")
     _saved_results()
 
