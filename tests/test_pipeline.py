@@ -339,3 +339,23 @@ def test_copilot_survives_malformed_draft_updates(monkeypatch):
     d = copilot.new_draft()
     copilot.chat(d, [], "hi")
     assert d["line_items"] == [{"line_id": "L01"}] and d["terms"] == ["Net 45"] and isinstance(d["header"]["title"], str)
+
+
+def test_only_document_gaps_count_as_fixable_by_paperwork():
+    from types import SimpleNamespace
+    from core.pipeline import State
+    fake = SimpleNamespace(DOCUMENT_QUESTIONS=State.DOCUMENT_QUESTIONS, q_evals={
+        "expired_cert": {"results": {"Q1": {"status": "fail"}, "Q7": {"status": "unclear"}}},
+        "no_lab": {"results": {"Q1": {"status": "unclear"}, "Q2": {"status": "fail"}}},
+        "high_rejects": {"results": {"Q4": {"status": "fail"}}}})
+    kind = lambda v: State.blocker_kind(fake, v)
+    assert kind("expired_cert") == "documents" and kind("no_lab") == "capability" and kind("high_rejects") == "capability"
+
+
+def test_answer_key_is_never_part_of_what_the_ai_reads():
+    from core import readers
+    from core.config import INBOX, ANSWER_KEY
+    assert INBOX not in ANSWER_KEY.parents
+    for d in INBOX.iterdir():
+        ev = readers.load_vendor(d)
+        assert "answer_key" not in ev.as_text() and not any("ground_truth" in f for f in ev.files)

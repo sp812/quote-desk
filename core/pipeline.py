@@ -140,6 +140,17 @@ class State:
                 i["detail"] = f"If cleared, wins {len(i['lines'])} line{'s' if len(i['lines']) != 1 else ''}"
         return issues
 
+    # Questions a document or a written confirmation can settle (a valid certificate; any 'unclear' answer).
+    # A failed answer on the others is a capability or performance gap: no paperwork fixes a missing lab.
+    DOCUMENT_QUESTIONS = {"Q1"}
+
+    def blocker_kind(self, v: str) -> str:
+        """'documents' if only paperwork or clarifications stand between this vendor and qualifying, else 'capability'."""
+        ev = self.q_evals.get(v, {}).get("results", {})
+        mandatory = {q["q_id"] for q in extract.load_questionnaire() if q["type"].lower() == "mandatory"}
+        fails = [q for q, r in ev.items() if q in mandatory and r.get("status") == "fail"]
+        return "documents" if all(q in self.DOCUMENT_QUESTIONS for q in fails) else "capability"
+
     def ready(self) -> bool:
         return bool(self.extractions)
 

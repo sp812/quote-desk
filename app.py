@@ -364,8 +364,10 @@ def page_board():
     rs = review_status(load_decisions())
     signed = sum(1 for r in rs.values() if r["status"] == "approved")
     out = [v for v, st_ in s.status.items() if st_ not in ("pass", "include")]
-    unlocked = s.award(eligible=set(s.extractions)) if out else None
-    gain = (res["total"] - unlocked["total"]) if (unlocked and res["total"] and not unlocked["uncovered_lines"]) else 0
+    fixable = [v for v in out if s.blocker_kind(v) == "documents"]
+    capability = [v for v in out if v not in fixable]
+    unlocked = s.award(eligible=s.eligible | set(fixable)) if fixable else None
+    gain = (res["total"] - unlocked["total"]) if (unlocked and res["total"] and len(unlocked["uncovered_lines"]) <= len(res["uncovered_lines"])) else 0
     stake = max((_stake(i)[0] for i in hot), default=0)   # issues overlap, so they are never summed
 
     # ---------------- status line
@@ -395,14 +397,18 @@ def page_board():
 
     # ---------------- the one thing to do next
     if gain > 0:
-        mv = [short(n) for n in unlocked["by_vendor"] if name_to_key.get(n) in out]
-        movers = ", ".join(mv[:-1]) + " and " + mv[-1] if len(mv) > 1 else (mv[0] if mv else "the other vendors")
+        names = [short(s.vendor_names[v]) for v in fixable]
+        who = ", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]
+        n_sup = len(unlocked["by_vendor"])
+        risk = (f"; {short(unlocked['top_vendor'])} would still hold {unlocked['top_share']:.0%} of spend" if unlocked.get("top_share", 0) > 0.7
+                else "" )
+        cap_txt = (f" {', '.join(short(s.vendor_names[v]) for v in capability)} fail on capability (test lab, rejection rate, lead time): "
+                   f"no document fixes that, so they stay out unless you record a waiver." if capability else "")
         st.markdown(f"""<div class="nba"><div class="nba-k">Biggest opportunity</div>
-            <div class="nba-t">Clear qualification paperwork: {money(gain)} lower award{' and no single-source risk' if len(unlocked['by_vendor']) > 1 >= len(res['by_vendor']) else ''}</div>
-            <div class="nba-s">The prices are already read. If {E(movers)} cleared the questionnaire, the same quotes give {money(unlocked['total'])}
-            across {len(unlocked['by_vendor'])} vendors instead of {money(res['total'])}. What each vendor is missing is in the table below.</div></div>""",
-                    unsafe_allow_html=True)
-        _link("issues", "Chase the missing documents in Open issues")
+            <div class="nba-t">Get {E(who)}'s missing documents: {money(gain)} lower award{' and a second supplier' if n_sup > len(res['by_vendor']) else ''}</div>
+            <div class="nba-s">The prices are already read. With {E(who)} qualified, the same quotes give {money(unlocked['total'])} across {n_sup}
+            vendor{'s' if n_sup != 1 else ''} instead of {money(res['total'])}{E(risk)}.{E(cap_txt)}</div></div>""", unsafe_allow_html=True)
+        _link("issues", "Ask for the documents in Open issues")
     elif hot:
         top = hot[0]
         st.markdown(f'<div class="nba"><div class="nba-k">Next step</div><div class="nba-t">{E(issue_headline(top))}</div>'
@@ -432,7 +438,7 @@ def page_board():
             lg = "".join(f'<span style="margin-right:14px;white-space:nowrap"><span class="dot" style="background:{color[name_to_key[n]]}"></span>'
                          f'{E(short(n))} {d["lines"]} items · {money(d["value"])}</span>'
                          for n, d in sorted(unlocked["by_vendor"].items(), key=lambda kv: -kv[1]["value"]))
-            alt = (f'<div class="panel-h" style="margin-top:16px;font-size:.95rem">If the paperwork is cleared: {money(unlocked["total"])}</div>'
+            alt = (f'<div class="panel-h" style="margin-top:16px;font-size:.95rem">With the missing documents: {money(unlocked["total"])}</div>'
                    f'<div class="stack">{seg}</div><div class="spct" style="margin-top:8px">{lg}</div>')
         st.markdown(f'<div class="panel"><div class="panel-h">Award split</div><div class="panel-s">Cheapest qualified, on-spec landed price per item</div>'
                     f'{body}{warn}{alt}</div>', unsafe_allow_html=True)
