@@ -424,3 +424,18 @@ def test_empty_terms_are_read_again_and_merged(monkeypatch):
     monkeypatch.setattr(extract, "structured_call", boom)
     r2 = extract._reread_terms({"terms": {"currency": "unstated"}, "unreadable_or_uncertain": []}, [], "m")
     assert r2["terms"] == {"currency": "unstated"} and r2["unreadable_or_uncertain"]
+
+
+def test_finished_turns_lose_thinking_blocks_so_a_changed_system_prompt_never_breaks_the_chat():
+    from types import SimpleNamespace as NS
+    from core.llm import trim_history
+    hist = [{"role": "user", "content": "q1"},
+            {"role": "assistant", "content": [NS(type="thinking", thinking="x", signature="s"), NS(type="tool_use", id="t1", name="a", input={})]},
+            {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "ok"}]},
+            {"role": "assistant", "content": [{"type": "redacted_thinking", "data": "z"}, {"type": "text", "text": "done"}]},
+            {"role": "assistant", "content": [NS(type="thinking", thinking="only", signature="s")]}]
+    out = trim_history(hist)
+    types = [getattr(b, "type", None) or b.get("type") for m in out if m["role"] == "assistant" for b in m["content"]]
+    assert "thinking" not in types and "redacted_thinking" not in types
+    assert types.count("tool_use") == 1 and "text" in types
+    assert hist[1]["content"][0].type == "thinking"          # the stored history itself is not mutated

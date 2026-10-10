@@ -120,7 +120,22 @@ def trim_history(msgs: list[dict], keep_turns: int = 6) -> list[dict]:
     """Keep the last few question-and-answer turns so a long conversation never overflows the context.
     Cuts only at a plain user question, so tool calls and their results are never separated."""
     starts = [i for i, m in enumerate(msgs) if m.get("role") == "user" and isinstance(m.get("content"), str)]
-    return msgs[starts[-keep_turns]:] if len(starts) > keep_turns else msgs
+    kept = msgs[starts[-keep_turns]:] if len(starts) > keep_turns else msgs
+    return [_without_thinking(m) for m in kept]
+
+
+def _btype(b) -> str:
+    return b.get("type", "") if isinstance(b, dict) else getattr(b, "type", "")
+
+
+def _without_thinking(m: dict) -> dict:
+    """Drop thinking blocks from finished turns. Their signatures are bound to the exact system prompt they were
+    made under, and the co-pilot's system prompt carries the live draft, so replaying them fails with a 400.
+    The API allows omitting thinking from earlier turns; only an in-progress tool loop must keep them."""
+    if m.get("role") != "assistant" or isinstance(m.get("content"), str):
+        return m
+    content = [b for b in m["content"] if _btype(b) not in ("thinking", "redacted_thinking")]
+    return {**m, "content": content or [{"type": "text", "text": "(no reply)"}]}
 
 
 def friendly_error(e: Exception) -> str:
