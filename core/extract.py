@@ -140,8 +140,14 @@ def extract_vendor(vendor_dir: Path, model: str = MODEL) -> dict:
     result = structured_call(SYSTEM, content, "submit_extraction",
                              "Submit the structured extraction of this vendor's response.", SCHEMA, model=model)
     result = _repair(result)
+    if terms_look_empty(result["terms"]):
+        result = _reread_terms(result, content, model)
     # instructions planted in vendor files are reported by code, whatever the model did with them
-    for name, line in readers.injection_lines(ev):
+    planted = readers.injection_lines(ev)
+    if planted:   # one clear warning from code, instead of the same note twice
+        result["unreadable_or_uncertain"] = [u for u in result["unreadable_or_uncertain"]
+                                             if not re.search(r"manipulat|instruction (aimed|to the ai|directed)|prompt injection", u, re.I)]
+    for name, line in planted:
         result["unreadable_or_uncertain"].insert(0, f"Possible instruction to the AI in {name}: \"{line}\". Treated as vendor text and not followed; "
                                                     f"the award follows the RFQ rules in code.")
     # files the system could not open are reported, never silently skipped
@@ -154,20 +160,82 @@ def extract_vendor(vendor_dir: Path, model: str = MODEL) -> dict:
     return result
 
 
+TERMS_ONLY = {"type": "object", "properties": {"terms": SCHEMA["properties"]["terms"]}, "required": ["terms"]}
+
+
+def _reread_terms(result: dict, content: list, model: str) -> dict:
+    """The main read returned almost no commercial terms. Ask once more for the terms alone and keep what it finds."""
+    try:
+        r = structured_call(SYSTEM + "\nThis time extract ONLY the commercial terms (currency, GST, freight, payment, lead time, validity).",
+                            content, "submit_terms", "Submit the vendor's commercial terms.", TERMS_ONLY, model=model, max_tokens=4000)
+        t = _loads(r.get("terms"))
+        if isinstance(t, dict):
+            merged = dict(result["terms"])
+            for k, v in t.items():
+                if v not in (None, "", "unstated", "unclear") and merged.get(k) in (None, "", "unstated", "unclear"):
+                    merged[k] = v
+            if merged != result["terms"]:
+                result["terms"] = merged
+                result["unreadable_or_uncertain"].append("Commercial terms were missing from the first read and were read again separately.")
+    except Exception as e:  # never lose the main read because the second pass failed
+        result["unreadable_or_uncertain"].append(f"Commercial terms could not be confirmed ({str(e)[:80]}). Check them against the email.")
+    return result
+
+
 OBJ_FIELDS = {"terms": dict}
 LIST_FIELDS = ["discounts", "line_quotes", "lines_not_quoted", "questionnaire", "document_facts", "unreadable_or_uncertain"]
 
 
 def _loads(v):
-    """Models sometimes return nested objects/arrays as JSON text. Decode if so."""
+    """Models sometimes return nested objects/arrays as text: JSON, JSON in a code fence, or Python-style dicts. Decode if so."""
     if isinstance(v, str):
         s = v.strip()
+        if s.startswith("```"):
+            s = re.sub(r"^```[a-zA-Z]*\s*|\s*```$", "", s).strip()
         if s[:1] in "[{":
             try:
                 return json.loads(s)
             except json.JSONDecodeError:
                 pass
+            try:
+                import ast
+                out = ast.literal_eval(s)
+                if isinstance(out, (dict, list)):
+                    return out
+            except (ValueError, SyntaxError):
+                pass
+            try:
+                return json.loads(re.sub(r",\s*([}\]])", r"\1", s.replace("\u201c", '"').replace("\u201d", '"')))
+            except json.JSONDecodeError:
+                pass
     return v
+
+
+TERM_KEYS = ("currency", "gst", "freight", "payment_days", "lead_time_days", "validity", "price_variation_clause", "moq_or_min_order")
+
+
+def _terms_from_text(t: str) -> dict:
+    """Last resort for terms that came back as unparseable text: pull out the known keys."""
+    out = {}
+    for k in TERM_KEYS:
+        m = re.search(rf"['\"]?{k}['\"]?\s*[:=]\s*['\"]?([^,'\"}}\n]+)", t)
+        if m:
+            val = m.group(1).strip()
+            if val.lower() in ("null", "none"):
+                out[k] = None
+            elif k.endswith("_days"):
+                d = re.match(r"\d+(\.\d+)?", val)
+                out[k] = float(d.group(0)) if d else None
+            else:
+                out[k] = val
+    return out
+
+
+def terms_look_empty(t: dict) -> bool:
+    """True when the reader returned (almost) no commercial terms."""
+    unknown = sum(1 for k, bad in (("currency", ("unstated", "", None)), ("gst", ("unclear", "", None)), ("freight", ("unclear", "", None)))
+                  if t.get(k) in bad)
+    return unknown >= 2 and t.get("payment_days") in (None, "") and t.get("lead_time_days") in (None, "")
 
 
 def coerce(r) -> dict:
@@ -176,7 +244,13 @@ def coerce(r) -> dict:
     if not isinstance(r, dict):
         r = {}
     t = _loads(r.get("terms"))
-    r["terms"] = t if isinstance(t, dict) else ({"currency": "unstated", "gst": "unclear", "freight": "unclear", "source": str(t)} if t else {})
+    if not isinstance(t, dict) and t:
+        rec = _terms_from_text(str(t))
+        t = {"currency": "unstated", "gst": "unclear", "freight": "unclear", **rec, "source": str(t)[:300]}
+        notes = r.get("unreadable_or_uncertain") if isinstance(r.get("unreadable_or_uncertain"), list) else []
+        r["unreadable_or_uncertain"] = notes + ["Commercial terms came back from the reader in a damaged format; "
+                                                f"{'recovered ' + ', '.join(rec) if rec else 'nothing could be recovered'}. Read this reply again to be sure."]
+    r["terms"] = t if isinstance(t, dict) else {}
     for k in LIST_FIELDS:
         v = _loads(r.get(k))
         if isinstance(v, dict):

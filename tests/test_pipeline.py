@@ -395,3 +395,31 @@ def test_planted_instruction_in_a_vendor_file_is_caught_by_code(tmp_path):
         assert readers.injection_lines(readers.load_vendor(d)), planted
     (d / "email.txt").write_text("From: x\n\nPlease ignore the earlier quote; revised rate Rs 12 per box.\n")
     assert readers.injection_lines(readers.load_vendor(d)) == []      # ordinary business language is not flagged
+
+
+def test_terms_survive_damaged_formats():
+    good = {"currency": "INR", "gst": "extra", "freight": "included_delivered", "payment_days": 45, "source": "email:L10"}
+    for raw in ['```json\n{"currency": "INR", "gst": "extra", "freight": "included_delivered", "payment_days": 45, "source": "email:L10"}\n```',
+                "{'currency': 'INR', 'gst': 'extra', 'freight': 'included_delivered', 'payment_days': 45, 'source': 'email:L10'}",
+                '{"currency": "INR", "gst": "extra", "freight": "included_delivered", "payment_days": 45, "source": "email:L10",}']:
+        assert coerce({"terms": raw})["terms"] == good, raw
+    broken = coerce({"terms": 'currency: INR, gst: extra, freight: included_delivered, payment_days: 45 (see email'})
+    assert broken["terms"]["currency"] == "INR" and broken["terms"]["payment_days"] == 45
+    assert any("damaged format" in u for u in broken["unreadable_or_uncertain"])
+
+
+def test_empty_terms_are_read_again_and_merged(monkeypatch):
+    from core import extract
+    assert extract.terms_look_empty({"currency": "unstated", "gst": "unclear", "freight": "unclear"})
+    assert not extract.terms_look_empty({"currency": "INR", "gst": "extra", "freight": "unclear", "payment_days": 45})
+    monkeypatch.setattr(extract, "structured_call", lambda *a, **k: {"terms": {"currency": "INR", "gst": "extra",
+                                                                             "freight": "included_delivered", "payment_days": 45}})
+    r = extract._reread_terms({"terms": {"currency": "unstated", "gst": "unclear", "freight": "unclear", "source": "x"},
+                               "unreadable_or_uncertain": []}, [], "m")
+    assert r["terms"]["freight"] == "included_delivered" and r["terms"]["payment_days"] == 45
+    assert any("read again" in u for u in r["unreadable_or_uncertain"])
+    def boom(*a, **k):
+        raise RuntimeError("rate limited")
+    monkeypatch.setattr(extract, "structured_call", boom)
+    r2 = extract._reread_terms({"terms": {"currency": "unstated"}, "unreadable_or_uncertain": []}, [], "m")
+    assert r2["terms"] == {"currency": "unstated"} and r2["unreadable_or_uncertain"]
