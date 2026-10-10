@@ -717,21 +717,29 @@ def page_replies():
             for u in sorted(unsure, key=lambda u: not str(u).startswith("Possible instruction"))[:8]:
                 tag = pill("Security", "stop") if str(u).startswith("Possible instruction") else pill("Check", "check")
                 st.markdown(f"{tag} {E(str(u))}", unsafe_allow_html=True)
-        prices = []
+        prices, not_quoted = [], []
         for n in [n for n in s.norms if n.vendor == pick]:
+            if n.status == "missing":
+                not_quoted.append(n.line_id)
+                continue
             worst = max((f.severity for f in n.flags), key=lambda x: ["info", "warn", "critical"].index(x), default="")
             prices.append({"Line": n.line_id, "Their item": n.vendor_item_text, "As they wrote it": n.source_quote,
-                           "Landed ₹ per unit": n.landed,
+                           "Landed ₹ per unit": f"{n.landed:,.2f}" if n.landed is not None else "unusable",
                            "Possible readings": " or ".join(f"{c['landed']:.2f}" for c in n.candidates) if len(n.candidates) > 1 else "",
-                           "Status": {"ok": "Read", "review": "Confirm", "missing": "Not quoted"}[n.status] + ("" if n.spec_compliant else ", lower spec"),
+                           "Status": ({"ok": "Read", "review": "Confirm"}.get(n.status, n.status) + ("" if n.spec_compliant else ", lower spec")
+                                      + ("" if n.awardable else ", held out")),
                            "Attention": {"critical": "Blocks award", "warn": "Check", "info": "Note", "": ""}[worst]})
-        st.markdown("**Prices, converted to landed cost**")
-        st.dataframe(pd.DataFrame(prices), hide_index=True, width="stretch", height=420,
-                     column_config={"Line": st.column_config.TextColumn(width=48),
-                                    "Landed ₹ per unit": st.column_config.NumberColumn(format="%.2f", width="small"),
-                                    "Possible readings": st.column_config.TextColumn(width="small"),
-                                    "Status": st.column_config.TextColumn(width="small"),
-                                    "Attention": st.column_config.TextColumn(width="small")})
+        st.markdown(f"**Prices, converted to landed cost** · {len(prices)} of 30 items priced")
+        if prices:
+            st.dataframe(pd.DataFrame(prices), hide_index=True, width="stretch", height=min(38 * (len(prices) + 1) + 3, 420),
+                         column_config={"Line": st.column_config.TextColumn(width=48),
+                                        "Landed ₹ per unit": st.column_config.TextColumn(width="small"),
+                                        "Possible readings": st.column_config.TextColumn(width="small"),
+                                        "Status": st.column_config.TextColumn(width="small"),
+                                        "Attention": st.column_config.TextColumn(width="small")})
+        if not_quoted:
+            st.caption(f"Not quoted ({len(not_quoted)}): {', '.join(not_quoted)}. Never priced or filled in; "
+                       "these items go to other vendors or stay open.")
         ev = s.q_evals.get(pick)
         if ev:
             lbl, cls = STATUS[s.verdicts[pick]]
@@ -740,7 +748,7 @@ def page_replies():
             ans = {a.get("q_id"): a.get("answer") for a in ex.get("questionnaire", [])}
             res_lbl = {"pass": "Pass", "fail": "Fail", "unclear": "Unclear"}
             st.dataframe(pd.DataFrame([{"Question": qmeta.get(k, {}).get("question", k), "Rule": qmeta.get(k, {}).get("type"),
-                                        "Their answer": ans.get(k), "Result": res_lbl.get(r.get("status"), r.get("status")),
+                                        "Their answer": ans.get(k) or "No answer", "Result": res_lbl.get(r.get("status"), r.get("status")),
                                         "Why": r.get("reason", "") + (f" ({r['rule_note']})" if r.get("rule_note") else "")
                                         + (" (checked against the certificate date)" if r.get("check") == "deterministic" else "")}
                                        for k, r in sorted(ev["results"].items())]), hide_index=True, width="stretch")

@@ -176,7 +176,9 @@ def _reread_terms(result: dict, content: list, model: str) -> dict:
                     merged[k] = v
             if merged != result["terms"]:
                 result["terms"] = merged
-                result["unreadable_or_uncertain"].append("Commercial terms were missing from the first read and were read again separately.")
+                result["unreadable_or_uncertain"] = [u for u in result["unreadable_or_uncertain"] if "damaged format" not in u]
+                result["unreadable_or_uncertain"].append("Commercial terms were incomplete in the first read and were read again "
+                                                         "separately; check them against the vendor's words.")
     except Exception as e:  # never lose the main read because the second pass failed
         result["unreadable_or_uncertain"].append(f"Commercial terms could not be confirmed ({str(e)[:80]}). Check them against the email.")
     return result

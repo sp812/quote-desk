@@ -415,7 +415,8 @@ def test_empty_terms_are_read_again_and_merged(monkeypatch):
     monkeypatch.setattr(extract, "structured_call", lambda *a, **k: {"terms": {"currency": "INR", "gst": "extra",
                                                                              "freight": "included_delivered", "payment_days": 45}})
     r = extract._reread_terms({"terms": {"currency": "unstated", "gst": "unclear", "freight": "unclear", "source": "x"},
-                               "unreadable_or_uncertain": []}, [], "m")
+                               "unreadable_or_uncertain": ["Commercial terms came back from the reader in a damaged format; nothing"]}, [], "m")
+    assert not any("damaged format" in u for u in r["unreadable_or_uncertain"])   # no contradictory leftover
     assert r["terms"]["freight"] == "included_delivered" and r["terms"]["payment_days"] == 45
     assert any("read again" in u for u in r["unreadable_or_uncertain"])
     def boom(*a, **k):
