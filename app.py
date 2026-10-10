@@ -237,6 +237,7 @@ def get_state(refresh=False) -> State:
     if refresh or "state" not in st.session_state:
         st.session_state.state = State()
         st.session_state.pop("analyst", None)
+        st.session_state["_data_version"] = st.session_state.get("_data_version", 0) + 1
     _set_short_names(list(st.session_state.state.vendor_names.values()))
     return st.session_state.state
 
@@ -1024,15 +1025,24 @@ def _show_source(n):
     st.markdown("**In the vendor's own document**")
     ev = readers.load_vendor(vdir)
     lines = [ln for _, body in ev.texts for ln in body.splitlines()]
-    loc, quote = (n.source or "").strip(), (n.source_quote or "").strip()
-    hit = None
-    if loc:
-        key = loc.split(",")[0].strip()
-        hit = next((i for i, ln in enumerate(lines) if ln.startswith(key + " ") or ln.startswith(key + ":") or ln.startswith(key + " |")), None)
-    if hit is None and quote and len(quote) >= 3:
-        hit = next((i for i, ln in enumerate(lines) if quote[:40] in ln), None)
+    loc = (n.source or "").strip()
+    hit = readers.locate(lines, n.source, n.source_quote)
     if hit is not None:
-        st.code("\n".join(lines[max(0, hit - 2): hit + 3]), language=None)
+        def pretty(ln):
+            m_x = re.match(r"(.+?\.xls[xm]?)!([^!]+)!R(\d+):\s*(.*)", ln)
+            if m_x:   # Excel: show the row and its cells, without the file name on every line
+                return f"Row {m_x.group(3)}  " + re.sub(r"\b[A-Z]{1,3}\d+=", "", m_x.group(4)).replace("'", "")
+            if " | " in ln:   # email, PDF, Word: show the line number and the words
+                head, body = ln.split(" | ", 1)
+                return f"{head.split(':')[-1]:<6}{body}"
+            return ln
+        parts = loc.split("!")
+        if ".xls" in loc and len(parts) >= 3:
+            st.caption(f"From {E(parts[0])}, sheet {E(parts[1])}, cell {E(parts[-1])}")
+        elif loc:
+            st.caption(f"From {E(loc)}")
+        st.code("\n".join(("▶ " if i == hit else "  ") + pretty(lines[i]) for i in range(max(0, hit - 2), min(len(lines), hit + 3))),
+                language=None, wrap_lines=True)
     m = re.search(r"([\w\-. ]+\.pdf):p(\d+)", loc)
     if m and (vdir / m.group(1).strip()).exists():
         pf = vdir / m.group(1).strip()
@@ -1171,9 +1181,18 @@ def page_ask():
         need_replies(); return
     if "analyst" not in st.session_state:
         st.session_state.analyst = Analyst(s)
-        st.session_state.an_hist, st.session_state.an_view = [], []
+        if st.session_state.get("an_view") and st.session_state.get("_an_version") != st.session_state.get("_data_version"):
+            # the data changed after these answers: keep them on screen, but never let the model reuse their numbers
+            st.session_state.an_hist = []
+            st.session_state.an_view.append({"q": None, "a": None, "outputs": [], "notice": True})
+        st.session_state.setdefault("an_hist", []); st.session_state.setdefault("an_view", [])
+        st.session_state["_an_version"] = st.session_state.get("_data_version")
     a = st.session_state.analyst
     for turn in st.session_state.an_view:
+        if turn.get("notice"):
+            st.info("The data changed after the answers above (a value was confirmed, a vendor included or a reply re-read). "
+                    "New answers use the updated data; ask again to refresh any number above.")
+            continue
         st.chat_message("user").write(turn["q"])
         with st.chat_message("assistant"):
             _render_outputs(turn["outputs"])

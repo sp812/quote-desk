@@ -140,6 +140,10 @@ def extract_vendor(vendor_dir: Path, model: str = MODEL) -> dict:
     result = structured_call(SYSTEM, content, "submit_extraction",
                              "Submit the structured extraction of this vendor's response.", SCHEMA, model=model)
     result = _repair(result)
+    # instructions planted in vendor files are reported by code, whatever the model did with them
+    for name, line in readers.injection_lines(ev):
+        result["unreadable_or_uncertain"].insert(0, f"Possible instruction to the AI in {name}: \"{line}\". Treated as vendor text and not followed; "
+                                                    f"the award follows the RFQ rules in code.")
     # files the system could not open are reported, never silently skipped
     for name, body in ev.texts:
         if body.startswith("[unsupported file type") or body.startswith("[ERROR reading file"):

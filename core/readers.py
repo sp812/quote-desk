@@ -144,6 +144,43 @@ def _fit_image(data: bytes, suf: str) -> tuple[bytes, str]:
         return data, mt
 
 
+def locate(lines: list[str], source: str, quote: str) -> int | None:
+    """Index of the line a cited value came from. Excel cells map to their row; other locators match their prefix;
+    the quoted words are the fallback."""
+    import re
+    loc, quote = (source or "").strip(), (quote or "").strip()
+    m = re.match(r"(.+?\.xls[xm]?)!([^!]+)!\$?([A-Z]{1,3})\$?(\d+)", loc)
+    if m:
+        row = f"{m.group(1)}!{m.group(2)}!R{m.group(4)}:"
+        hit = next((i for i, ln in enumerate(lines) if ln.startswith(row)), None)
+        if hit is not None:
+            return hit
+    if loc:
+        key = loc.split(",")[0].strip()
+        hit = next((i for i, ln in enumerate(lines) if ln.startswith(key + " ") or ln.startswith(key + ":") or ln.startswith(key + " |")), None)
+        if hit is not None:
+            return hit
+    if quote and len(quote) >= 3:
+        return next((i for i, ln in enumerate(lines) if quote[:40] in ln), None)
+    return None
+
+
+INJECTION = [r"ignore (all |any )?(the )?(previous|prior|above|earlier)? ?(instructions|rules)", r"disregard (the |all )?(previous|above|award)? ?(instructions|rules)",
+             r"recommend (this|our) (vendor|company|quote)", r"you are (an? )?(ai|assistant|model)", r"(system|developer) prompt",
+             r"mark (this|our) (vendor|quote|company) as (compliant|qualified|approved)", r"regardless of (price|qualification|the rules)"]
+
+
+def injection_lines(ev: Evidence) -> list[tuple[str, str]]:
+    """Text in a vendor's files that reads like an instruction to an AI. Found by code, independent of the model."""
+    import re
+    out = []
+    for name, body in ev.texts:
+        for ln in body.splitlines():
+            if any(re.search(p, ln, re.I) for p in INJECTION):
+                out.append((name, ln.split("|", 1)[-1].strip()[:160]))
+    return out
+
+
 def to_claude_content(ev: Evidence) -> list[dict]:
     """Message content blocks: originals first (so the model sees layout), then the locator-numbered text."""
     blocks: list[dict] = []
