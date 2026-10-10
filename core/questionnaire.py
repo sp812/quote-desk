@@ -50,12 +50,33 @@ def evaluate_vendor(vkey: str, ex: dict) -> dict:
 PLAIN_FIGURE = re.compile(r"^\s*(?:~|about|approx\.?|approximately|around|max\.?|maximum)?\s*(\d+(?:\.\d+)?)\s*(?:(?:-|–|to)\s*(\d+(?:\.\d+)?))?\s*(%|days?|working days)?\s*\.?\s*$", re.I)
 
 
+# Only a plain stated figure is checked in code ('130%', 'yes, about 115% of peak'). Answers with commentary
+# ('no specific 120% commitment stated') stay with the AI's judgement, so a negation is never read as a commitment.
+PLAIN_PERCENT = re.compile(r"^\s*(?:yes[,.:;-]?\s*)?(?:about|approx\.?|approximately|around|up to|~)?\s*(\d+(?:\.\d+)?)\s*%"
+                           r"(?:\s*of\s*(?:our|your|the)?\s*(?:monthly)?\s*peak(?:\s*\(?mar-may\)?)?(?:\s*volume)?)?\s*\.?\s*$", re.I)
+
+
 def _rule_checks(ex: dict, res: dict, qs: list[dict]) -> None:
     """Numeric pass criteria ('<= 2.0%', '<= 10 days') are checked in code, not by the model.
     Only plain figures are checked ('1.6%', '12 days', '3-4 days'); hedged answers ('under 2%')
     stay with the model's judgement and are marked as such."""
     answers = {a.get("q_id"): str(a.get("answer", "")) for a in ex.get("questionnaire", []) if isinstance(a, dict)}
     for q in qs:
+        at_least = re.search(r"at least (\d+(?:\.\d+)?)\s*%", q.get("question", ""), re.I)
+        qid = q["q_id"]
+        if at_least and qid in answers:
+            pct = PLAIN_PERCENT.match(answers[qid])
+            if pct:   # a stated percentage is checked in code; a plain 'yes' stays with the AI's judgement
+                need, have = float(at_least.group(1)), float(pct.group(1))
+                rule = "pass" if have >= need else "fail"
+                cur = res.get(qid, {"q_id": qid, "status": "unclear", "reason": ""})
+                note = f"Rule check: {have:g}% vs at least {need:g}% -> {rule}."
+                if cur.get("status") != rule:
+                    note += f" Overrides AI verdict '{cur.get('status')}'."
+                    cur["status"] = rule
+                cur["check"], cur["rule_note"] = "rule", note
+                res[qid] = cur
+                continue
         m = re.search(r"<=\s*(\d+(?:\.\d+)?)", q.get("pass_criterion", ""))
         qid = q["q_id"]
         if not m or qid not in answers:

@@ -667,7 +667,10 @@ def page_replies():
     left, right = st.columns([4, 8], gap="large")
     with left:
         st.subheader("What they sent")
-        for f in sorted(vdir.iterdir(), key=lambda p: (p.name != "email.txt", p.name)):
+        old = sorted((vdir / "_superseded").glob("*")) if (vdir / "_superseded").exists() else []
+        if old:
+            st.caption(f"Revised quote: {len(old)} earlier version{'s' if len(old) != 1 else ''} kept for the audit trail and no longer counted.")
+        for f in sorted((p for p in vdir.iterdir() if p.is_file() and not p.name.startswith("_")), key=lambda p: (p.name != "email.txt", p.name)):
             label = "Email" if f.name == "email.txt" else f.name
             with st.expander(label, expanded=f.suffix.lower() in (".jpg", ".jpeg", ".png") or f.name == "email.txt"):
                 suf = f.suffix.lower()
@@ -754,7 +757,15 @@ def page_replies():
                                        for k, r in sorted(ev["results"].items())]), hide_index=True, width="stretch")
 
     with st.expander("Add a vendor reply (any format)"):
-        name = st.text_input("Vendor name", max_chars=80)
+        existing = {d.name: s.vendor_names.get(d.name, d.name) for d in vendor_dirs()}
+        kind = st.radio("This is", ["A new vendor", "A revised quote from a vendor already here"], horizontal=True, key="add_kind")
+        revise = None
+        if kind.startswith("A revised"):
+            revise = st.selectbox("Which vendor revised their quote?", list(existing), format_func=lambda k: existing[k], key="revise_of")
+            name = existing.get(revise, "")
+            st.caption("Their earlier files move to an archive folder: kept for the audit trail, no longer counted. Only the new version is read.")
+        else:
+            name = st.text_input("Vendor name", max_chars=80)
         files = st.file_uploader("Files: Excel, PDF, Word, photo, CSV or a saved email", accept_multiple_files=True,
                                  type=["xlsx", "xlsm", "pdf", "docx", "jpg", "jpeg", "png", "webp", "csv", "txt", "eml"])
         body = st.text_area("Or paste the email / WhatsApp text")
@@ -767,12 +778,21 @@ def page_replies():
                 st.error("Already received: " + "; ".join(f"{a} is the same file as {s.vendor_names.get(b, b)}'s reply" for a, b in dup)
                          + ". Nothing was added, so nothing is counted twice.")
                 st.stop()
-            base = "vendor_X_" + ("".join(c for c in name.lower() if c.isalnum())[:20] or "new")
-            slug, k = base, 2
-            while (INBOX / slug).exists():
-                slug, k = f"{base}{k}", k + 1
-            nd = INBOX / slug
-            nd.mkdir()
+            if revise:
+                from datetime import datetime as _dt
+                nd = INBOX / revise
+                arch = nd / "_superseded" / _dt.now().strftime("%Y%m%d-%H%M%S")
+                arch.mkdir(parents=True)
+                for f in [p for p in nd.iterdir() if p.is_file()]:
+                    f.rename(arch / f.name)
+                log(load_decisions(), "revised quote", f"{name}: earlier files archived ({arch.name}); reading the revision")
+            else:
+                base = "vendor_X_" + ("".join(c for c in name.lower() if c.isalnum())[:20] or "new")
+                slug, k = base, 2
+                while (INBOX / slug).exists():
+                    slug, k = f"{base}{k}", k + 1
+                nd = INBOX / slug
+                nd.mkdir()
             if body.strip():
                 (nd / "email.txt").write_text(f"From: {name}\nSubject: Quote for {config.RFX_ID}\n\n{body}")
             for f in files or []:
@@ -1080,6 +1100,8 @@ def _stake(i):
         if i["award_swing"] < 0:
             return -i["award_swing"], "higher award cost if this vendor qualifies (volume-discount effect)"
         return 0, "no change in award cost if this vendor qualifies"
+    if i["kind"] == "spec":
+        return abs(i["award_swing"]), "lower award cost if you accept the lower spec as a substitute (kept out until you do)"
     if i["award_swing"]:
         return i["award_swing"], "difference in award cost between the possible readings"
     if i.get("exposure_in_award"):
@@ -1118,10 +1140,25 @@ def _issue_card(s, i, compact=False):
                 dec.setdefault("choices", {})[i["id"]] = opts[choice]
                 log(dec, "value confirmed", f"{i['vendor_name']}: {issue_headline(i)} -> {choice}")
                 refresh(); st.rerun()
+        if i["kind"] == "fx" and not i.get("held_out"):
+            cur = float(dec.get("usd_inr") or config.USD_INR)
+            rate = st.number_input("USD rate to use (₹ per USD)", min_value=1.0, max_value=500.0, value=cur, step=0.1, key=f"fx_{i['id']}",
+                                   help=f"Reference rate {config.USD_INR} ({config.USD_INR_SOURCE}). Every USD price and the award are recalculated.")
+            b1, b2 = st.columns(2)
+            if b1.button("Use this rate", key=f"fxb_{i['id']}", disabled=rate == cur):
+                dec["usd_inr"] = rate
+                log(dec, "FX rate set", f"USD prices now converted at {rate:g} (reference {config.USD_INR})")
+                refresh(); st.rerun()
+            if dec.get("usd_inr") and b2.button("Back to the reference rate", key=f"fxr_{i['id']}"):
+                dec.pop("usd_inr")
+                log(dec, "FX rate reset", f"Back to the reference rate {config.USD_INR}")
+                refresh(); st.rerun()
         if i.get("acceptable"):
-            why = st.text_input("Why this price is right (saved to the decision log)", key=f"ac_{i['id']}",
-                                placeholder="e.g. vendor confirmed in writing on 9 Oct")
-            if st.button("Accept this price", key=f"acb_{i['id']}", disabled=not why):
+            spec = i["kind"] == "spec"
+            why = st.text_input("Why the substitute is acceptable (saved to the decision log)" if spec else
+                                "Why this price is right (saved to the decision log)", key=f"ac_{i['id']}",
+                                placeholder="e.g. Quality approved 120 GSM after a BCT test" if spec else "e.g. vendor confirmed in writing on 9 Oct")
+            if st.button("Accept the lower spec" if spec else "Accept this price", key=f"acb_{i['id']}", disabled=not why):
                 dec.setdefault("accepted", {})[i["id"]] = why
                 log(dec, "price accepted", f"{i['vendor_name']}: {issue_headline(i)} ({why})")
                 refresh(); st.rerun()
@@ -1159,7 +1196,7 @@ def page_issues():
         _issue_card(s, i)
     with st.expander(f"Noted, but they don't change the award ({len(cold)})"):
         for i in cold:
-            _issue_card(s, i, compact=True)
+            _issue_card(s, i, compact=not (i.get("acceptable") or (i["kind"] == "fx" and not i.get("held_out"))))
     dec = load_decisions()
     with st.expander(f"Decision log ({len(dec.get('log', []))} entries)"):
         if dec.get("log"):

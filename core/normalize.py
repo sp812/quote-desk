@@ -57,6 +57,7 @@ class NormQuote:
     group: str | None = None
     resolved_by_buyer: bool = False
     awardable: bool = True                  # False = shown, but kept out of the award until the buyer acts
+    spec_accepted: bool = False             # lower spec, accepted by the buyer as a substitute (logged)
     block_group: str | None = None          # issue id that, when accepted by the buyer, makes it awardable
 
     def to_dict(self):
@@ -189,6 +190,13 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
             elif unit == "per_strip" and sps:
                 variants.append((f"{c:g} x {sps} strips", c * sps))
                 nq.steps.append(f"Per strip x {sps} strips per set")
+            elif unit == "per_pack":
+                pk = num(q.get("pack_size"))
+                if pk and pk > 0:
+                    variants.append((f"{c:g} / pack of {pk:g}", c / pk))
+                    nq.steps.append(f"Price per pack of {pk:g} -> divided by {pk:g}")
+                else:
+                    nq.flags.append(Flag("unit", "critical", f"Priced per pack ('{q.get('unit_as_written')}') but the pack size is not stated. Ask the vendor."))
             elif unit == "per_100":
                 variants.append((f"{c:g} / 100", c / 100))
             elif unit == "per_1000":
@@ -226,9 +234,11 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
 
         # ---- FX
         if cur == "USD":
-            variants = [(lbl + f" x {USD_INR} INR/USD", v * USD_INR) for lbl, v in variants]
-            nq.steps.append(f"USD converted at {USD_INR} INR/USD ({USD_INR_SOURCE})")
-            nq.flags.append(Flag("fx", "warn", f"Quoted in USD; converted at {USD_INR}. A 3% rupee move shifts this price ~3%.", group=f"{vkey}|fx"))
+            rate = num(decisions.get("usd_inr")) or USD_INR
+            basis = "rate set by the buyer" if rate != USD_INR else USD_INR_SOURCE
+            variants = [(lbl + f" x {rate:g} INR/USD", v * rate) for lbl, v in variants]
+            nq.steps.append(f"USD converted at {rate:g} INR/USD ({basis})")
+            nq.flags.append(Flag("fx", "warn", f"Quoted in USD; converted at {rate:g} ({basis}). A 3% rupee move shifts this price ~3%.", group=f"{vkey}|fx"))
         elif cur != "INR":
             nq.flags.append(Flag("fx", "critical", f"Quoted in {cur}, which has no reference rate here. Not converted and kept out of "
                                                    f"the award; ask the vendor for an INR price.", group=f"{vkey}|currency"))
@@ -275,6 +285,10 @@ def normalize_vendor(vkey: str, ex: dict, decisions: dict) -> list[NormQuote]:
         if q.get("spec_deviation"):
             nq.spec_compliant = False
             nq.flags.append(Flag("spec", "critical", f"Spec deviation: {q['spec_deviation']}", group=f"{vkey}|spec"))
+            why = decisions.get("accepted", {}).get(f"{vkey}|spec")
+            if why:
+                nq.spec_accepted = True
+                nq.steps.append(f"Buyer accepted the lower spec as a substitute: {why}")
 
         # ---- selection: buyer choice, else least favourable
         choice = decisions.get("choices", {}).get(nq.group) if nq.group else None

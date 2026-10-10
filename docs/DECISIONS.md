@@ -44,4 +44,4 @@ So the real job is **closure**: knowing which gaps a document can close, what ea
 - **North star:** time from bids closing to an approved award.
 - **Guardrail:** zero prices shown wrong without a warning.
 
-On the demo: 133 of 136 prices read correctly; the 3 misses were flagged and none reached the award; 17 of 17 planted traps caught. 57 automated tests run, including 20 buyer scenarios on the real reading ([list](TEST_SCENARIOS.md)). In a pilot I would add how many values buyers still re-check by hand, and how fast open issues get closed.
+On the demo: 133 of 136 prices read correctly; the 3 misses were flagged and none reached the award; 17 of 17 planted traps caught. 87 automated tests run, including 20 buyer scenarios on the real reading ([list](TEST_SCENARIOS.md)) and one test per edge case on the review panel's list ([list](EDGE_CASES.md)). In a pilot I would add how many values buyers still re-check by hand, and how fast open issues get closed.

@@ -78,7 +78,7 @@ def read_docx(p: Path) -> str:
 def load_vendor(vendor_dir: Path) -> Evidence:
     ev = Evidence(vendor_dir=vendor_dir.name)
     for f in sorted(vendor_dir.iterdir()):
-        if f.name.startswith("."):
+        if f.name.startswith((".", "_")) or not f.is_file():   # '_superseded' keeps earlier versions for the audit trail, unread
             continue
         ev.files.append(f.name)
         suf = f.suffix.lower()
