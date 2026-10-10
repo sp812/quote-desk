@@ -165,7 +165,7 @@ def locate(lines: list[str], source: str, quote: str) -> int | None:
     return None
 
 
-INJECTION = [r"ignore (all |any )?(the )?(previous|prior|above|earlier)? ?(instructions|rules)", r"disregard (the |all )?(previous|above|award)? ?(instructions|rules)",
+INJECTION = [r"\b(ignore|disregard|override|bypass|forget)\b(\s+\w+){0,3}\s+(instructions|rules|criteria|policy|prompt)\b",
              r"recommend (this|our) (vendor|company|quote)", r"you are (an? )?(ai|assistant|model)", r"(system|developer) prompt",
              r"mark (this|our) (vendor|quote|company) as (compliant|qualified|approved)", r"regardless of (price|qualification|the rules)"]
 

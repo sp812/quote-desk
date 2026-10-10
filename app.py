@@ -714,8 +714,9 @@ def page_replies():
         unsure = ex.get("unreadable_or_uncertain", [])
         if unsure:
             st.markdown("**The reader flagged**")
-            for u in unsure[:8]:
-                st.markdown(f"{pill('Check', 'check')} {E(str(u))}", unsafe_allow_html=True)
+            for u in sorted(unsure, key=lambda u: not str(u).startswith("Possible instruction"))[:8]:
+                tag = pill("Security", "stop") if str(u).startswith("Possible instruction") else pill("Check", "check")
+                st.markdown(f"{tag} {E(str(u))}", unsafe_allow_html=True)
         prices = []
         for n in [n for n in s.norms if n.vendor == pick]:
             worst = max((f.severity for f in n.flags), key=lambda x: ["info", "warn", "critical"].index(x), default="")
