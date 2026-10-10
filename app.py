@@ -750,6 +750,13 @@ def page_replies():
         body = st.text_area("Or paste the email / WhatsApp text")
         st.caption("Old .xls or .doc files and iPhone .heic photos: save as .xlsx, .docx or .jpg first.")
         if st.button("Add and read", disabled=not (name.strip() and (files or body.strip()) and api_key_present())):
+            import hashlib
+            seen = {hashlib.sha256(f.read_bytes()).hexdigest(): d.name for d in vendor_dirs() for f in d.iterdir() if f.is_file()}
+            dup = [(f.name, seen[h]) for f in (files or []) if (h := hashlib.sha256(f.getvalue()).hexdigest()) in seen]
+            if dup:
+                st.error("Already received: " + "; ".join(f"{a} is the same file as {s.vendor_names.get(b, b)}'s reply" for a, b in dup)
+                         + ". Nothing was added, so nothing is counted twice.")
+                st.stop()
             base = "vendor_X_" + ("".join(c for c in name.lower() if c.isalnum())[:20] or "new")
             slug, k = base, 2
             while (INBOX / slug).exists():
@@ -973,6 +980,16 @@ def _comparison_xlsx(s, prices: pd.DataFrame) -> bytes:
             sc["failed_mandatory"] = sc["failed_mandatory"].apply(", ".join)
             sc.to_excel(xw, sheet_name="Vendor scorecard", index=False)
         pd.DataFrame(rows).to_excel(xw, sheet_name="Questionnaire & terms", index=False)
+        # every price with its status, so missing and uncertain values survive outside the app
+        pd.DataFrame([{"Item": x.line_id, "Vendor": x.vendor_name,
+                       "Landed ₹ per unit": x.landed,
+                       "Status": ("Not quoted" if x.status == "missing" else "Price unusable" if x.landed is None
+                                  else "Held out until confirmed" if not x.awardable else "To confirm" if x.status == "review"
+                                  else "Lower spec" if not x.spec_compliant else "Read"),
+                       "Possible readings": " / ".join(f"{c['landed']:.2f}" for c in x.candidates) if len(x.candidates) > 1 else "",
+                       "Vendor wrote": x.source_quote, "Where": x.source,
+                       "Warnings": " | ".join(f.text for f in x.flags if f.severity != "info")}
+                      for x in s.norms]).to_excel(xw, sheet_name="Price details", index=False)
     return buf.getvalue()
 
 
