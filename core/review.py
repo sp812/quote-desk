@@ -29,26 +29,30 @@ def asks(st) -> dict[str, list[str]]:
         by_v.setdefault(n.vendor, []).append(n)
     out = {k: [] for k in REVIEWERS}
 
-    # quality
-    for v, s in st.status.items():
-        name = st.vendor_names[v]
-        if s in ("fail", "pending", "exclude"):
+    # quality: one line on who is out and why, one on the lower grade
+    gap = {"Q1": "ISO certificate", "Q2": "test lab", "Q3": "inks", "Q4": "rejection rate", "Q5": "capacity", "Q6": "lead time"}
+    out_list = []
+    for v, s_ in st.status.items():
+        if s_ in ("fail", "pending", "exclude"):
             ev = st.q_evals.get(v, {}).get("results", {})
-            bad = [f"{q} {r['status']}" for q, r in sorted(ev.items()) if r.get("status") != "pass"]
-            out["quality"].append(f"{name} is not in the award ({'; '.join(bad[:3]) or s}). Agree?")
-        elif s == "include":
-            out["quality"].append(f"{name} was included by the buyer despite its questionnaire result. See the reason in the decision log.")
-    low_spec = sorted({st.vendor_names[n.vendor] for n in st.norms if n.status != "missing" and not n.spec_compliant})
+            fails = [gap[q] for q, r in sorted(ev.items()) if r.get("status") == "fail" and q in gap]
+            out_list.append(f"{st.vendor_names[v].split()[0]} ({', '.join(fails) or 'documents pending'})")
+        elif s_ == "include":
+            out["quality"].append(f"{st.vendor_names[v].split()[0]} was included by the buyer; see the reason in the log.")
+    if out_list:
+        out["quality"].insert(0, "Agree to leave out: " + "; ".join(out_list) + ".")
+    low_spec = sorted({st.vendor_names[n.vendor].split()[0] for n in st.norms if n.status != "missing" and not n.spec_compliant})
     if low_spec:
-        out["quality"].append(f"Lower board grade offered by {', '.join(low_spec)}; kept out of the award. Confirm the RFQ spec stands.")
+        out["quality"].append(f"Lower board grade from {', '.join(low_spec)} stays out of the award.")
 
     # logistics
     for v in sorted(awarded):
         fr = [n for n in by_v.get(v, []) if any(f.type == "freight" for f in n.flags)]
-        if fr:
-            out["logistics"].append(f"{st.vendor_names[v]}: freight is estimated from our rate card, not quoted ({len(fr)} items). Confirm the lane rate.")
         lt = num((st.extractions[v].get("terms") or {}).get("lead_time_days"))
-        out["logistics"].append(f"{st.vendor_names[v]}: lead time {f'{lt:g} days' if lt else 'not stated'} against the 10-day limit.")
+        bits = [f"lead time {lt:g} days (limit 10)" if lt else "lead time not stated"]
+        if fr:
+            bits.append(f"freight estimated on {len(fr)} items")
+        out["logistics"].append(f"{st.vendor_names[v].split()[0]}: " + "; ".join(bits) + ".")
 
     # finance
     out["finance"].append(f"Award value {_lakh(res['total'])} a year; "
@@ -66,13 +70,10 @@ def asks(st) -> dict[str, list[str]]:
 
     # approver
     hot = [i for i in st.issues() if i["decision_relevant"]]
-    out["approver"].append(f"Recommended award {_lakh(res['total'])} across {len(res['by_vendor'])} vendor{'s' if len(res['by_vendor']) != 1 else ''}.")
-    if res.get("top_share", 0) > 0.7:
-        out["approver"].append(f"{res['top_vendor']} would hold {res['top_share']:.0%} of spend: single-source risk in peak season.")
-    if res["uncovered_lines"]:
-        out["approver"].append(f"{len(res['uncovered_lines'])} items have no qualified quote yet.")
-    out["approver"].append(f"{len(hot)} open issue{'s' if len(hot) != 1 else ''} could still change the award." if hot else "No open issue changes the award.")
-    out["approver"].append("Above ₹1 crore: needs CFO/CPO sign-off under a typical approval matrix.")
+    top = f", {res['top_vendor'].split()[0]} holds {res['top_share']:.0%}" if res.get("top_share", 0) > 0.7 else ""
+    out["approver"].append(f"{_lakh(res['total'])} across {len(res['by_vendor'])} vendor{'s' if len(res['by_vendor']) != 1 else ''}{top}.")
+    out["approver"].append(f"{len(hot)} open issue{'s' if len(hot) != 1 else ''} could still change it." if hot else "Nothing open changes it.")
+    out["approver"].append("Above ₹1 crore: CFO/CPO sign-off.")
     return out
 
 

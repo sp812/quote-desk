@@ -331,7 +331,7 @@ def _blockers(s, v) -> tuple[str, str]:
     bad = [(q, r) for q, r in sorted(ev.items()) if r.get("status") != "pass" and q != "Q8"]
     fails = [Q_SHORT.get(q, q) for q, r in bad if r.get("status") == "fail"]
     unclear = [Q_SHORT.get(q, q) for q, r in bad if r.get("status") != "fail"]
-    short_txt = " · ".join(fails[:3]) + (" · " if fails and unclear else "") + (("unclear: " + ", ".join(unclear[:2])) if unclear else "")
+    short_txt = " · ".join(fails[:3]) if fails else ("To confirm: " + ", ".join(unclear[:2]) if unclear else "")
     full = "\n".join(f"{q} {r.get('status')}: {r.get('reason', '')}" for q, r in bad)
     return short_txt, full
 
@@ -476,7 +476,6 @@ def page_board():
                 '<th>Value</th><th><abbr title="Hover a row for the full reasons">Missing to qualify</abbr></th></tr></thead><tbody>'
                 + "".join(vrows) + "</tbody></table>", unsafe_allow_html=True)
     st.write("")
-    _saved_results()
 
 
 def _review_line():
@@ -671,7 +670,7 @@ def page_replies():
             st.caption(f"Revised quote: {len(old)} earlier version{'s' if len(old) != 1 else ''} kept for the audit trail and no longer counted.")
         for f in sorted((p for p in vdir.iterdir() if p.is_file() and not p.name.startswith("_")), key=lambda p: (p.name != "email.txt", p.name)):
             label = "Email" if f.name == "email.txt" else f.name
-            with st.expander(label, expanded=f.suffix.lower() in (".jpg", ".jpeg", ".png") or f.name == "email.txt"):
+            with st.expander(label, expanded=f.suffix.lower() in (".jpg", ".jpeg", ".png")):
                 suf = f.suffix.lower()
                 if suf in (".jpg", ".jpeg", ".png"):
                     st.image(str(f), width="stretch")
@@ -703,8 +702,6 @@ def page_replies():
                 if ok is not None:
                     refresh(); st.rerun()
             return
-        if ex.get("response_summary"):
-            st.write(ex["response_summary"])
         t = ex.get("terms", {})
         disc = "; ".join(f"{d.get('percent')}% if {d.get('condition')}" for d in ex.get("discounts", [])) or "None found"
         rows = [("Currency", t.get("currency") or "-"), ("GST", GST.get(t.get("gst"), t.get("gst") or "-")),
@@ -713,12 +710,16 @@ def page_replies():
                 ("Lead time", f"{t.get('lead_time_days')} days" if t.get("lead_time_days") else "Not stated"),
                 ("Discounts", disc)]
         st.markdown('<table class="terms">' + "".join(f"<tr><td>{a}</td><td><b>{E(str(b))}</b></td></tr>" for a, b in rows) + "</table>", unsafe_allow_html=True)
-        unsure = ex.get("unreadable_or_uncertain", [])
-        if unsure:
-            st.markdown("**The reader flagged**")
-            for u in sorted(unsure, key=lambda u: not str(u).startswith("Possible instruction"))[:8]:
-                tag = pill("Security", "stop") if str(u).startswith("Possible instruction") else pill("Check", "check")
-                st.markdown(f"{tag} {E(str(u))}", unsafe_allow_html=True)
+        unsure = [str(u) for u in ex.get("unreadable_or_uncertain", [])]
+        for u in [u for u in unsure if u.startswith("Possible instruction")]:   # security warnings are never hidden
+            st.markdown(f"{pill('Security', 'stop')} {E(u)}", unsafe_allow_html=True)
+        notes = [u for u in unsure if not u.startswith("Possible instruction")]
+        if notes or ex.get("response_summary"):
+            with st.expander(f"Reader's notes ({len(notes)})" if notes else "Reader's summary"):
+                if ex.get("response_summary"):
+                    st.write(ex["response_summary"])
+                for u in notes[:10]:
+                    st.markdown(f"- {E(u)}")
         prices, not_quoted = [], []
         for n in [n for n in s.norms if n.vendor == pick]:
             if n.status == "missing":
@@ -728,32 +729,40 @@ def page_replies():
             prices.append({"Line": n.line_id, "Their item": n.vendor_item_text, "As they wrote it": n.source_quote,
                            "Landed ₹ per unit": f"{n.landed:,.2f}" if n.landed is not None else "unusable",
                            "Possible readings": " or ".join(f"{c['landed']:.2f}" for c in n.candidates) if len(n.candidates) > 1 else "",
-                           "Status": ({"ok": "Read", "review": "Confirm"}.get(n.status, n.status) + ("" if n.spec_compliant else ", lower spec")
-                                      + ("" if n.awardable else ", held out")),
-                           "Attention": {"critical": "Blocks award", "warn": "Check", "info": "Note", "": ""}[worst]})
+                           "Status": ("Lower spec" if not n.spec_compliant else "Held out" if not n.awardable
+                                      else "Confirm" if n.status == "review" else "Read")})
         st.markdown(f"**Prices, converted to landed cost** · {len(prices)} of 30 items priced")
         if prices:
-            st.dataframe(pd.DataFrame(prices), hide_index=True, width="stretch", height=min(38 * (len(prices) + 1) + 3, 420),
+            pdf = pd.DataFrame(prices)
+            if not pdf["Possible readings"].astype(bool).any():
+                pdf = pdf.drop(columns=["Possible readings"])
+            st.dataframe(pdf, hide_index=True, width="stretch", height=min(38 * (len(prices) + 1) + 3, 420),
                          column_config={"Line": st.column_config.TextColumn(width=48),
                                         "Landed ₹ per unit": st.column_config.TextColumn(width="small"),
                                         "Possible readings": st.column_config.TextColumn(width="small"),
                                         "Status": st.column_config.TextColumn(width="small"),
                                         "Attention": st.column_config.TextColumn(width="small")})
         if not_quoted:
-            st.caption(f"Not quoted ({len(not_quoted)}): {', '.join(not_quoted)}. Never priced or filled in; "
-                       "these items go to other vendors or stay open.")
+            st.caption(f"Not quoted ({len(not_quoted)}): {', '.join(not_quoted)}")
         ev = s.q_evals.get(pick)
         if ev:
             lbl, cls = STATUS[s.verdicts[pick]]
             st.markdown(f"**Quality questionnaire** {pill(lbl, cls)}", unsafe_allow_html=True)
             qmeta = {q["q_id"]: q for q in extract.load_questionnaire()}
             ans = {a.get("q_id"): a.get("answer") for a in ex.get("questionnaire", [])}
+            short_q = {q: Q_SHORT.get(q, q) for q in qmeta}
+            bad = [(k, r) for k, r in sorted(ev["results"].items()) if r.get("status") != "pass" and qmeta.get(k, {}).get("type") != "Info"]
+            for k, r in bad:
+                tag = pill("Fail", "stop") if r.get("status") == "fail" else pill("Unclear", "check")
+                st.markdown(f"{tag} <b>{E(short_q.get(k, k))}</b>: {E(r.get('reason', ''))}", unsafe_allow_html=True)
+            if not bad:
+                st.caption("Every mandatory answer passes.")
             res_lbl = {"pass": "Pass", "fail": "Fail", "unclear": "Unclear"}
-            st.dataframe(pd.DataFrame([{"Question": qmeta.get(k, {}).get("question", k), "Rule": qmeta.get(k, {}).get("type"),
-                                        "Their answer": ans.get(k) or "No answer", "Result": res_lbl.get(r.get("status"), r.get("status")),
-                                        "Why": r.get("reason", "") + (f" ({r['rule_note']})" if r.get("rule_note") else "")
-                                        + (" (checked against the certificate date)" if r.get("check") == "deterministic" else "")}
-                                       for k, r in sorted(ev["results"].items())]), hide_index=True, width="stretch")
+            with st.expander("All answers"):
+                st.dataframe(pd.DataFrame([{"Question": qmeta.get(k, {}).get("question", k), "Their answer": ans.get(k) or "No answer",
+                                            "Result": res_lbl.get(r.get("status"), r.get("status")),
+                                            "Why": r.get("reason", "") + (f" ({r['rule_note']})" if r.get("rule_note") else "")}
+                                           for k, r in sorted(ev["results"].items())]), hide_index=True, width="stretch")
 
     with st.expander("Add a vendor reply (any format)"):
         existing = {d.name: s.vendor_names.get(d.name, d.name) for d in vendor_dirs()}
@@ -762,7 +771,7 @@ def page_replies():
         if kind.startswith("A revised"):
             revise = st.selectbox("Which vendor revised their quote?", list(existing), format_func=lambda k: existing[k], key="revise_of")
             name = existing.get(revise, "")
-            st.caption("Their earlier files move to an archive folder: kept for the audit trail, no longer counted. Only the new version is read.")
+            st.caption("Only the new version counts. Earlier files are archived.")
         else:
             name = st.text_input("Vendor name", max_chars=80)
         files = st.file_uploader("Files: Excel, PDF, Word, photo, CSV or a saved email", accept_multiple_files=True,
@@ -1276,7 +1285,7 @@ SUGGESTED = [
 def page_ask():
     from core.analyst import Analyst
     s = get_state()
-    header("Ask a question", "Plain-language questions, answered from the data. Every step is shown.")
+    header("Ask a question", "Answers come from the data, with every step shown.")
     key_notice()
     if not s.ready():
         need_replies(); return
@@ -1291,8 +1300,7 @@ def page_ask():
     a = st.session_state.analyst
     for turn in st.session_state.an_view:
         if turn.get("notice"):
-            st.info("The data changed after the answers above (a value was confirmed, a vendor included or a reply re-read). "
-                    "New answers use the updated data; ask again to refresh any number above.")
+            st.info("The data changed since these answers. Ask again for updated numbers.")
             continue
         st.chat_message("user").write(turn["q"])
         with st.chat_message("assistant"):
@@ -1391,8 +1399,7 @@ def page_memo():
     if st.session_state.get("memo"):
         md, res_m = st.session_state.memo
         if abs(res_m["total"] - res["total"]) > 1:
-            st.info(f"The award has changed since this memo was written ({money(res_m['total'])} then, {money(res['total'])} now). "
-                    "Write it again before sending.")
+            st.info(f"The award changed ({money(res_m['total'])} → {money(res['total'])}). Write the memo again.")
         with st.container(border=True):
             st.markdown(md)
         c1, c2 = st.columns(2)
@@ -1431,22 +1438,22 @@ def _validation(s, res):
             st.write("")
     unsent = [k for k, r in rs.items() if r["status"] == "not_sent"]
     if unsent:
-        pick = st.multiselect("Send for validation to", unsent, default=unsent,
-                              format_func=lambda k: f"{review.REVIEWERS[k]['person']} ({review.REVIEWERS[k]['role']})")
-        note = st.text_input("Note to reviewers (optional)", placeholder="e.g. need sign-off by Friday; PO release planned 20 Oct")
-        if st.button("Send for validation", type="primary", disabled=not pick):
-            review.request(dec, pick, note, total=res["total"])
+        c1, c2 = st.columns([3, 1])
+        note = c1.text_input("Note to reviewers", label_visibility="collapsed", placeholder="Note to reviewers (optional)")
+        if c2.button(f"Send to {'all ' if len(unsent) == len(rs) else ''}{len(unsent)} reviewer{'s' if len(unsent) != 1 else ''}",
+                     type="primary", width="stretch"):
+            review.request(dec, unsent, note, total=res["total"])
             refresh(); st.rerun()
     done = sum(1 for r in rs.values() if r["status"] == "approved")
     if done == len(rs):
-        st.success("All stakeholders have signed off. The decision log and award pack record who approved what, and when.")
+        st.success("All reviewers have signed off.")
 
 
 # ================================================================== Reading accuracy
 def page_accuracy():
     from core.evaluate import score
     s = get_state()
-    header("Reading accuracy", "The AI's reading, scored against a hidden answer key. The number that matters: <b>confidently wrong</b>.")
+    header("Reading accuracy", "The AI's reading, scored against a hidden answer key.")
     if not s.ready():
         need_replies(); return
     r = score(s.norms, s.extractions, s.verdicts)
@@ -1478,6 +1485,7 @@ def page_accuracy():
                                     "Result": lbl.get(x["result"], x["result"])} for x in bad]), hide_index=True, width="stretch")
     models = {ex.get("_meta", {}).get("model") for ex in s.extractions.values()}
     st.caption(f"Read by: {', '.join(m for m in models if m)}")
+    _saved_results()
     _next("board", "Back to the decision board")
 
 # ================================================================== navigation
@@ -1499,10 +1507,8 @@ with st.sidebar:
            "<path d='M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z'/><path d='M3 7.5 12 12l9-4.5M12 12v9'/></svg>")
     _n = len(vendor_dirs())
     st.markdown(f"""<div class="sb-brand"><div class="sb-mark">{BOX}</div><div class="brand">Quote desk</div></div>
-        <div class="sb-sub">From vendor replies to an award you can defend</div>
         <div class="flute" style="margin:10px 0 0 0"></div>
-        <div class="sb-rfq"><div class="k">Sourcing event</div><div class="v">{config.RFX_ID}</div>
-        <div class="m">Corrugated packaging · 30 items · {_n} vendors</div><div class="m">Deccan Peak Breweries, Waluj</div></div>
-        <div class="sb-note{'' if api_key_present() else ' off'}">{'Demo data; all companies are fictional.' if api_key_present()
-            else 'AI actions are off (no API key). Everything already read still works.'}</div>""", unsafe_allow_html=True)
+        <div class="sb-sub" style="margin-top:8px">{config.RFX_ID} · {_n} vendors</div>
+        {'' if api_key_present() else '<div class="sb-note off">AI is off (no API key). Everything already read still works.</div>'}""",
+                unsafe_allow_html=True)
 nav.run()
