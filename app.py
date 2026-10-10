@@ -176,6 +176,10 @@ table.vt td.why {{ color: {INK_2}; font-size: .86rem; max-width: 340px; }}
 .spct {{ grid-column: 2 / 4; color: {INK_2}; font-size: .8rem; }}
 .mini {{ width: 120px; height: 8px; background: {MUTED_BG}; border-radius: 4px; overflow: hidden; margin-top: 6px; }}
 .mini div {{ height: 100%; }}
+table.vt .fmt {{ display: inline-block; font-size: .68rem; letter-spacing: .05em; text-transform: uppercase; color: {INK_2};
+  border: 1px solid {LINE}; border-radius: 4px; padding: 0 6px; margin-left: 8px; vertical-align: 2px; }}
+table.vt .cov {{ height: 5px; background: {LINE}; border-radius: 3px; margin-top: 6px; width: 96px; overflow: hidden; }}
+table.vt .cov > div {{ height: 100%; border-radius: 3px; }}
 table.vt th abbr {{ text-decoration: underline dotted {INK_2}; cursor: help; }}
 .sc {{ display: flex; align-items: center; gap: 8px; }}
 .sc .track {{ flex: 1; height: 7px; background: {MUTED_BG}; border-radius: 4px; overflow: hidden; min-width: 40px; }}
@@ -233,9 +237,19 @@ def pill(text, cls):
     return f'<span class="pill {cls}">{text}</span>'
 
 
-def header(title, purpose):
-    st.title(title)
-    st.markdown(f'<p class="purpose">{purpose}</p>', unsafe_allow_html=True)
+def header(title, purpose, action=None):
+    """Page title, one line of purpose, and (optionally) the one obvious next action as a button on the right."""
+    page = st.session_state.get("_pages", {}).get(action[0]) if action else None
+    if page is None:
+        st.title(title)
+        st.markdown(f'<p class="purpose">{purpose}</p>', unsafe_allow_html=True)
+        return
+    left, right = st.columns([5, 1.5], vertical_alignment="center")
+    with left:
+        st.title(title)
+        st.markdown(f'<p class="purpose">{purpose}</p>', unsafe_allow_html=True)
+    if right.button(action[1], type="primary", icon=":material/arrow_forward:", width="stretch", key=f"hdr_{action[0]}"):
+        st.switch_page(page)
 
 
 def get_state(refresh=False) -> State:
@@ -339,7 +353,8 @@ def _blockers(s, v) -> tuple[str, str]:
 def page_board():
     s = get_state()
     header("Corrugated packaging, FY27 annual contract",
-           f"Deccan Peak Breweries, Waluj · {config.RFX_ID} · 30 items · bids closed 7 Oct 2026")
+           f"Deccan Peak Breweries, Waluj · {config.RFX_ID} · 30 items · bids closed 7 Oct 2026",
+           action=("compare", "Open comparison") if s.ready() and not s.missing_extractions() else None)
     key_notice()
     missing = s.missing_extractions()
     if missing:
@@ -406,7 +421,7 @@ def page_board():
         who = ", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]
         n_sup = len(unlocked["by_vendor"])
         cap_txt = (f" {', '.join(short(s.vendor_names[v]) for v in capability)} fail on capability, which no document fixes." if capability else "")
-        st.markdown(f"""<div class="nba"><div class="nba-k">Biggest opportunity</div>
+        st.markdown(f"""<div class="nba"><div class="nba-k">Next step · biggest opportunity</div>
             <div class="nba-t">Get {E(who)}'s missing documents: {money(gain)} lower award{' and a second supplier' if n_sup > len(res['by_vendor']) else ''}</div>
             <div class="nba-s">Same quotes, {money(unlocked['total'])} across {n_sup} vendor{'s' if n_sup != 1 else ''}.{E(cap_txt)}</div></div>""",
                     unsafe_allow_html=True)
@@ -452,7 +467,12 @@ def page_board():
                     f'<ol class="todo">{items}</ol>{more}</div>', unsafe_allow_html=True)
 
     # ---------------- vendors
-    st.subheader("Vendors")
+    n_items = len({n.line_id for n in s.norms}) or 30
+    fmts = set()
+    for ex in s.extractions.values():
+        k = {FORMAT.get("." + f.split(".")[-1].lower(), "Email") for f in ex.get("_meta", {}).get("files", [])}
+        fmts |= (k - {"Email"}) or k                                   # email counts only when it is the whole reply
+    st.subheader(f"Vendors: {len(fmts)} formats, one view" if len(fmts) > 1 else "Vendors")
     vrows = []
     for v, ex in s.extractions.items():
         lbl, cls = STATUS.get(s.status[v], ("Unknown", "muted"))
@@ -462,11 +482,15 @@ def page_board():
         won = res["by_vendor"].get(s.vendor_names[v], {"lines": 0, "value": 0})
         fmt = ", ".join(sorted({FORMAT.get("." + f.split(".")[-1].lower(), "Email") for f in ex.get("_meta", {}).get("files", [])}))
         short_b, full_b = _blockers(s, v) if s.status[v] not in ("pass", "include") else ("", "")
-        sub = " · ".join(x for x in [f"{30 - quoted} not quoted" if quoted < 30 else "", f"{conf} to confirm" if conf else ""] if x)
+        sub = " · ".join(x for x in [f"{n_items - quoted} not quoted" if quoted < n_items else "", f"{conf} to confirm" if conf else ""] if x)
+        kinds = [f for f in fmt.split(", ") if f]
+        kinds = [f for f in kinds if f != "Email"] or kinds          # the email is only a cover note when files came with it
+        tags = "".join(f'<span class="fmt">{E(f)}</span>' for f in kinds)
         vrows.append(f"""<tr><td><span class="dot" style="background:{color[v]}"></span><b>{E(s.vendor_names[v])}</b>
-            <div class="sub">{E(place(ex.get('vendor_location')))}{' · ' + fmt if fmt else ''}</div></td>
+            <div class="sub">{E(place(ex.get('vendor_location')))}{tags}</div></td>
             <td>{pill(lbl, cls)}</td>
-            <td class="n"><b>{quoted}</b> of 30{f'<div class="sub">{sub}</div>' if sub else ''}</td>
+            <td class="n"><b>{quoted}</b> of {n_items}<div class="cov"><div style="width:{quoted / n_items * 100:.0f}%;background:{color[v]}"></div></div>
+            {f'<div class="sub">{sub}</div>' if sub else ''}</td>
             <td class="n">{won['lines'] or '–'}</td>
             <td class="n">{money(won['value']) if won['lines'] else '–'}</td>
             <td class="why" title="{E(full_b)}">{E(short_b) or '–'}</td></tr>""")
@@ -515,7 +539,7 @@ def _saved_results():
 # ================================================================== Draft RFQ
 def page_draft():
     from core import copilot
-    header("Draft the RFQ", "Say what you need; the co-pilot drafts items, questionnaire and terms.")
+    header("Draft the RFQ", "Say what you need; the co-pilot drafts items, questionnaire and terms.", action=("replies", "See replies"))
     key_notice()
     if "draft" not in st.session_state:
         st.session_state.draft, st.session_state.draft_hist, st.session_state.draft_chat = copilot.new_draft(), [], []
@@ -650,7 +674,7 @@ def _pdf_pages(path: str, resolution: int, mtime: float) -> list[bytes]:
 def page_replies():
     from core import readers
     s = get_state()
-    header("Vendor replies", "What each vendor sent, next to what was read from it.")
+    header("Vendor replies", "What each vendor sent, next to what was read from it.", action=("compare", "Open comparison"))
     key_notice()
     with st.expander(f"Inbox: {len(vendor_dirs())} replies to {config.RFX_ID}", expanded=not s.ready()):
         _reply_tracker(s, key="replies")
@@ -831,7 +855,8 @@ def page_replies():
 # ================================================================== Comparison
 def page_compare():
     s = get_state()
-    header("Comparison", "Every price in ₹ per unit, without GST, delivered to Waluj. Click any price to see where it came from.")
+    header("Comparison", "Every price in ₹ per unit, without GST, delivered to Waluj. Click any price to see where it came from.",
+           action=("issues", "Open issues"))
     if not s.ready():
         need_replies(); return
     lines = extract.load_rfx_lines()
@@ -1248,7 +1273,7 @@ def _issue_card(s, i, compact=False):
 
 def page_issues():
     s = get_state()
-    header("Open issues", "Every uncertainty, ranked by how much money it can move.")
+    header("Open issues", "Every uncertainty, ranked by how much money it can move.", action=("memo", "Award and approvals"))
     if not s.ready():
         need_replies(); return
     issues = s.issues()
@@ -1285,7 +1310,7 @@ SUGGESTED = [
 def page_ask():
     from core.analyst import Analyst
     s = get_state()
-    header("Ask a question", "Answers come from the data, with every step shown.")
+    header("Ask a question", "Answers come from the data, with every step shown.", action=("memo", "Award and approvals"))
     key_notice()
     if not s.ready():
         need_replies(); return
@@ -1380,7 +1405,7 @@ def _render_outputs(outs):
 def page_memo():
     from core.memo import write_memo, memo_workbook
     s = get_state()
-    header("Award and approvals", "Write the memo, get sign-off, download the audit trail.")
+    header("Award and approvals", "Write the memo, get sign-off, download the audit trail.", action=("board", "Decision board"))
     key_notice()
     if not s.ready():
         need_replies(); return
