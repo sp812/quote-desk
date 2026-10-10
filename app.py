@@ -4,6 +4,7 @@ Interface only. All logic lives in core/ (the AI reads, code does the arithmetic
 from __future__ import annotations
 import json
 import os
+import re
 from html import escape as E  # vendor- and AI-supplied text goes into HTML: always escape it
 
 import pandas as pd
@@ -338,8 +339,7 @@ def _blockers(s, v) -> tuple[str, str]:
 def page_board():
     s = get_state()
     header("Corrugated packaging, FY27 annual contract",
-           f"Deccan Peak Breweries, Waluj · {config.RFX_ID} · 30 items · bids closed 7 Oct 2026. "
-           "The AI reads every reply, code does the arithmetic, you decide.")
+           f"Deccan Peak Breweries, Waluj · {config.RFX_ID} · 30 items · bids closed 7 Oct 2026")
     key_notice()
     missing = s.missing_extractions()
     if missing:
@@ -384,16 +384,16 @@ def page_board():
         state_txt, state_cls = "Ready for sign-off", "good"
     else:
         state_txt, state_cls = "Approved by all reviewers", "good"
-    st.markdown(f'<div class="statusrow">{pill(state_txt, state_cls)}<span>{len(s.extractions)} of {len(vendor_dirs())} replies read</span>'
-                f'<span>{30 - len(res["uncovered_lines"])} of 30 items have a qualified price</span></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="statusrow">{pill(state_txt, state_cls)}<span>{len(s.extractions)} of {len(vendor_dirs())} replies read</span></div>',
+                unsafe_allow_html=True)
 
     # ---------------- four numbers
     sav = res["savings_vs_fy26"] if res["fy26_comparable_base"] else None
     tiles = [
         ("Recommended award", money(res["total"]) if res["total"] else "–", "a year, landed, ex-GST" if res["total"] else "no qualified vendor yet",
          (f'<span class="delta {"up" if sav < 0 else "down"}">{"↑" if sav < 0 else "↓"} {money(abs(sav))} vs last year</span>' if sav else "")),
-        ("Qualified vendors", f"{qual} of {len(s.extractions)}", "passed the quality questionnaire", ""),
-        ("Open items", str(len(hot)), f"can change the award; the largest is worth {money(stake)}" if hot else "nothing changes the award", ""),
+        ("Qualified vendors", f"{qual} of {len(s.extractions)}", "passed quality checks", ""),
+        ("Open items", str(len(hot)), f"largest worth {money(stake)}" if hot else "none change the award", ""),
         ("Sign-off", f"{signed} of {len(rs)}", "Quality, Logistics, Finance, VP", ""),
     ]
     st.markdown('<div class="kpis">' + "".join(
@@ -405,14 +405,11 @@ def page_board():
         names = [short(s.vendor_names[v]) for v in fixable]
         who = ", ".join(names[:-1]) + " and " + names[-1] if len(names) > 1 else names[0]
         n_sup = len(unlocked["by_vendor"])
-        risk = (f"; {short(unlocked['top_vendor'])} would still hold {unlocked['top_share']:.0%} of spend" if unlocked.get("top_share", 0) > 0.7
-                else "" )
-        cap_txt = (f" {', '.join(short(s.vendor_names[v]) for v in capability)} fail on capability (test lab, rejection rate, lead time): "
-                   f"no document fixes that, so they stay out unless you record a waiver." if capability else "")
+        cap_txt = (f" {', '.join(short(s.vendor_names[v]) for v in capability)} fail on capability, which no document fixes." if capability else "")
         st.markdown(f"""<div class="nba"><div class="nba-k">Biggest opportunity</div>
             <div class="nba-t">Get {E(who)}'s missing documents: {money(gain)} lower award{' and a second supplier' if n_sup > len(res['by_vendor']) else ''}</div>
-            <div class="nba-s">The prices are already read. With {E(who)} qualified, the same quotes give {money(unlocked['total'])} across {n_sup}
-            vendor{'s' if n_sup != 1 else ''} instead of {money(res['total'])}{E(risk)}.{E(cap_txt)}</div></div>""", unsafe_allow_html=True)
+            <div class="nba-s">Same quotes, {money(unlocked['total'])} across {n_sup} vendor{'s' if n_sup != 1 else ''}.{E(cap_txt)}</div></div>""",
+                    unsafe_allow_html=True)
         _link("issues", "Ask for the documents in Open issues")
     elif hot:
         top = hot[0]
@@ -434,8 +431,7 @@ def page_board():
                        for n, d in rows) if res["total"] else '<div class="small">No qualified vendor yet.</div>'
         warn = ""
         if res.get("top_share", 0) > 0.7:
-            warn = (f'<div class="warn-line">{E(short(res["top_vendor"]))} would hold {res["top_share"]:.0%} of spend: '
-                    f'one plant outage stops the brewery\'s packaging in peak season.</div>')
+            warn = f'<div class="warn-line">{E(short(res["top_vendor"]))} holds {res["top_share"]:.0%} of spend: a single-supplier risk.</div>'
         alt = ""
         if gain > 0:
             seg = "".join(f'<div title="{E(n)}: {money(d["value"])}" style="width:{d["value"] / unlocked["total"] * 100:.1f}%;background:{color[name_to_key[n]]}"></div>'
@@ -445,14 +441,14 @@ def page_board():
                          for n, d in sorted(unlocked["by_vendor"].items(), key=lambda kv: -kv[1]["value"]))
             alt = (f'<div class="panel-h" style="margin-top:16px;font-size:.95rem">With the missing documents: {money(unlocked["total"])}</div>'
                    f'<div class="stack">{seg}</div><div class="spct" style="margin-top:8px">{lg}</div>')
-        st.markdown(f'<div class="panel"><div class="panel-h">Award split</div><div class="panel-s">Cheapest qualified, on-spec landed price per item</div>'
+        st.markdown(f'<div class="panel"><div class="panel-h">Award split</div>'
                     f'{body}{warn}{alt}</div>', unsafe_allow_html=True)
     with right:
         items = "".join(f'<li><div class="it">{E(issue_headline(i))}</div><div class="iv">{money(_stake(i)[0])} · '
-                        f'{"changes the winner on " + str(len(i["lines_flipping"])) + (" item" if len(i["lines_flipping"]) == 1 else " items") if i["lines_flipping"] else "assumption to confirm"}</div></li>'
+                        f'{str(len(i["lines_flipping"])) + (" item" if len(i["lines_flipping"]) == 1 else " items") if i["lines_flipping"] else "to confirm"}</div></li>'
                         for i in hot[:4]) or '<li><div class="it">Nothing open changes the award</div></li>'
         more = f'<div class="meta">+{len(hot) - 4} more in Open issues</div>' if len(hot) > 4 else ""
-        st.markdown(f'<div class="panel"><div class="panel-h">Before you approve</div><div class="panel-s">Ranked by the money each can move</div>'
+        st.markdown(f'<div class="panel"><div class="panel-h">Before you approve</div>'
                     f'<ol class="todo">{items}</ol>{more}</div>', unsafe_allow_html=True)
 
     # ---------------- vendors
@@ -1073,7 +1069,7 @@ def _verdict(s, n) -> str:
     warns = [f.text for f in n.flags if f.severity == "warn"]
     if warns:
         return box("check", "Usable, with an assumption to know:", warns[0])
-    return box("good", "Read clearly and used as is.", "Every step from the vendor's words to this price is listed below.")
+    return box("good", "Read clearly and used as is.", "")
 
 
 def _evidence(s, n):
@@ -1150,7 +1146,7 @@ def _stake(i):
         return i["newly_covered_value"], f"of spend on {len(i['newly_covered'])} lines with no qualified quote today"
     if i["kind"] == "eligibility":
         if i["award_swing"] > 0:
-            return i["award_swing"], "lower award cost if this vendor qualifies"
+            return i["award_swing"], "lower award if they qualify"
         if i["award_swing"] < 0:
             return -i["award_swing"], "higher award cost if this vendor qualifies (volume-discount effect)"
         return 0, "no change in award cost if this vendor qualifies"
@@ -1168,14 +1164,21 @@ def _issue_card(s, i, compact=False):
     cls = "stopper" if stopper else ("" if i["decision_relevant"] else "quiet")
     stake, stake_lbl = _stake(i)
     flips = i["lines_flipping"]
-    flip_txt = (f"Changes L1 on {len(flips)} line{'s' if len(flips) != 1 else ''}" if flips else "Doesn't change L1 on any line")
-    detail = i["title"] if i["kind"] != "eligibility" else i["title"].split(". ", 1)[-1]
+    if i["kind"] == "eligibility":
+        short_b, full = _blockers(s, i["vendor"])
+        detail = (f"Missing: {short_b}. " if short_b else "") + (f"Would win {len(i['lines'])} item{'s' if len(i['lines']) != 1 else ''}." if i["lines"] else "")
+    else:
+        full = i["title"]
+        first = re.split(r"(?<=[.;])\s", i["title"], maxsplit=1)[0]
+        detail = first + (f" Changes the winner on {len(flips)} item{'s' if len(flips) != 1 else ''}." if flips else "")
     st.markdown(f"""<div class="issue {cls}"><div class="head">{E(issue_headline(i))}</div>
         <div><span class="stake">{money(stake)}</span> <span class="stake-l">{stake_lbl}</span></div>
-        <div class="detail">{E(detail)}</div>
-        <div class="detail">{flip_txt}{'. ' + E(i['detail']) if i.get('detail') else ''}.</div></div>""", unsafe_allow_html=True)
+        <div class="detail">{E(detail)}</div></div>""", unsafe_allow_html=True)
     if compact:
         return
+    if full and full.strip() != detail.strip():
+        with st.expander("Why"):
+            st.markdown("\n".join(f"- {E(x.strip())}" for x in re.split(r"\n|;\s(?=Q\d)", full) if x.strip()), unsafe_allow_html=True)
     if i.get("cascade_lines") and i.get("discount_effect"):
         st.markdown(f"Knock-on effect: under one reading a vendor's volume discount switches on or off, which moves "
                     f"{len(i['cascade_lines'])} other lines ({', '.join(i['cascade_lines'])}).")
@@ -1185,54 +1188,53 @@ def _issue_card(s, i, compact=False):
                                 "Volume discounts": ", ".join(f"{short(s.vendor_names.get(d['vendor'], d['vendor']))} {d['percent']:g}%"
                                                               for d in o["discounts"]) or "none"} for o in i["outcomes"]]))
     dec = load_decisions()
-    c1, c2 = st.columns(2)
-    with c1:
-        if i.get("resolvable") and i.get("outcomes"):
-            opts = {o["label"]: o["index"] for o in i["outcomes"]}
-            choice = st.selectbox("Vendor confirmed the value as", ["Not confirmed yet"] + list(opts), key=f"ch_{i['id']}")
-            if choice != "Not confirmed yet" and st.button("Use this value", key=f"ap_{i['id']}", type="primary"):
-                dec.setdefault("choices", {})[i["id"]] = opts[choice]
-                log(dec, "value confirmed", f"{i['vendor_name']}: {issue_headline(i)} -> {choice}")
-                refresh(); st.rerun()
-        if i["kind"] == "fx" and not i.get("held_out"):
-            cur = float(dec.get("usd_inr") or config.USD_INR)
-            rate = st.number_input("USD rate to use (₹ per USD)", min_value=1.0, max_value=500.0, value=cur, step=0.1, key=f"fx_{i['id']}",
-                                   help=f"Reference rate {config.USD_INR} ({config.USD_INR_SOURCE}). Every USD price and the award are recalculated.")
-            b1, b2 = st.columns(2)
-            if b1.button("Use this rate", key=f"fxb_{i['id']}", disabled=rate == cur):
-                dec["usd_inr"] = rate
-                log(dec, "FX rate set", f"USD prices now converted at {rate:g} (reference {config.USD_INR})")
-                refresh(); st.rerun()
-            if dec.get("usd_inr") and b2.button("Back to the reference rate", key=f"fxr_{i['id']}"):
-                dec.pop("usd_inr")
-                log(dec, "FX rate reset", f"Back to the reference rate {config.USD_INR}")
-                refresh(); st.rerun()
-        if i.get("acceptable"):
-            spec = i["kind"] == "spec"
-            why = st.text_input("Why the substitute is acceptable (saved to the decision log)" if spec else
-                                "Why this price is right (saved to the decision log)", key=f"ac_{i['id']}",
-                                placeholder="e.g. Quality approved 120 GSM after a BCT test" if spec else "e.g. vendor confirmed in writing on 9 Oct")
-            if st.button("Accept the lower spec" if spec else "Accept this price", key=f"acb_{i['id']}", disabled=not why):
-                dec.setdefault("accepted", {})[i["id"]] = why
-                log(dec, "price accepted", f"{i['vendor_name']}: {issue_headline(i)} ({why})")
-                refresh(); st.rerun()
-        if i["kind"] == "eligibility":
-            reason = st.text_input("Reason for including (saved to the decision log)", key=f"rs_{i['id']}",
-                                   placeholder="e.g. renewed ISO certificate received")
-            if st.button("Include in the award", key=f"in_{i['id']}", disabled=not reason):
+    c1, c2, c3 = st.columns([5, 2, 2], vertical_alignment="bottom")
+    key = i["id"]
+    if i.get("resolvable") and i.get("outcomes"):
+        opts = {o["label"]: o["index"] for o in i["outcomes"]}
+        choice = c1.selectbox("Vendor confirmed it as", ["Not confirmed yet"] + list(opts), key=f"ch_{key}")
+        if c2.button("Use this value", key=f"ap_{key}", type="primary", disabled=choice == "Not confirmed yet"):
+            dec.setdefault("choices", {})[key] = opts[choice]
+            log(dec, "value confirmed", f"{i['vendor_name']}: {issue_headline(i)} -> {choice}")
+            refresh(); st.rerun()
+    elif i["kind"] == "fx" and not i.get("held_out"):
+        cur = float(dec.get("usd_inr") or config.USD_INR)
+        rate = c1.number_input("USD rate (₹ per USD)", min_value=1.0, max_value=500.0, value=cur, step=0.1, key=f"fx_{key}",
+                               help=f"Reference {config.USD_INR} ({config.USD_INR_SOURCE}). Every USD price and the award follow.")
+        if c2.button("Use this rate", key=f"fxb_{key}", disabled=rate == cur):
+            dec["usd_inr"] = rate
+            log(dec, "FX rate set", f"USD prices now converted at {rate:g} (reference {config.USD_INR})")
+            refresh(); st.rerun()
+        if dec.get("usd_inr") and c3.button("Reset rate", key=f"fxr_{key}"):
+            dec.pop("usd_inr")
+            log(dec, "FX rate reset", f"Back to the reference rate {config.USD_INR}")
+            refresh(); st.rerun()
+    elif i.get("acceptable") or i["kind"] == "eligibility":
+        spec, elig = i["kind"] == "spec", i["kind"] == "eligibility"
+        why = c1.text_input("Reason (saved to the log)", key=f"rs_{key}", label_visibility="collapsed",
+                            placeholder=("Reason to include, e.g. renewed ISO certificate received" if elig else
+                                         "Reason, e.g. Quality approved 120 GSM after a BCT test" if spec else
+                                         "Reason, e.g. vendor confirmed in writing on 9 Oct"))
+        label = "Include" if elig else "Accept spec" if spec else "Accept price"
+        if c2.button(label, key=f"in_{key}", disabled=not why, help="Saved to the decision log with your reason"):
+            if elig:
                 dec.setdefault("eligibility", {})[i["vendor"]] = "include"
-                log(dec, "vendor included", f"{i['vendor_name']}: {reason}")
-                refresh(); st.rerun()
-    with c2:
-        if st.button("Draft an email to the vendor", key=f"cl_{i['id']}", disabled=not api_key_present()):
+                log(dec, "vendor included", f"{i['vendor_name']}: {why}")
+            else:
+                dec.setdefault("accepted", {})[key] = why
+                log(dec, "price accepted" if not spec else "substitute accepted", f"{i['vendor_name']}: {issue_headline(i)} ({why})")
+            refresh(); st.rerun()
+    if not (i["kind"] == "fx" and dec.get("usd_inr")):
+        if c3.button("Email vendor", key=f"cl_{key}", disabled=not api_key_present(), help="Drafts a clarification email for you to send"):
             from core.memo import draft_clarification
             with st.spinner("Drafting"):
                 mail = ai(draft_clarification, i, s)
             if mail:
-                st.session_state[f"mail_{i['id']}"] = mail
+                st.session_state[f"mail_{key}"] = mail
                 log(dec, "clarification drafted", f"{i['vendor_name']}: {issue_headline(i)}")
     if st.session_state.get(f"mail_{i['id']}"):
         st.text_area("Email draft: copy, edit and send", st.session_state[f"mail_{i['id']}"], height=230, key=f"ta_{i['id']}")
+    st.write("")
 
 
 def page_issues():
@@ -1262,13 +1264,12 @@ def page_issues():
 
 # ================================================================== Ask a question
 SUGGESTED = [
-    ("The VP's question", "What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?"),
-    ("Supply security", "No vendor should hold more than 70% of our spend. What would that split cost, and what would L1 matching save?"),
-    ("Test an unreadable value", "If Godavari's blurred 5-ply rate is 62.50 instead of 68.50, what changes in the award?"),
-    ("Cheap but risky", "Nordvik is cheapest on the Classic 650 shipper. What would it take to award them, and what's the risk?"),
-    ("Payment terms", "Nordvik offers 90 days credit and Godavari 30. At a 10% cost of capital, does that change who is really cheapest?"),
-    ("Overall ranking", "Rank the vendors on price, quality, delivery and terms. Does the strongest vendor overall match the "
-                        "cheapest-per-line award? Chart it and export the ranking to Excel."),
+    ("The VP's question", "Split it cheapest per line, but only among vendors who cleared the quality questionnaire?"),
+    ("Supply risk", "No vendor above 70% of spend: what does that cost, and what would L1 matching save?"),
+    ("A blurred price", "If Godavari's blurred 5-ply rate is 62.50, not 68.50, what changes?"),
+    ("Cheap but risky", "Nordvik is cheapest on the Classic 650 shipper. What would it take to award them?"),
+    ("Payment terms", "At 10% cost of capital, do 90 vs 30 days' payment change who is cheapest?"),
+    ("Ranking", "Rank the vendors on price, quality, delivery and terms, as a chart, and export it."),
 ]
 
 
@@ -1403,7 +1404,7 @@ def page_memo():
 def _validation(s, res):
     from core import review
     st.subheader("2. Stakeholder validation")
-    st.caption("Each reviewer gets a checklist built from the award. Sending is simulated; their answers are logged.")
+    st.caption("Sending is simulated; answers are logged.")
     dec = load_decisions()
     rs = review.status(dec)
     asks = review.asks(s)
@@ -1417,7 +1418,7 @@ def _validation(s, res):
             said = f'<div class="small">“{E(r["note"])}”</div>' if r.get("note") and r["status"] in ("approved", "changes") else ""
             st.markdown(f'<div class="rev"><div class="who">{meta["person"]} {pill(review.STATUS[r["status"]], cls)}'
                         f'{" " + pill("award changed since", "check") if stale else ""}</div>'
-                        f'<div class="role">{meta["role"]}: {meta["why"]}</div><ul>{items}</ul>'
+                        f'<div class="role">{meta["role"]}</div><ul>{items}</ul>'
                         f'{said}'
                         f'</div>', unsafe_allow_html=True)
             if r["status"] in ("requested", "changes") or stale:
