@@ -166,6 +166,10 @@ table.vt td.why {{ color: {INK_2}; font-size: .86rem; max-width: 340px; }}
 .sname {{ font-weight: 600; color: {INK}; font-size: .95rem; white-space: nowrap; }}
 .sbar {{ height: 12px; background: {MUTED_BG}; border-radius: 6px; overflow: hidden; }} .sbar div {{ height: 100%; border-radius: 6px; }}
 .sval {{ text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; color: {INK}; }}
+.verdict {{ border-radius: 8px; padding: 10px 14px; margin: 6px 0 14px 0; font-size: .95rem; }}
+.verdict.good {{ background: {GOOD_BG}; color: {GOOD}; }} .verdict.check {{ background: {CHECK_BG}; color: {CHECK}; }}
+.verdict.stop {{ background: {STOP_BG}; color: {STOP}; }} .verdict.muted {{ background: {MUTED_BG}; color: {MUTED}; }}
+.verdict b {{ color: inherit; }}
 .stack {{ display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 8px; background: {MUTED_BG}; }}
 .stack div {{ height: 100%; border-right: 2px solid {CARD}; }}
 .spct {{ grid-column: 2 / 4; color: {INK_2}; font-size: .8rem; }}
@@ -575,8 +579,7 @@ def page_draft():
     if st.session_state.get("sent"):
         st.subheader("Replies")
         _reply_tracker(get_state(), key="draft")
-
-
+    _next("replies", "Next: see the replies as they arrive")
 
 FORMAT = {".xlsx": "Excel", ".xlsm": "Excel", ".pdf": "PDF", ".docx": "Word", ".jpg": "Photo", ".jpeg": "Photo", ".png": "Photo"}
 
@@ -818,48 +821,57 @@ def page_replies():
                     f.unlink()
                 log(load_decisions(), "vendor removed", s.vendor_names.get(rm, rm))
                 refresh(); st.rerun()
-
+    _next("compare", "Next: compare all vendors like for like")
 
 # ================================================================== Comparison
 def page_compare():
     s = get_state()
-    header("Comparison", "Every price in ₹ per unit, ex-GST, delivered to Waluj.")
+    header("Comparison", "Every price in ₹ per unit, without GST, delivered to Waluj. Click any price to see where it came from.")
     if not s.ready():
         need_replies(); return
     lines = extract.load_rfx_lines()
     vendors = list(s.extractions)
     by = {(n.vendor, n.line_id): n for n in s.norms}
-    tab_p, tab_s, tab_q = st.tabs(["Prices by item", "Vendor scorecard", "Questionnaire, terms and documents"])
+    tab_p, tab_s, tab_q = st.tabs(["Prices", "Vendor scorecard", "Questionnaire, terms and documents"])
     with tab_p:
-        data = _price_table(s, lines, vendors, by)
+        data, picked = _price_table(s, lines, vendors, by)
+        if data:
+            v, lid = picked
+            st.markdown(f'<div class="panel-h" style="margin-top:14px">Where this price came from</div>', unsafe_allow_html=True)
+            _evidence(s, by.get((v, lid)))
+            with st.expander("Or pick an item and vendor"):
+                c1, c2 = st.columns(2)
+                lid2 = c1.selectbox("Item", [l["line_id"] for l in lines], index=[l["line_id"] for l in lines].index(lid),
+                                    format_func=lambda x: f"{x} · {next(l['description'] for l in lines if l['line_id'] == x)}", key="ev_line")
+                v2 = c2.selectbox("Vendor", vendors, index=vendors.index(v), format_func=lambda k: s.vendor_names[k], key="ev_vendor")
+                if (v2, lid2) != (v, lid):
+                    st.session_state["_picked"] = (v2, lid2); st.rerun()
     with tab_s:
         _scorecard(s)
     with tab_q:
         _vendor_summary(s, vendors)
     if data:
         st.download_button("Download Excel", _comparison_xlsx(s, pd.DataFrame(data)), file_name="comparison.xlsx",
-                           help="Prices, scorecard, questionnaire and terms in one workbook")
-    st.subheader("How was this number worked out?")
-    c1, c2 = st.columns(2)
-    lid = c1.selectbox("Line", [l["line_id"] for l in lines], format_func=lambda x: f"{x} · {next(l['description'] for l in lines if l['line_id'] == x)}")
-    v = c2.selectbox("Vendor", vendors, format_func=lambda k: s.vendor_names[k])
-    _evidence(s, by.get((v, lid)))
+                           help="Prices with their status, scorecard, questionnaire and terms in one workbook")
+    _next("issues", "Next: resolve what could change the award")
 
 
 def _price_table(s, lines, vendors, by):
+    """The comparison grid. Returns the rows and the (vendor, item) whose evidence to show: the clicked cell,
+    or the awarded price on the first item."""
     res = s.award()
     won = {r["line_id"]: r for r in res["rows"]}
     disc = {d["vendor"]: d["percent"] for d in res["discounts_applied"]}
     c1, c2 = st.columns([3, 2])
-    view = c1.segmented_control("Show", ["All lines", "Lines to confirm", "Lines without a qualified quote"], default="All lines",
-                                label_visibility="collapsed") or "All lines"
+    view = c1.segmented_control("Show", ["All items", "Items to check", "Items with no qualified price"], default="All items",
+                                label_visibility="collapsed") or "All items"
     only_q = c2.toggle("Only qualified vendors", value=False)
     disc_note = (f'<span>† after {", ".join(f"{short(s.vendor_names.get(v, v))} {p:g}%" for v, p in disc.items())} volume discount</span>'
                  if disc else "")
-    st.markdown(f"""<div class="legend"><span><span class="l1">L1</span> <span class="sw" style="background:#DCEFE4"></span>awarded: cheapest qualified, on-spec</span>
-        <span><span class="sw" style="background:{CHECK_BG}"></span>unclear reading (higher one used)</span>
-        <span><span class="sw" style="background:{STOP_BG}"></span>lower spec</span>
-        <span>– not quoted</span><span>? price unusable</span><span>⚑ held out until confirmed</span><span>* not qualified yet</span>{disc_note}</div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="legend"><span><span class="sw" style="background:#DCEFE4"></span>Awarded</span>
+        <span><span class="sw" style="background:{CHECK_BG}"></span>Needs your check</span>
+        <span><span class="sw" style="background:{STOP_BG}"></span>Lower spec than asked</span>
+        <span>– Not quoted</span><span>* Vendor not qualified</span>{disc_note}</div>""", unsafe_allow_html=True)
     shown = [v for v in vendors if (not only_q or v in s.eligible)]
     colname = {v: short(s.vendor_names[v]) + ("" if v in s.eligible else " *") for v in shown}
     data, style = [], []
@@ -867,43 +879,59 @@ def _price_table(s, lines, vendors, by):
         lid = l["line_id"]
         w = won.get(lid) or {}
         best_v = w.get("vendor")
-        any_review = any(by.get((v, lid)) and by[(v, lid)].status == "review" for v in vendors)
-        if view == "Lines to confirm" and not any_review:
+        needs_check = any(by.get((v, lid)) and (by[(v, lid)].status == "review" or not by[(v, lid)].awardable) for v in vendors)
+        if view == "Items to check" and not needs_check:
             continue
-        if view == "Lines without a qualified quote" and best_v is not None:
+        if view == "Items with no qualified price" and best_v is not None:
             continue
-        row = {"Line": lid, "Item": l["description"], "Annual qty": f"{int(l['annual_qty']):,}",
-               "Awarded (L1)": (f"{short(w['vendor_name'])} ₹{w['unit_price']:,.2f}{' †' if best_v in disc else ''}" if best_v
-                      else "No qualified quote")}
-        srow = {"Awarded (L1)": f"color:{KRAFT}; font-weight:600" if best_v else f"color:{STOP}"}
+        row = {"Item": lid, "Description": l["description"], "Qty / year": f"{int(l['annual_qty']):,}",
+               "Awarded to": (f"{short(w['vendor_name'])} ₹{w['unit_price']:,.2f}{' †' if best_v in disc else ''}" if best_v
+                              else "No qualified price")}
+        srow = {"Awarded to": f"color:{KRAFT}; font-weight:600" if best_v else f"color:{STOP}"}
         for v in shown:
             n = by.get((v, lid))
-            row[colname[v]] = (f"{n.landed:,.2f}" + ("" if n.awardable else " ⚑") if (n and n.landed is not None and n.status != "missing")
-                               else "?" if (n and n.status == "review") else "–")
+            priced = n is not None and n.status != "missing" and n.landed is not None
+            row[colname[v]] = f"{n.landed:,.2f}" if priced else ("check" if (n and n.status == "review") else "–")
             css = ""
             if n is None or n.status == "missing":
                 css = f"color:{MUTED}"
-            elif n.landed is None or not n.awardable:
+            elif n.landed is None or not n.awardable or n.status == "review":
                 css = f"background-color:{CHECK_BG}; color:{CHECK}"
-            elif not n.spec_compliant:
+            elif not n.spec_compliant and not n.spec_accepted:
                 css = f"background-color:{STOP_BG}; color:{STOP}"
-            elif n.status == "review":
-                css = f"background-color:{CHECK_BG}"
             if v == best_v:
                 css = "background-color:#DCEFE4; font-weight:700"
             srow[colname[v]] = css
         data.append(row); style.append(srow)
+    default = (won.get(lines[0]["line_id"], {}).get("vendor") or vendors[0], lines[0]["line_id"])
     if not data:
-        st.success("No lines match this filter.")
-        return data
+        st.success("No items match this filter.")
+        return data, st.session_state.get("_picked", default)
     df = pd.DataFrame(data)
     sty = df.style.apply(lambda _: pd.DataFrame([{**{c: "" for c in df.columns}, **r} for r in style], columns=df.columns), axis=None) \
-        .set_properties(subset=[colname[v] for v in shown] + ["Annual qty"], **{"text-align": "right"})
-    st.dataframe(sty, hide_index=True, width="stretch", height=min(35 * (len(df) + 1) + 3, 1150),
-                 column_config={colname[v]: st.column_config.Column(width="small") for v in shown} |
-                 {"Line": st.column_config.Column(width=48), "Item": st.column_config.Column(width="medium"),
-                  "Annual qty": st.column_config.Column(width="small"), "Awarded (L1)": st.column_config.Column(width="medium")})
-    return data
+        .set_properties(subset=[colname[v] for v in shown] + ["Qty / year"], **{"text-align": "right"})
+    ev = st.dataframe(sty, hide_index=True, width="stretch", height=min(35 * (len(df) + 1) + 3, 528), key="cmp_grid",
+                      on_select="rerun", selection_mode="single-cell",
+                      column_config={colname[v]: st.column_config.Column(width="small") for v in shown} |
+                      {"Item": st.column_config.Column(width=52), "Description": st.column_config.Column(width="medium"),
+                       "Qty / year": st.column_config.Column(width="small"), "Awarded to": st.column_config.Column(width="medium")})
+    cells = (ev.selection.get("cells") if ev and getattr(ev, "selection", None) else None) or []
+    if cells:
+        r_i, col = cells[0][0], cells[0][1]
+        if 0 <= r_i < len(data):
+            lid = data[r_i]["Item"]
+            inv = {c: v for v, c in colname.items()}
+            v = inv.get(col) or (won.get(lid, {}).get("vendor")) or st.session_state.get("_picked", default)[0]
+            st.session_state["_picked"] = (v, lid)
+    return data, st.session_state.get("_picked", default)
+
+
+def _next(page_key, label):
+    """One obvious way forward at the end of every page."""
+    st.write("")
+    page = st.session_state.get("_pages", {}).get(page_key)
+    if page is not None:
+        st.page_link(page, label=label, icon=":material/arrow_forward:")
 
 
 def _scorecard(s):
@@ -1023,11 +1051,37 @@ def _comparison_xlsx(s, prices: pd.DataFrame) -> bytes:
     return buf.getvalue()
 
 
+def _verdict(s, n) -> str:
+    """One plain sentence a buyer can act on: can this price be used as it is, and if not, what to do."""
+    def box(cls, head, body):
+        return f'<div class="verdict {cls}"><b>{head}</b> {E(body)}</div>'
+    crit = [f for f in n.flags if f.severity == "critical"]
+    if n.status == "missing":
+        return box("muted", "Not quoted.", "Never filled in or guessed; this item goes to another vendor.")
+    if n.landed is None:
+        return box("stop", "Can't be used.", (crit[0].text if crit else "No usable price.") + " Ask the vendor; Open issues drafts the email.")
+    if not n.awardable:
+        return box("check", "Kept out of the award until you confirm it.", crit[0].text if crit else "")
+    if len(n.candidates) > 1 and not n.resolved_by_buyer:
+        opts = " or ".join(f"₹{c['landed']:,.2f}" for c in n.candidates)
+        return box("check", "Needs your check.", f"The vendor's figure could mean {opts} landed. The higher one is used until the vendor "
+                   f"confirms, so a doubt never makes them look cheaper. Confirm it in Open issues.")
+    if not n.spec_compliant and not n.spec_accepted:
+        return box("stop", "Lower spec than asked, so it can't win.", next((f.text for f in crit if f.type == "spec"), ""))
+    if n.vendor not in s.eligible:
+        return box("muted", "Read clearly, but this vendor isn't qualified yet,", "so this price can't win until they pass the questionnaire.")
+    warns = [f.text for f in n.flags if f.severity == "warn"]
+    if warns:
+        return box("check", "Usable, with an assumption to know:", warns[0])
+    return box("good", "Read clearly and used as is.", "Every step from the vendor's words to this price is listed below.")
+
+
 def _evidence(s, n):
     if not n:
         return
     val = "not quoted" if n.landed is None or n.status == "missing" else f"₹{n.landed:,.2f} landed per unit"
-    st.markdown(f"**{n.vendor_name}, {n.line_id}:** {val}")
+    st.markdown(f"**{E(n.vendor_name)}, {n.line_id}:** {val}")
+    st.markdown(_verdict(s, n), unsafe_allow_html=True)
     left, right = st.columns([6, 5], gap="large")
     with left:
         st.markdown("**Steps**")
@@ -1204,7 +1258,7 @@ def page_issues():
                          hide_index=True, width="stretch")
         if st.button("Reset all my decisions"):
             reset_decisions(); refresh(); st.rerun()
-
+    _next("ask", "Next: ask a question about the award")
 
 # ================================================================== Ask a question
 SUGGESTED = [
@@ -1274,7 +1328,7 @@ def page_ask():
     if st.session_state.an_view and st.button("Start a new conversation"):
         st.session_state.an_hist, st.session_state.an_view = [], []
         st.rerun()
-
+    _next("memo", "Next: write the memo and get sign-off")
 
 def _render_outputs(outs):
     for k, o in enumerate(outs):
@@ -1423,7 +1477,7 @@ def page_accuracy():
                                     "Result": lbl.get(x["result"], x["result"])} for x in bad]), hide_index=True, width="stretch")
     models = {ex.get("_meta", {}).get("model") for ex in s.extractions.values()}
     st.caption(f"Read by: {', '.join(m for m in models if m)}")
-
+    _next("board", "Back to the decision board")
 
 # ================================================================== navigation
 pages = {
@@ -1436,7 +1490,8 @@ pages = {
     "Decide": [st.Page(page_memo, title="Award and approvals", icon=":material/verified:", url_path="memo")],
     "Trust": [st.Page(page_accuracy, title="Reading accuracy", icon=":material/fact_check:", url_path="accuracy")],
 }
-st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Decide"][0], "compare": pages["Evaluate"][0]}
+st.session_state["_pages"] = {"issues": pages["Evaluate"][1], "memo": pages["Decide"][0], "compare": pages["Evaluate"][0],
+                               "replies": pages["Collect"][1], "ask": pages["Evaluate"][2], "board": pages["Overview"][0]}
 nav = st.navigation(pages)
 with st.sidebar:
     BOX = ("<svg width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='#FFFFFF' stroke-width='1.8' stroke-linejoin='round'>"
